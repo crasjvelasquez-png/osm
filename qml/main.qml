@@ -139,6 +139,27 @@ ApplicationWindow {
 
     }
 
+    ToolButton {
+        id: defaultsButton
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.margins: 8
+        z: 100
+        text: "⚙"
+        width: 42
+        height: 42
+        ToolTip.visible: hovered
+        ToolTip.text: qsTr("Default settings")
+        Accessible.name: qsTr("Open default settings")
+        onClicked: {
+            var selected = sourceList.selected;
+            var measurement = selected && selected.objectName === "Measurement" ? selected.data : null;
+            defaultsWindow.openFor(measurement, charts.magnitudePlot(), charts.spectrumPlot());
+        }
+    }
+
+    SettingsDefaults { id: defaultsWindow }
+
     About {
         id: aboutpopup
         x: 100

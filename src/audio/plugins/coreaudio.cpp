@@ -240,6 +240,8 @@ QStringList CoreaudioPlugin::getDeviceChannelNames(const int &deviceID, const Di
 Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction &mode, const Format &format,
                               QIODevice *endpoint)
 {
+    if (mode == Direction::Input && !microphoneAccessAllowed()) return nullptr;
+
     AudioStreamBasicDescription streamFormat;
     streamFormat.mSampleRate          = format.sampleRate;
     streamFormat.mFormatID            = kAudioFormatLinearPCM;

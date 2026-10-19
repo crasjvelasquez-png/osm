@@ -28,7 +28,7 @@ using namespace Chart;
 SpectrogramSeriesRenderer::SpectrogramSeriesRenderer() : FrequencyBasedSeriesRenderer(),
     m_min(0), m_mid(0), m_max(0),
     m_pointsPerOctave(0), m_timer(),
-    m_indexBufferId(0), m_sourceSize(0)
+    m_indexBufferId(0), m_sourceSize(0), m_active(true)
 {
 }
 
@@ -87,7 +87,8 @@ void SpectrogramSeriesRenderer::renderSeries()
 
     historyRowData rowData;
     historyRow row;
-    row.time = static_cast<int>(m_timer.restart());
+    row.time = m_timer.isValid() ? static_cast<int>(m_timer.restart()) : 80;
+    if (!m_timer.isValid()) m_timer.start();
     row.data.reserve(m_pointsPerOctave * 11);
     float value = 0.f;
     static const QColor qred("#F44336"), qgreen("#8BC34A"), qblue("#2196F3");
@@ -159,6 +160,7 @@ void SpectrogramSeriesRenderer::renderSeries()
         m_refreshBuffers = true;
     }
 
+    if (history.size() < 2 || history.front().data.empty()) return;
     auto rowSize = history[0].data.size();
     maxIndicesCount = 51 * (2 * rowSize + 2);
     if (m_indices.size() != maxIndicesCount) {
@@ -202,15 +204,17 @@ void SpectrogramSeriesRenderer::renderSeries()
         t += tStep;
         index += rowSize;
     }
-    indicesCount--;
+    // The last row has no following row: omit its strip, whose indices
+    // would otherwise reference vertices beyond the uploaded buffer.
+    indicesCount -= 2 * rowSize + 3;
 
     m_program.setUniformValue(m_matrixUniform, m_matrix);
 
     if (m_openGL33CoreFunctions) {
         if (m_refreshBuffers) {
-            m_openGL33CoreFunctions->glGenBuffers(1, &m_vertexBufferId);
-            m_openGL33CoreFunctions->glGenVertexArrays(1, &m_vertexArrayId);
-            m_openGL33CoreFunctions->glGenBuffers(1, &m_indexBufferId);
+            if (!m_vertexBufferId) m_openGL33CoreFunctions->glGenBuffers(1, &m_vertexBufferId);
+            if (!m_vertexArrayId) m_openGL33CoreFunctions->glGenVertexArrays(1, &m_vertexArrayId);
+            if (!m_indexBufferId) m_openGL33CoreFunctions->glGenBuffers(1, &m_indexBufferId);
         }
 
         m_openGL33CoreFunctions->glBindVertexArray(m_vertexArrayId);
@@ -226,7 +230,7 @@ void SpectrogramSeriesRenderer::renderSeries()
             m_openGL33CoreFunctions->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
                                                            reinterpret_cast<const void *>(2 * sizeof(GLfloat)));
         }
-        m_openGL33CoreFunctions->glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLfloat) * maxIndicesCount,
+        m_openGL33CoreFunctions->glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int) * indicesCount,
                                                  m_indices.data());
         m_openGL33CoreFunctions->glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(GLfloat) * verticiesCount, m_vertices.data());
 

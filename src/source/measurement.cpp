@@ -354,6 +354,7 @@ void Measurement::setDeviceId(const audio::DeviceInfo::Id &deviceId)
     if (!deviceId.isNull() && deviceId != m_deviceId) {
         m_error = false;
         emit errorChanged(m_error);
+        m_lastInputMs.store(0, std::memory_order_relaxed);
         m_deviceId = deviceId;
         emit deviceIdChanged(m_deviceId);
         updateAudio();
@@ -384,12 +385,19 @@ void Measurement::calculateDataLength()
     }
     applyCalibration();
 }
+bool Measurement::inputAvailable() const noexcept
+{
+    const auto lastInput = m_lastInputMs.load(std::memory_order_relaxed);
+    return active() && lastInput > 0 && QDateTime::currentMSecsSinceEpoch() - lastInput < 3000;
+}
+
 void Measurement::setActive(bool newActive)
 {
     if (newActive == active())
         return;
     std::lock_guard<std::mutex> guard(m_dataMutex);
 
+    m_lastInputMs.store(0, std::memory_order_relaxed);
     Abstract::Source::setActive(newActive);
     m_error = false;
     emit errorChanged(m_error);
@@ -471,6 +479,7 @@ void Measurement::writeData(const char *data, qint64 len)
     if (!m_audioStream) {
         return;
     }
+    if (len > 0) m_lastInputMs.store(QDateTime::currentMSecsSinceEpoch(), std::memory_order_relaxed);
     float sample;
     auto totalChanels = m_audioStream->format().channelCount;
     unsigned int currentChanel = 0;
@@ -794,6 +803,8 @@ bool Measurement::loadCalibrationFile(const QUrl &fileName) noexcept
     loadFile.close();
 
     m_calibrationLoaded = (m_calibrationList.count() > 0);
+    if (m_calibrationLoaded)
+        m_calibrationFile = fileName.toLocalFile();
     emit calibrationLoadedChanged(m_calibrationLoaded);
     applyCalibration();
     return m_calibrationLoaded;

@@ -37,6 +37,7 @@ public:
     Q_ENUM(Scale)
 
     Q_PROPERTY(Chart::RTAPlot::Mode mode READ mode WRITE setMode NOTIFY modeChanged)
+    Q_PROPERTY(bool smooth MEMBER m_smooth NOTIFY smoothChanged)
     Q_PROPERTY(bool showPeaks READ showPeaks WRITE setShowPeaks NOTIFY showPeaksChanged)
     Q_PROPERTY(Chart::RTAPlot::Scale scale READ scale WRITE setScale NOTIFY scaleChanged)
 
@@ -59,6 +60,7 @@ public:
 
 
 signals:
+    void smoothChanged();
     void showPeaksChanged(bool);
     void modeChanged(Chart::RTAPlot::Mode);
     void scaleChanged(Chart::RTAPlot::Scale);
@@ -74,6 +76,7 @@ private:
     Mode m_mode;
     Scale m_scale;
     bool m_spline, m_showPeaks;
+    bool m_smooth = false;
 
     class TargetTraceItem : public PaintedItem
     {

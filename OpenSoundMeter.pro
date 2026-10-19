@@ -44,6 +44,7 @@ SOURCES += src/main.cpp \
     src/chart/xyplot.cpp \
     \
     src/common/autosaver.cpp \
+    src/common/defaultscontroller.cpp \
     src/common/recentfilesmodel.cpp \
     src/common/wavfile.cpp \
     src/common/workingfolder.cpp \
@@ -211,6 +212,7 @@ HEADERS += \
     src/generator/wav.h \
     src/inputdevice.h \
     src/common/appearance.h \
+    src/common/defaultscontroller.h \
     src/common/logger.h \
     src/generator/mnoise.h \
     src/common/notifier.h \
@@ -315,11 +317,13 @@ macx {
         src/audio/plugins/coreaudio.h
 
     SOURCES += \
-        src/audio/plugins/coreaudio.cpp
+        src/audio/plugins/coreaudio.cpp \
+        src/audio/plugins/microphonepermission.mm
 
     LIBS += \
         -framework CoreAudio \
-        -framework AudioToolbox
+        -framework AudioToolbox \
+        -framework AVFoundation
 }
 
 ios {

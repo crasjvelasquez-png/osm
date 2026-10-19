@@ -18,10 +18,56 @@
 import QtQuick 2.7
 import QtQuick.Controls 1.4 //SplitView needs exactly 1.4
 import QtQuick.Layouts 1.3
+import QtQuick.Controls 2.15 as Controls
 
 Item {
     id: chartsLayout
     property int count: applicationSettings.value("layout/charts/count", 1)
+    property alias rtaItem: rtaLoader.item
+
+    function magnitudePlot() {
+        if (first.type === "Magnitude") return first.plot;
+        if (second.visible && second.type === "Magnitude") return second.plot;
+        if (third.visible && third.type === "Magnitude") return third.plot;
+        return null;
+    }
+    function spectrumPlot() {
+        if (rtaLoader.item && rtaLoader.item.spectrum) return rtaLoader.item.spectrum;
+        if (first.type === "Spectrum") return first.plot;
+        if (second.visible && second.type === "Spectrum") return second.plot;
+        if (third.visible && third.type === "Spectrum") return third.plot;
+        return null;
+    }
+    function applyDefaults(chart) {
+        if (!chart || !chart.plot) return;
+        if (chart.type === "Magnitude") defaultsController.applyPlotDefaults(chart.plot, "magnitude");
+        else if (chart.type === "Spectrum") defaultsController.applyPlotDefaults(chart.plot, "rta");
+    }
+
+    property bool rtaWorkspace: applicationSettings.value("rta/workspace", false)
+    Connections {
+        target: sourceList
+        // Session files do not opt into a new workspace or change their format.
+        function onLoaded() { chartsLayout.rtaWorkspace = false; }
+    }
+    onRtaWorkspaceChanged: applicationSettings.setValue("rta/workspace", rtaWorkspace)
+
+    Controls.Button {
+        id: workspaceAction
+        anchors.top: parent.top
+        anchors.left: parent.left
+        text: chartsLayout.rtaWorkspace ? qsTr("Return to chart layout") : qsTr("RTA")
+        onClicked: chartsLayout.rtaWorkspace = !chartsLayout.rtaWorkspace
+    }
+    Loader {
+        id: rtaLoader
+        anchors.top: workspaceAction.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        active: chartsLayout.rtaWorkspace
+        source: "qrc:/RTAWorkspace.qml"
+    }
 
     Component.onCompleted: {
         chartsLayout.onCountChanged.connect(updateCount);
@@ -38,7 +84,11 @@ Item {
 
     SplitView {
         id: sv
-        anchors.fill: parent
+        anchors.top: workspaceAction.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        visible: !chartsLayout.rtaWorkspace
         orientation: Qt.Vertical
         readonly property int minimunHeight: 100
 
@@ -52,9 +102,11 @@ Item {
              onHeightChanged: applicationSettings.setValue("layout/charts/1/height", height)
              type: applicationSettings.value("layout/charts/1/type", "Spectrum")
              onTypeChanged: applicationSettings.setValue("layout/charts/1/type", type)
+             onPlotChanged: Qt.callLater(function() { chartsLayout.applyDefaults(first); })
 
              Component.onCompleted: {
                  settings = applicationSettings.getGroup("layout/charts/1");
+                 Qt.callLater(function() { chartsLayout.applyDefaults(first); });
              }
          }
 
@@ -68,9 +120,11 @@ Item {
              onHeightChanged: applicationSettings.setValue("layout/charts/2/height", height)
              type: applicationSettings.value("layout/charts/2/type", "Spectrum")
              onTypeChanged: applicationSettings.setValue("layout/charts/2/type", type)
+             onPlotChanged: Qt.callLater(function() { chartsLayout.applyDefaults(second); })
 
              Component.onCompleted: {
                  settings = applicationSettings.getGroup("layout/charts/2");
+                 Qt.callLater(function() { chartsLayout.applyDefaults(second); });
              }
          }
 
@@ -84,9 +138,11 @@ Item {
              onHeightChanged: applicationSettings.setValue("layout/charts/3/height", height)
              type: applicationSettings.value("layout/charts/3/type", "Spectrum")
              onTypeChanged: applicationSettings.setValue("layout/charts/3/type", type)
+             onPlotChanged: Qt.callLater(function() { chartsLayout.applyDefaults(third); })
 
              Component.onCompleted: {
                  settings = applicationSettings.getGroup("layout/charts/3");
+                 Qt.callLater(function() { chartsLayout.applyDefaults(third); });
              }
          }
 

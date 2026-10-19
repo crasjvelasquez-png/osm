@@ -27,6 +27,8 @@ Item {
     id: chartview
     property alias type: chart.type
     property alias settings: chart.settings
+    property alias plot: chart.plot
+    property bool typeLocked: false
 
     VariableChart {
         id: chart
@@ -385,6 +387,7 @@ Item {
     }
 
     DropDown {
+        visible: !chartview.typeLocked
         anchors.top: parent.top
         anchors.right: parent.right
         implicitWidth: 145

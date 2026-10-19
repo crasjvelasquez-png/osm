@@ -699,8 +699,12 @@ QUuid SourceList::firstChecked() const noexcept
 
 bool SourceList::loadList(const QJsonDocument &document, const QUrl &fileName) noexcept
 {
+    m_loadingProject = true;
+    emit loadingProjectChanged();
     fromJSON( document["list"].toArray(), this );
     setSelected(document["selected"].toInt(-1));
+    m_loadingProject = false;
+    emit loadingProjectChanged();
 
     emit loaded(fileName);
     return true;

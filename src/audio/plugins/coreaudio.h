@@ -22,6 +22,8 @@
 
 namespace audio {
 
+bool microphoneAccessAllowed();
+
 class CoreaudioPlugin : public Plugin
 {
     Q_OBJECT

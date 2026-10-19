@@ -5,6 +5,8 @@
         <file alias="source/Measurement.qml">qml/source/Measurement.qml</file>
         <file alias="Chart.qml">qml/Chart.qml</file>
         <file alias="Charts.qml">qml/Charts.qml</file>
+        <file alias="RTAWorkspace.qml">qml/RTAWorkspace.qml</file>
+        <file alias="SettingsDefaults.qml">qml/SettingsDefaults.qml</file>
         <file alias="SideBar.qml">qml/SideBar.qml</file>
         <file alias="GeneratorProperties.qml">qml/GeneratorProperties.qml</file>
         <file alias="PropetiesBar.qml">qml/PropetiesBar.qml</file>

@@ -19,6 +19,7 @@
 #define RTASERIES_H
 
 #include <QQuickFramebufferObject>
+#include <QElapsedTimer>
 #include <QOpenGLShaderProgram>
 
 #include "frequencybasedseriesrenderer.h"
@@ -46,6 +47,10 @@ protected:
 
 private:
     void initShaders();
+    bool m_smooth = false;
+    QElapsedTimer m_frameTimer;
+    std::vector<float> m_displayModules;
+    float displayModule(unsigned int i) const { return m_smooth ? m_displayModules[i] : m_source->module(i); }
 
     bool m_showPeaks, m_inited;
     unsigned int m_pointsPerOctave;

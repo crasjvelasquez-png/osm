@@ -106,6 +106,7 @@ void RTASeriesRenderer::synchronize(QQuickFramebufferObject *item)
             m_scale = plot->scale();
         }
         m_showPeaks = plot->showPeaks();
+        m_smooth = plot->property("smooth").toBool();
     }
 }
 void RTASeriesRenderer::updateMatrix()
@@ -120,6 +121,27 @@ void RTASeriesRenderer::renderSeries()
     if (!m_source->active() || !m_source->frequencyDomainSize())
         return;
 
+    // Ease only the displayed spectrum; measurement values and peak detection stay untouched.
+    if (m_smooth) {
+        const auto size = m_source->frequencyDomainSize();
+        const float dt = m_frameTimer.isValid() ? m_frameTimer.restart() : 16.f;
+        if (!m_frameTimer.isValid()) m_frameTimer.start();
+        // After an idle frame, start a fresh transition rather than jumping
+        // most of the way to a newly arrived measurement.
+        const float blend = 1.f - std::exp(-(dt > 50.f ? 16.f : dt) / 45.f);
+        const bool reset = m_displayModules.size() != size || m_refreshBuffers;
+        m_displayModules.resize(size);
+        bool moving = false;
+        for (unsigned int i = 0; i < size; ++i) {
+            const float target = std::max(m_source->module(i), 1e-12f);
+            float previous = reset ? target : m_displayModules[i];
+            // Interpolate in dB so quiet and loud bands share the same response time.
+            const float delta = std::log(target / std::max(previous, 1e-12f));
+            moving |= std::abs(delta) > 0.002f;
+            m_displayModules[i] = previous * std::exp(blend * delta);
+        }
+        if (moving) update();
+    }
     m_program.setUniformValue(m_matrixUniform, m_matrix);
     m_program.setUniformValue(m_screenUniform, m_width, m_height);
     m_program.setUniformValue(m_widthUniform, m_weight * m_retinaScale);
@@ -168,7 +190,7 @@ void RTASeriesRenderer::renderLine()
     Math::EqualLoudnessContour elc;
     if (m_openGL33CoreFunctions) {
         for (unsigned int i = 0, j = 0; i < count; ++i, j += 2) {
-            auto value = 20 * log10f(m_source->module(i)) + offset;
+            auto value = 20 * log10f(displayModule(i)) + offset;
             if (m_scale == RTAPlot::Scale::Phon) {
                 value = elc.phone(m_source->frequency(i), value + LEVEL_NORMALIZATION) - LEVEL_NORMALIZATION;
             }
@@ -182,8 +204,8 @@ void RTASeriesRenderer::renderLine()
         unsigned int j = 0, i, verticiesCount = 0;
         for (i = 0; i < m_source->frequencyDomainSize() - 1; ++i) {
 
-            auto value1 = 20 * log10f(m_source->module(i)) + offset;
-            auto value2 = 20 * log10f(m_source->module(i)) + offset;
+            auto value1 = 20 * log10f(displayModule(i)) + offset;
+            auto value2 = 20 * log10f(displayModule(i + 1)) + offset;
             if (m_scale == RTAPlot::Scale::Phon) {
                 value1 = elc.phone(m_source->frequency(i    ), value1 + LEVEL_NORMALIZATION) - LEVEL_NORMALIZATION;
                 value2 = elc.phone(m_source->frequency(i + 1), value2 + LEVEL_NORMALIZATION) - LEVEL_NORMALIZATION;
@@ -221,7 +243,7 @@ void RTASeriesRenderer::renderPPOLine()
         if (i == 0) {
             return ;
         }
-        value += m_source->module(i) * m_source->module(i);
+        value += displayModule(i) * displayModule(i);
     };
 
     unsigned int i = 0, verticiesCount = 0;
@@ -285,7 +307,7 @@ void RTASeriesRenderer::renderBars()
             return ;
         }
 
-        value += m_source->module(i) * m_source->module(i);
+        value += displayModule(i) * displayModule(i);
         peak = std::max(peak, m_source->peakSquared(i));
     };
 
@@ -381,8 +403,8 @@ void RTASeriesRenderer::renderBars()
 void RTASeriesRenderer::drawVertices(const GLsizei &count, const GLenum &mode)
 {
     if (m_refreshBuffers) {
-        m_openGL33CoreFunctions->glGenBuffers(1, &m_vertexBufferId);
-        m_openGL33CoreFunctions->glGenVertexArrays(1, &m_vertexArrayId);
+        if (!m_vertexBufferId) m_openGL33CoreFunctions->glGenBuffers(1, &m_vertexBufferId);
+        if (!m_vertexArrayId) m_openGL33CoreFunctions->glGenVertexArrays(1, &m_vertexArrayId);
     }
 
     m_openGL33CoreFunctions->glBindVertexArray(m_vertexArrayId);
@@ -425,7 +447,7 @@ void RTASeriesRenderer::renderLines()
     if (m_openGL33CoreFunctions) {
         for (unsigned int i = 0, j = 0; i < count; ++i, j += 4) {
 
-            auto value = 20 * log10f(m_source->module(i)) + offset;
+            auto value = 20 * log10f(displayModule(i)) + offset;
             if (m_scale == RTAPlot::Scale::Phon) {
                 value = elc.phone(m_source->frequency(i), value + LEVEL_NORMALIZATION) - LEVEL_NORMALIZATION;
             }
@@ -454,7 +476,7 @@ void RTASeriesRenderer::renderLines()
         float peak;
         for (unsigned int i = 0; i < m_source->frequencyDomainSize(); ++i) {
 
-            auto value = 20 * log10f(m_source->module(i)) + offset;
+            auto value = 20 * log10f(displayModule(i)) + offset;
             if (m_scale == RTAPlot::Scale::Phon) {
                 value = elc.phone(m_source->frequency(i), value + LEVEL_NORMALIZATION) - LEVEL_NORMALIZATION;
             }

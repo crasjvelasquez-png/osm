@@ -23,6 +23,6 @@ DropDown {
     property string tooltip : ""
 
     displayText: (title ? title + ": " : "") + currentText
-    ToolTip.visible: (tooltip ? hovered : none)
+    ToolTip.visible: (tooltip ? hovered : false)
     ToolTip.text: tooltip
 }

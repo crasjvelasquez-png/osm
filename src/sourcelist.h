@@ -43,6 +43,7 @@ class SourceList : public QObject
     Q_PROPERTY(Shared::Source selected READ selected NOTIFY selectedChanged)
     Q_PROPERTY(QColor highlightColor READ highlightColor NOTIFY selectedChanged)
     Q_PROPERTY(bool isRoot READ isRoot CONSTANT)
+    Q_PROPERTY(bool loadingProject READ loadingProject NOTIFY loadingProjectChanged)
     using iterator = QVector<Shared::Source>::iterator;
     using const_iterator = QVector<Shared::Source>::const_iterator;
 
@@ -99,6 +100,7 @@ public:
     {
         return !!parent();
     }
+    bool loadingProject() const noexcept { return m_loadingProject; }
 
     enum {
         TRANSFER_TXT    = 0,
@@ -153,6 +155,7 @@ signals:
     void loaded(QUrl fileName);
 
     void countChanged();
+    void loadingProjectChanged();
 
 private:
     bool loadList(const QJsonDocument &document, const QUrl &fileName) noexcept;
@@ -174,6 +177,7 @@ private:
     int m_colorIndex;
     int m_selected;
     mutable std::mutex m_mutex;
+    bool m_loadingProject = false;
 };
 
 #endif // SOURCELIST_H

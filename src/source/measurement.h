@@ -77,11 +77,14 @@ class Measurement : public Abstract::Source, public Meta::Measurement
     Q_PROPERTY(long estimated READ estimated NOTIFY estimatedChanged)
     Q_PROPERTY(long estimatedDelta READ estimatedDelta NOTIFY estimatedChanged)
 
+    Q_PROPERTY(bool inputAvailable READ inputAvailable NOTIFY levelChanged)
+
     Q_PROPERTY(bool error MEMBER m_error NOTIFY errorChanged)
 
     //calibration
     Q_PROPERTY(bool calibrationLoaded READ calibrationLoaded NOTIFY calibrationLoadedChanged)
     Q_PROPERTY(bool calibration READ calibration WRITE setCalibration NOTIFY calibrationChanged)
+    Q_PROPERTY(QString calibrationFile READ calibrationFile NOTIFY calibrationLoadedChanged)
 
     Q_PROPERTY(Meta::Measurement::InputFilter inputFilter READ inputFilter WRITE setInputFilter NOTIFY inputFilterChanged)
 
@@ -102,6 +105,7 @@ public:
     float peak(const Weighting::Curve curve = Weighting::Z, const Meter::Time time = Meter::Fast) const override;
     float referenceLevel() const override;
 
+    bool inputAvailable() const noexcept;
     float measurementPeak() const;
     float referencePeak() const;
 
@@ -115,6 +119,7 @@ public:
     bool calibrationLoaded() const noexcept;
     void setCalibration(bool c) noexcept;
     Q_INVOKABLE bool loadCalibrationFile(const QUrl &fileName) noexcept;
+    QString calibrationFile() const noexcept { return m_calibrationFile; }
 
     audio::DeviceInfo::Id deviceId() const;
     void setDeviceId(const audio::DeviceInfo::Id &deviceId);
@@ -156,6 +161,7 @@ private:
     unsigned int m_delayFinderCounter;
     long m_estimatedDelay;
     bool m_error;
+    std::atomic<qint64> m_lastInputMs {0};
     std::atomic<bool>       m_onReset;
 
     Container::Circular<float> m_data, m_reference, m_loopBuffer;
@@ -190,6 +196,7 @@ private:
     QList<QVector<float>> m_calibrationList;
     QVector<float> m_calibrationGain;
     QVector<float> m_calibrationPhase;
+    QString m_calibrationFile;
     void applyCalibration();
 
     std::pair<std::shared_ptr<math::Filter>, std::shared_ptr<math::Filter>> m_inputFilters;

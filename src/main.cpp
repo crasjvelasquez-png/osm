@@ -39,6 +39,7 @@
 #include "audio/devicemodel.h"
 #include "common/appearance.h"
 #include "common/autosaver.h"
+#include "common/defaultscontroller.h"
 #include "filesystem/dialog.h"
 #include "remote/server.h"
 #include "remote/remoteclient.h"
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
     auto generator = std::make_shared<Generator>(settings.getGroup("generator"));
     Shared::SourceList sourceList = std::make_shared<SourceList>();
     AutoSaver autoSaver(settings.getGroup("autosaver"), sourceList);
+    DefaultsController defaultsController(settings.getGroup("defaults"), sourceList.get());
     auto t = new TargetTrace(settings.getGroup("targettrace"));
     auto notifier = Notifier::getInstance();
 
@@ -133,6 +135,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("notifier", notifier);
 
     engine.rootContext()->setContextProperty("autoSaver", &autoSaver);
+    engine.rootContext()->setContextProperty("defaultsController", &defaultsController);
 
     engine.rootContext()->setContextProperty("remoteServer", &server);
     engine.rootContext()->setContextProperty("remoteClient", &client);
