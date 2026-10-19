@@ -16,13 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import QtQuick 2.12
-import QtQuick.Controls 2.12
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.1
 
 Popup {
     id: popup
     modal: true
+    Overlay.modal: Rectangle { color: applicationAppearance.darkMode ? "#99000000" : "#55000000" }
+    background: Rectangle { radius: 6; color: applicationWindow.ui.panel; border.color: applicationWindow.ui.separator }
     focus: true
     padding: 25
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import QtQuick 2.0
-import QtQuick.Controls 2.1
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.2
 
@@ -30,6 +30,7 @@ Popup {
     y: (parent ? (parent.height - height) / 2 : 100)
 
     modal: true
+    Overlay.modal: Rectangle { color: applicationAppearance.darkMode ? "#99000000" : "#55000000" }
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
@@ -41,8 +42,9 @@ Popup {
 
     Rectangle {
         anchors.fill: parent
-        border.width: 4
-        radius: 4
+        color: applicationWindow.ui.panel
+        border.width: 1
+        radius: 6
         border.color: popup.color;
         anchors.margins: 8
 
@@ -54,6 +56,7 @@ Popup {
             wrapMode: Text.Wrap
             textFormat: Text.RichText
             text: popup.text
+            color: applicationWindow.ui.text
         }
     }
 

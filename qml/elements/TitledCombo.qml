@@ -21,8 +21,9 @@ import QtQuick.Controls 2.12
 DropDown {
     property string title : ""
     property string tooltip : ""
+    property bool showTitleInValue: true
 
-    displayText: (title ? title + ": " : "") + currentText
+    displayText: (showTitleInValue && title ? title + ": " : "") + currentText
     ToolTip.visible: (tooltip ? hovered : false)
     ToolTip.text: tooltip
 }

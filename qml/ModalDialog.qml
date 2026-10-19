@@ -22,6 +22,8 @@ Dialog {
     id: dialog
     title: ""
     modal: true
+    Overlay.modal: Rectangle { color: applicationAppearance.darkMode ? "#99000000" : "#55000000" }
+    background: Rectangle { radius: 6; color: applicationWindow.ui.panel; border.color: applicationWindow.ui.separator }
     focus: true
     x: (parent ? (parent.width  - width) / 2 : 100)
     y: (parent ? (parent.height - height) / 2 : 100)

@@ -19,6 +19,8 @@ import QtQuick 2.7
 import QtQuick.Controls 2.12
 
 Item {
+    Rectangle { anchors.fill: parent; color: applicationWindow.ui.panel; z: -1 }
+    Rectangle { anchors.left: parent.left; anchors.right: parent.right; height: 1; color: applicationWindow.ui.separator }
     property alias stack: propertiesStack
     property var currentObject : null
     property var currentQml : null
@@ -26,7 +28,7 @@ Item {
     StackView {
         id: propertiesStack
         anchors.fill: parent
-        anchors.margins: 5
+        anchors.margins: 16
         initialItem: topView
 
         replaceEnter: Transition {
@@ -54,7 +56,7 @@ Item {
             horizontalAlignment: Label.AlignHCenter
             verticalAlignment: Label.AlignVCenter
 
-            text: qsTr("Select an item in the right bar to change its properties")
+            text: qsTr("Select a source or chart to view its settings.")
         }
     }
 

@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.13
 
 TextField {
+    id: control
     property var target //Shared::Source
 
     placeholderText: qsTr("title")
@@ -28,6 +29,14 @@ TextField {
     ToolTip.text: qsTr("title")
 
     selectByMouse: true
+    implicitHeight: 36
+    font.pixelSize: 14
+    background: Rectangle {
+        radius: 6
+        color: control.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control
+        border.width: control.activeFocus ? 2 : 1
+        border.color: control.activeFocus ? applicationWindow.accentColor : applicationWindow.ui.separator
+    }
     onFocusChanged: {
         if (focus) {
             selectAll();

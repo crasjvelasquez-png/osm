@@ -54,6 +54,8 @@ Item {
 
             Label {
                 Layout.fillWidth: true
+                Layout.rightMargin: dataModelData && dataModelData.cloneable ? 62 : 28
+                elide: Text.ElideRight
                 font.bold: highlight
                 text:  (dataModelData ? dataModelData.name : "")
             }

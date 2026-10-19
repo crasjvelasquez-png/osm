@@ -32,7 +32,7 @@ Item {
     property bool editable: true
     property bool indicators: true
     property bool background: true
-    property int implicitWidth: 120
+    property int implicitWidth: 160
     property int fontSize: spinbox.font.pixelSize
     property int bottomPadding: spinbox.bottomPadding
 
@@ -70,7 +70,7 @@ Item {
             //if indicators is true use default value
             if (!indicators) {
                 down.indicator.width = 0;
-                up.indicator.height = 0;
+                up.indicator.width = 0;
                 spacing = 0;
             }
             if (!floatspinbox.background) {

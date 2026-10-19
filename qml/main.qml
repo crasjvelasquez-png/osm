@@ -39,6 +39,15 @@ ApplicationWindow {
     property string backgroundColor: Material.backgroundColor
     property string accentColor: Material.accent
     property string foregroundColor: Material.foreground
+    readonly property QtObject ui: QtObject {
+        readonly property color shell: applicationAppearance.darkMode ? "#202226" : "#ECEEF1"
+        readonly property color panel: applicationAppearance.darkMode ? "#292C31" : "#F7F8FA"
+        readonly property color control: applicationAppearance.darkMode ? "#31353B" : "#FFFFFF"
+        readonly property color hover: applicationAppearance.darkMode ? "#3B4048" : "#E8ECF2"
+        readonly property color separator: applicationAppearance.darkMode ? "#41464F" : "#D0D5DD"
+        readonly property color text: applicationAppearance.darkMode ? "#F0F2F5" : "#20252D"
+        readonly property color secondaryText: applicationAppearance.darkMode ? "#B7BEC8" : "#5C6573"
+    }
     readonly property bool narrowWindow: width < 1024
 
     visible: true
@@ -64,12 +73,12 @@ ApplicationWindow {
     minimumWidth: 768
     minimumHeight: 540
     visibility: applicationAppearance.visibility
-    color: applicationAppearance.darkMode ? Material.backgroundColor : "#FFFFFF"
+    color: ui.shell
     Material.theme: applicationAppearance.darkMode ? Material.Dark : Material.Light
     Material.accent: Material.Indigo
 
     Rectangle {
-        color: applicationAppearance.darkMode ? Material.backgroundColor : "#ECECEC"
+        color: applicationWindow.ui.shell
         height: applicationWindow.height
         anchors.fill: parent
         z: -1
@@ -126,7 +135,8 @@ ApplicationWindow {
             id: righttab
             Layout.fillHeight: true
             Layout.rowSpan: applicationWindow.narrowWindow ? 1 : 2
-            width: 200
+            Layout.preferredWidth: 240
+            Layout.minimumWidth: 240
         }
 
         //Properties area
@@ -137,25 +147,6 @@ ApplicationWindow {
             Layout.columnSpan: applicationWindow.narrowWindow ? 2 : 1
         }
 
-    }
-
-    ToolButton {
-        id: defaultsButton
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.margins: 8
-        z: 100
-        text: "⚙"
-        width: 42
-        height: 42
-        ToolTip.visible: hovered
-        ToolTip.text: qsTr("Default settings")
-        Accessible.name: qsTr("Open default settings")
-        onClicked: {
-            var selected = sourceList.selected;
-            var measurement = selected && selected.objectName === "Measurement" ? selected.data : null;
-            defaultsWindow.openFor(measurement, charts.magnitudePlot(), charts.spectrumPlot());
-        }
     }
 
     SettingsDefaults { id: defaultsWindow }

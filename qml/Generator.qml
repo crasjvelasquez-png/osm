@@ -84,6 +84,9 @@ Item {
                 background: false
 
                 width: 45
+                Layout.preferredWidth: 45
+                Layout.minimumWidth: 45
+                Layout.maximumWidth: 45
                 bottomPadding: 8
                 fontSize: label.font.pixelSize
 

@@ -32,7 +32,7 @@ Item {
                 checkable: true
                 text: qsTr("Server")
                 checked: remoteServer.active
-                Material.background: parent.Material.background
+                Material.background: applicationWindow.ui.control
                 onCheckedChanged: {
                     remoteServer.active = checked;
                 }
@@ -42,7 +42,7 @@ Item {
                 checkable: true
                 text: qsTr("Generator")
                 checked: remoteServer.generatorEnable
-                Material.background: parent.Material.background
+                Material.background: applicationWindow.ui.control
                 onCheckedChanged: {
                     remoteServer.generatorEnable = checked;
                 }
@@ -61,7 +61,7 @@ Item {
             Button {
                 text: qsTr("About remote control")
                 Layout.preferredWidth: 200
-                Material.background: parent.Material.background
+                Material.background: applicationWindow.ui.control
 
                 onClicked:  {
                     Qt.openUrlExternally("https://opensoundmeter.com/api");
@@ -73,7 +73,7 @@ Item {
             Button {
                 checkable: true
                 text: qsTr("Client")
-                Material.background: parent.Material.background
+                Material.background: applicationWindow.ui.control
                 checked: remoteClient.active
                 onCheckedChanged: {
                     remoteClient.active = checked;
@@ -85,7 +85,7 @@ Item {
                 font.bold: false
                 text: "\ue808"
 
-                Material.background: parent.Material.background
+                Material.background: applicationWindow.ui.control
                 onClicked: remoteClient.reset()
             }
         }

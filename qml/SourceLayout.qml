@@ -253,6 +253,8 @@ ListView {
                     anchors.top: parent.top
                     flat: true
                     font.pixelSize: 14
+                    width: 28
+                    height: 28
                     rightPadding: 4
                     leftPadding: 4
                     visible: (dragArea.source && dragArea.source.data ? dragArea.source.data.cloneable : false)
@@ -283,6 +285,8 @@ ListView {
                     anchors.top: parent.top
                     flat: true
                     font.pixelSize: 14
+                    width: 28
+                    height: 28
                     rightPadding: 4
                     leftPadding: 4
                     onClicked: {
@@ -352,10 +356,9 @@ ListView {
     currentIndex: -1
     highlight: Rectangle {
         z: 2
-        border.color: sources.highlightColor
-        border.width: 0.5
         visible: sources.selectedIndex >= 0 ? true : false
-        color: "transparent"
+        color: Qt.rgba(sources.highlightColor.r, sources.highlightColor.g, sources.highlightColor.b, 0.12)
+        Rectangle { width: 2; height: parent.height; color: sources.highlightColor }
     }
 
     Item {

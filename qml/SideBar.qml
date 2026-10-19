@@ -37,6 +37,8 @@ import "source"
  * For detail settings the bottom bar is used.
  */
 Item {
+    Rectangle { anchors.fill: parent; color: applicationWindow.ui.panel; z: -1 }
+    Rectangle { anchors.left: parent.left; anchors.top: parent.top; anchors.bottom: parent.bottom; width: 1; color: applicationWindow.ui.separator }
     property Item list : sideList
     property int colorIndex: 6;
 
@@ -45,10 +47,14 @@ Item {
         spacing: 5
 
         RowLayout {
-            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
+            spacing: 8
+
             DropDown {
                 id: chartsCount
-                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
                 model: ["Single", "Double", "Three"]
                 currentIndex: charts.count - 1
                 onCurrentIndexChanged: {
@@ -81,6 +87,21 @@ Item {
                 flat: true
                 onClicked: applicationWindow.sideMenu.open();
                 visible: applicationAppearance.showMenuBar ? false : true
+            }
+            ToolButton {
+                Layout.preferredWidth: 32
+                Layout.preferredHeight: 32
+                Layout.alignment: Qt.AlignVCenter
+                text: "⚙"
+                font.pixelSize: 16
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Default settings")
+                Accessible.name: qsTr("Open default settings")
+                onClicked: {
+                    var selected = sourceList.selected;
+                    var measurement = selected && selected.objectName === "Measurement" ? selected.data : null;
+                    defaultsWindow.openFor(measurement, charts.magnitudePlot(), charts.spectrumPlot());
+                }
             }
         }
 

@@ -21,6 +21,14 @@ import QtQuick.Controls 2.15
 
 ComboBox {
     id: control
+    implicitHeight: 36
+    font.pixelSize: 14
+    background: Rectangle {
+        radius: 6
+        color: control.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control
+        border.width: control.activeFocus ? 2 : 1
+        border.color: control.activeFocus ? applicationWindow.accentColor : applicationWindow.ui.separator
+    }
 
     Connections {
         target: control.popup.exit
@@ -54,7 +62,7 @@ ComboBox {
     Text {
         id: text
         text: ""
-        font.pixelSize: 18
+        font: control.font
         visible: false
     }
 }

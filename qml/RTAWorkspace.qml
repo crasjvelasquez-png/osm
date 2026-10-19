@@ -1,6 +1,7 @@
 /* Dedicated spectrum workspace; analysis remains owned by the selected source. */
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.3
 import Audio 1.0
 import "elements"
@@ -82,6 +83,7 @@ Item {
             }
             Button {
                 id: controlsAction
+                font.capitalization: Font.MixedCase
                 text: workspace.showControls ? qsTr("Hide controls") : qsTr("Input & display")
                 onClicked: workspace.showControls = !workspace.showControls
             }
@@ -91,113 +93,170 @@ Item {
                 onClicked: workspace.showHeatmap = checked
             }
         }
-        Label { text: workspace.stateText; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: statusLabel.implicitHeight + 16
+            radius: 6
+            color: applicationWindow.ui.panel
+            border.color: workspace.measurement && (!workspace.available || workspace.measurement.error) ?
+                Material.color(Material.Orange) : applicationWindow.ui.separator
+            Label {
+                id: statusLabel
+                anchors.fill: parent
+                anchors.margins: 8
+                text: workspace.stateText
+                color: workspace.measurement && (!workspace.available || workspace.measurement.error) ?
+                    Material.color(Material.Orange) : applicationWindow.ui.secondaryText
+                wrapMode: Text.WordWrap
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
         ScrollView {
             Layout.fillWidth: true
             visible: workspace.showControls
-            Layout.preferredHeight: Math.min(180, workspace.height * 0.32)
+            Layout.preferredHeight: Math.min(240, workspace.height * 0.32)
             clip: true
             contentWidth: availableWidth
             contentHeight: controls.implicitHeight
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             ColumnLayout {
                 id: controls
-                width: workspace.width - 32
+                width: Math.max(0, workspace.width - 32)
         // Flow wraps complete controls instead of clipping long device names.
         Flow {
             Layout.fillWidth: true
             Layout.preferredHeight: childrenRect.height
             spacing: 8
-            TitledCombo {
-                width: Math.min(280, parent.width)
-                title: qsTr("Device")
-                model: devices
-                textRole: "name"
-                currentIndex: workspace.deviceIndex
-                enabled: !!workspace.measurement
-                onActivated: workspace.measurement.deviceId = devices.deviceId(index)
-                tooltip: currentText
-            }
-            TitledCombo {
-                width: 180
-                title: qsTr("Input")
-                model: workspace.channels
-                currentIndex: workspace.measurement ? workspace.measurement.dataChanel : -1
-                enabled: !!workspace.measurement && workspace.deviceIndex >= 0
-                onActivated: workspace.measurement.dataChanel = index
-            }
             Column {
-                width: 160
-                Label { text: qsTr("Input meter • dBFS") }
-                Meter {
-                    width: parent.width
-                    height: 8
-                    dBV: workspace.available && workspace.measurement.active && workspace.measurement.inputAvailable && !workspace.measurement.error ? workspace.measurement.level : -90
-                    peak: workspace.available && workspace.measurement.active && workspace.measurement.inputAvailable && !workspace.measurement.error ? workspace.measurement.measurementPeak : -90
+                width: Math.min(240, parent.width); spacing: 4
+                Label { text: qsTr("Device"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                TitledCombo {
+                    width: parent.width; height: 36; showTitleInValue: false
+                    title: qsTr("Device"); model: devices; textRole: "name"
+                    currentIndex: workspace.deviceIndex
+                    enabled: !!workspace.measurement
+                    onActivated: workspace.measurement.deviceId = devices.deviceId(index)
+                    tooltip: currentText
                 }
             }
-            Button {
-                text: workspace.measurement && workspace.measurement.active ? qsTr("Stop") : qsTr("Start")
-                enabled: !!workspace.measurement && (workspace.available || workspace.measurement.active)
-                onClicked: workspace.measurement.active = !workspace.measurement.active
+            Column {
+                width: Math.min(96, parent.width); spacing: 4
+                Label { text: qsTr("Input"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                TitledCombo {
+                    width: parent.width; height: 36; showTitleInValue: false
+                    title: qsTr("Input"); model: workspace.channels
+                    currentIndex: workspace.measurement ? workspace.measurement.dataChanel : -1
+                    enabled: !!workspace.measurement && workspace.deviceIndex >= 0
+                    onActivated: workspace.measurement.dataChanel = index
+                }
             }
-            Button {
-                text: qsTr("Measurement settings")
-                enabled: !!workspace.measurement
-                onClicked: applicationWindow.properiesbar.open(workspace.selected, "qrc:/source/MeasurementProperties.qml")
+            Column {
+                width: Math.min(144, parent.width); spacing: 4
+                Label { text: qsTr("Input meter • dBFS"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                Item {
+                    width: parent.width; height: 36
+                    Meter {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width; height: 8
+                        dBV: workspace.available && workspace.measurement.active && workspace.measurement.inputAvailable && !workspace.measurement.error ? workspace.measurement.level : -90
+                        peak: workspace.available && workspace.measurement.active && workspace.measurement.inputAvailable && !workspace.measurement.error ? workspace.measurement.measurementPeak : -90
+                    }
+                }
+            }
+            Column {
+                width: Math.min(72, parent.width); spacing: 4
+                Label { text: qsTr("Capture"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                Button {
+                    width: parent.width; height: 36
+                    font.capitalization: Font.MixedCase
+                    text: workspace.measurement && workspace.measurement.active ? qsTr("Stop") : qsTr("Start")
+                    enabled: !!workspace.measurement && (workspace.available || workspace.measurement.active)
+                    onClicked: workspace.measurement.active = !workspace.measurement.active
+                }
+            }
+            Column {
+                width: Math.min(168, parent.width); spacing: 4
+                Label { text: qsTr("Settings"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                Button {
+                    width: parent.width; height: 36
+                    font.pixelSize: 12
+                    font.capitalization: Font.MixedCase
+                    text: qsTr("Measurement settings")
+                    enabled: !!workspace.measurement
+                    onClicked: applicationWindow.properiesbar.open(workspace.selected, "qrc:/source/MeasurementProperties.qml")
+                }
             }
         }
         Flow {
             Layout.fillWidth: true
             Layout.preferredHeight: childrenRect.height
             spacing: 8
-            TitledCombo {
-                width: 160
-                title: qsTr("Display")
-                model: [qsTr("Line"), qsTr("Bars"), qsTr("Lines")]
-                currentIndex: workspace.spectrum ? workspace.spectrum.mode : 0
-                onActivated: {
-                    workspace.spectrum.mode = index;
-                    if (index === 1 && workspace.spectrum.pointsPerOctave === 0)
-                        workspace.spectrum.pointsPerOctave = 12;
+            Column {
+                width: Math.min(144, parent.width); spacing: 4
+                Label { text: qsTr("Display"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                TitledCombo {
+                    width: parent.width; height: 36; showTitleInValue: false
+                    title: qsTr("Display")
+                    model: [qsTr("Line"), qsTr("Bars"), qsTr("Lines")]
+                    currentIndex: workspace.spectrum ? workspace.spectrum.mode : 0
+                    onActivated: {
+                        workspace.spectrum.mode = index;
+                        if (index === 1 && workspace.spectrum.pointsPerOctave === 0)
+                            workspace.spectrum.pointsPerOctave = 12;
+                    }
                 }
             }
-            TitledCombo {
-                width: 180
-                title: qsTr("Resolution")
-                property var values: [1, 3, 6, 12, 24, 48, 0]
-                model: [qsTr("1 octave"), qsTr("1/3 octave"), qsTr("1/6 octave"), qsTr("1/12 octave"), qsTr("1/24 octave"), qsTr("1/48 octave"), qsTr("FFT bins")]
-                currentIndex: workspace.spectrum ? values.indexOf(workspace.spectrum.pointsPerOctave) : -1
-                enabled: workspace.spectrum && workspace.spectrum.mode !== 2
-                onActivated: {
-                    workspace.spectrum.pointsPerOctave = values[index];
-                    if (values[index] === 0 && workspace.spectrum.mode === 1) workspace.spectrum.mode = 0;
+            Column {
+                width: Math.min(176, parent.width); spacing: 4
+                Label { text: qsTr("Resolution"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                TitledCombo {
+                    width: parent.width; height: 36; showTitleInValue: false
+                    title: qsTr("Resolution")
+                    property var values: [1, 3, 6, 12, 24, 48, 0]
+                    model: [qsTr("1 octave"), qsTr("1/3 octave"), qsTr("1/6 octave"), qsTr("1/12 octave"), qsTr("1/24 octave"), qsTr("1/48 octave"), qsTr("FFT bins")]
+                    currentIndex: workspace.spectrum ? values.indexOf(workspace.spectrum.pointsPerOctave) : -1
+                    enabled: workspace.spectrum && workspace.spectrum.mode !== 2
+                    onActivated: {
+                        workspace.spectrum.pointsPerOctave = values[index];
+                        if (values[index] === 0 && workspace.spectrum.mode === 1) workspace.spectrum.mode = 0;
+                    }
                 }
             }
-            TitledCombo {
-                width: 280
-                title: qsTr("Average")
-                model: [qsTr("Off"), qsTr("Low-pass smoothing (LPF)"), qsTr("Rolling frames (FIFO)")]
-                currentIndex: workspace.measurement ? workspace.measurement.averageType : -1
-                enabled: !!workspace.measurement
-                onActivated: workspace.measurement.averageType = index
+            Column {
+                width: Math.min(260, parent.width); spacing: 4
+                Label { text: qsTr("Average"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                TitledCombo {
+                    width: parent.width; height: 36; showTitleInValue: false
+                    title: qsTr("Average")
+                    model: [qsTr("Off"), qsTr("Low-pass smoothing (LPF)"), qsTr("Rolling frames (FIFO)")]
+                    currentIndex: workspace.measurement ? workspace.measurement.averageType : -1
+                    enabled: !!workspace.measurement
+                    onActivated: workspace.measurement.averageType = index
+                }
             }
-            TitledCombo {
-                width: 160
-                title: qsTr("LPF")
+            Column {
+                width: Math.min(144, parent.width); spacing: 4
                 visible: workspace.measurement && workspace.measurement.averageType === 1
-                model: ["0.25 Hz", "0.5 Hz", "1 Hz"]
-                currentIndex: workspace.measurement ? workspace.measurement.filtersFrequency : -1
-                onActivated: workspace.measurement.filtersFrequency = index
+                Label { text: qsTr("LPF"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                TitledCombo {
+                    width: parent.width; height: 36; showTitleInValue: false
+                    title: qsTr("LPF"); model: ["0.25 Hz", "0.5 Hz", "1 Hz"]
+                    currentIndex: workspace.measurement ? workspace.measurement.filtersFrequency : -1
+                    onActivated: workspace.measurement.filtersFrequency = index
+                }
             }
-            SpinBox {
-                width: 150
+            Column {
+                width: Math.min(144, parent.width); spacing: 4
                 visible: workspace.measurement && workspace.measurement.averageType === 2
-                from: 1; to: 100; editable: true
-                value: workspace.measurement ? workspace.measurement.average : 1
-                onValueModified: workspace.measurement.average = value
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("Number of frames in the rolling average")
+                Label { text: qsTr("FIFO frames"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                SelectableSpinBox {
+                    width: parent.width; height: 36
+                    from: 1; to: 100; editable: true
+                    value: workspace.measurement ? workspace.measurement.average : 1
+                    onValueModified: workspace.measurement.average = value
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Number of frames in the rolling average")
+                }
             }
             CheckBox {
                 text: qsTr("Hold peaks")
@@ -218,6 +277,8 @@ Item {
             text: qsTr("Averaging affects all plots using this measurement. Microphone correction is not SPL calibration.")
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
+            font.pixelSize: 12
+            color: applicationWindow.ui.secondaryText
         }
             }
         }
