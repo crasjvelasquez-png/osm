@@ -109,6 +109,14 @@ float Data::peakSquared(unsigned int i) const noexcept
     return 0;
 }
 
+float Data::meanSquared(unsigned int i) const noexcept
+{
+    if (i < frequencyDomainSize()) {
+        return m_ftdata[i].meanSquared;
+    }
+    return NAN;
+}
+
 float Data::crestFactor(unsigned int i) const noexcept
 {
     if (i < frequencyDomainSize()) {

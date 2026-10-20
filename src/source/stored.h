@@ -31,11 +31,20 @@ class Stored: public Abstract::Source, public Meta::Stored
     Q_PROPERTY(bool ignoreCoherence READ ignoreCoherence WRITE setIgnoreCoherence NOTIFY ignoreCoherenceChanged)
     Q_PROPERTY(float gain READ gain WRITE setGain NOTIFY gainChanged)
     Q_PROPERTY(float delay READ delay WRITE setDelay NOTIFY delayChanged)
+    Q_PROPERTY(QString captureType READ captureType WRITE setCaptureType NOTIFY captureTypeChanged)
+    Q_PROPERTY(QString contributors READ contributors WRITE setContributors NOTIFY contributorsChanged)
+    Q_PROPERTY(QString capturedAt READ capturedAt WRITE setCapturedAt NOTIFY capturedAtChanged)
 
 public:
     explicit Stored(QObject *parent = nullptr);
     Shared::Source clone() const override;
     void build (const Abstract::Source &source);
+    QString captureType() const { return m_captureType; }
+    void setCaptureType(const QString &value) { if (m_captureType != value) { m_captureType = value; emit captureTypeChanged(); } }
+    QString contributors() const { return m_contributors; }
+    void setContributors(const QString &value) { if (m_contributors != value) { m_contributors = value; emit contributorsChanged(); } }
+    QString capturedAt() const { return m_capturedAt; }
+    void setCapturedAt(const QString &value) { if (m_capturedAt != value) { m_capturedAt = value; emit capturedAtChanged(); } }
 
     Q_INVOKABLE void autoName(const QString &prefix) noexcept;
 
@@ -64,6 +73,14 @@ signals:
     void ignoreCoherenceChanged() override;
     void gainChanged() override;
     void delayChanged() override;
+    void captureTypeChanged();
+    void contributorsChanged();
+    void capturedAtChanged();
+
+private:
+    QString m_captureType { QStringLiteral("Magnitude") };
+    QString m_contributors;
+    QString m_capturedAt;
 };
 
 #endif // STORED_H

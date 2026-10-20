@@ -29,6 +29,34 @@ Item {
     property alias settings: chart.settings
     property alias plot: chart.plot
     property bool typeLocked: false
+    property bool spacePausesHeatmap: false
+
+    Keys.onSpacePressed: {
+        if (spacePausesHeatmap && plot) {
+            if (!event.isAutoRepeat) plot.active = !plot.active;
+            event.accepted = true;
+        } else {
+            event.accepted = false;
+        }
+    }
+
+    // Let the original target handle the click after updating keyboard focus.
+    MouseArea {
+        parent: applicationWindow.contentItem
+        anchors.fill: parent
+        z: 1000000
+        enabled: chartview.spacePausesHeatmap && chartview.visible
+        acceptedButtons: Qt.AllButtons
+        onPressed: {
+            var position = chartview.mapFromItem(parent, mouse.x, mouse.y);
+            if (chartview.contains(position)) {
+                chartview.forceActiveFocus(Qt.MouseFocusReason);
+            } else {
+                chartview.focus = false;
+            }
+            mouse.accepted = false;
+        }
+    }
 
     VariableChart {
         id: chart

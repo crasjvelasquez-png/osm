@@ -61,6 +61,7 @@ struct Data {
     virtual Complex phase(       unsigned int i) const noexcept;
     virtual float   coherence(   unsigned int i) const noexcept;
     virtual float   peakSquared( unsigned int i) const noexcept;
+    virtual float   meanSquared( unsigned int i) const noexcept;
     virtual float   crestFactor( unsigned int i) const noexcept;
 
     unsigned int    timeDomainSize() const noexcept;

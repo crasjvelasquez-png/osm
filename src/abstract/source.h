@@ -40,6 +40,7 @@ class Source : public QObject, public Data
     Q_PROPERTY(QColor   color      READ color      WRITE setColor      NOTIFY colorChanged)
     Q_PROPERTY(bool     active     READ active     WRITE setActive     NOTIFY activeChanged)
     Q_PROPERTY(unsigned sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
+    Q_PROPERTY(unsigned frequencyDomainCount READ frequencyDomainSize NOTIFY readyRead)
 
     Q_PROPERTY(QUuid    uuid       READ uuid       CONSTANT)
     Q_PROPERTY(bool     cloneable  READ cloneable  CONSTANT)

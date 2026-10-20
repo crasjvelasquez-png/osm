@@ -46,6 +46,9 @@ Shared::Source Stored::clone() const
     cloned->setDelay(delay());
     cloned->setGain(gain());
     cloned->setNotes(notes());
+    cloned->setCaptureType(captureType());
+    cloned->setContributors(contributors());
+    cloned->setCapturedAt(capturedAt());
 
     return std::static_pointer_cast<Abstract::Source>(cloned);
 }
@@ -68,6 +71,9 @@ QJsonObject Stored::toJSON() const noexcept
 {
     auto object = Abstract::Source::toJSON();
     object["notes"]     = notes();
+    object["captureType"] = captureType();
+    object["contributors"] = contributors();
+    object["capturedAt"] = capturedAt();
 
     object["polarity"]  = polarity();
     object["inverse"]   = inverse();
@@ -138,6 +144,9 @@ void Stored::fromJSON(QJsonObject data, const SourceList *) noexcept
     setDelay(data["delay"].toDouble(0));
     setGain( data["gain" ].toDouble(0));
     setNotes(data["notes"].toString());
+    setCaptureType(data["captureType"].toString(QStringLiteral("Magnitude")));
+    setContributors(data["contributors"].toString());
+    setCapturedAt(data["capturedAt"].toString());
 }
 
 bool Stored::save(const QUrl &fileName) const noexcept

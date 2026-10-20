@@ -21,10 +21,13 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QFileInfo>
+#include <QDateTime>
+#include <QStringList>
 
 #include "common/wavfile.h"
 #include "filtersource.h"
 #include "measurement.h"
+#include "source/stored.h"
 #include "sourcelist.h"
 #include "model/sourcemodel.h"
 #include "source/equalizer.h"
@@ -856,6 +859,76 @@ void SourceList::storeItem(const Shared::Source &item)
         newItem->setActive(true);
         appendItem(newItem, true);
     }
+}
+
+Shared::Source SourceList::averageStored(const QList<QUuid> &ids, const QString &name, QString *error)
+{
+    if (ids.size() < 2) { if (error) *error = tr("Select at least two stored measurements."); return {}; }
+    QVector<std::shared_ptr<Stored>> inputs;
+    for (const auto &id : ids) {
+        auto source = std::dynamic_pointer_cast<Stored>(getByUUid(id));
+        if (!source || source->frequencyDomainSize() == 0) { if (error) *error = tr("A selected trace has no frequency data."); return {}; }
+        inputs.push_back(source);
+    }
+    auto first = inputs.first();
+    const auto family = [](const QString &type) { return type == QStringLiteral("Spectrum") ? QStringLiteral("Spectrum") : QStringLiteral("Transfer"); };
+    for (const auto &source : inputs) {
+        if (family(source->captureType()) != family(first->captureType())) { if (error) *error = tr("Spectrum and transfer-function traces are different measurement types and cannot be averaged together."); return {}; }
+        if (source->frequencyDomainSize() != first->frequencyDomainSize()) { if (error) *error = tr("Frequency grids differ. Only traces with the same grid can be averaged."); return {}; }
+        for (unsigned int i = 0; i < first->frequencyDomainSize(); ++i) {
+            if (qAbs(source->frequency(i) - first->frequency(i)) > qMax(1e-5f, qAbs(first->frequency(i)) * 1e-6f)) { if (error) *error = tr("Frequency grids differ. Only traces with the same grid can be averaged."); return {}; }
+        }
+    }
+    std::vector<Abstract::Source::FTData> rows;
+    rows.reserve(first->frequencyDomainSize());
+    const float count = static_cast<float>(inputs.size());
+    for (unsigned int i = 0; i < first->frequencyDomainSize(); ++i) {
+        Abstract::Source::FTData row;
+        row.frequency = first->frequency(i);
+        float moduleSum = 0.f, magnitudeSum = 0.f, cohSum = 0.f, peakSum = 0.f, meanSum = 0.f;
+        int meanCount = 0;
+        Complex phaseSum(0.f, 0.f);
+        for (const auto &source : inputs) {
+            moduleSum += source->module(i);
+            magnitudeSum += source->magnitudeRaw(i);
+            cohSum += source->coherence(i);
+            peakSum += source->peakSquared(i);
+            const float mean = source->meanSquared(i);
+            if (std::isfinite(mean)) { meanSum += mean; ++meanCount; }
+            phaseSum += source->phase(i);
+        }
+        row.module = moduleSum / count;
+        row.magnitude = magnitudeSum / count;
+        row.phase = phaseSum / count;
+        row.coherence = cohSum / count;
+        row.peakSquared = peakSum / count;
+        row.meanSquared = meanCount ? meanSum / static_cast<float>(meanCount) : NAN;
+        rows.push_back(row);
+    }
+    auto result = std::make_shared<Stored>();
+    result->setFrequencyDomainData(std::move(rows));
+    result->setName(name.isEmpty() ? tr("Average (%1)").arg(inputs.size()) : name);
+    result->setColor(nextColor());
+    result->setActive(true);
+    result->setCaptureType(family(inputs.first()->captureType()));
+    result->setCapturedAt(QDateTime::currentDateTime().toString(Qt::ISODate));
+    QStringList names;
+    for (const auto &source : inputs) names << source->name();
+    result->setContributors(names.join(QStringLiteral("\n")));
+    result->setNotes(tr("Linear amplitude average; phase is averaged as complex vectors.\nContributors:\n%1").arg(names.join(QStringLiteral("\n"))));
+    Shared::Source shared{ result };
+    appendItem(shared, false);
+    return shared;
+}
+
+QVariantMap SourceList::averageStoredResult(const QList<QUuid> &ids, const QString &name)
+{
+    QString error;
+    auto source = averageStored(ids, name, &error);
+    QVariantMap result;
+    result.insert(QStringLiteral("source"), QVariant::fromValue(source));
+    result.insert(QStringLiteral("error"), error);
+    return result;
 }
 QColor SourceList::nextColor()
 {

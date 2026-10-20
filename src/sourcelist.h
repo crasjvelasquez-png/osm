@@ -135,6 +135,8 @@ public slots:
     Q_INVOKABLE void removeItem(const QUuid &uuid, bool deleteItem = true);
     Q_INVOKABLE void cloneItem(const Shared::Source &item);
     Q_INVOKABLE void storeItem(const Shared::Source &item);
+    Q_INVOKABLE Shared::Source averageStored(const QList<QUuid> &ids, const QString &name, QString *error = nullptr);
+    Q_INVOKABLE QVariantMap averageStoredResult(const QList<QUuid> &ids, const QString &name);
 
     int appendNone();
     int appendAll();

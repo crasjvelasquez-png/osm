@@ -332,6 +332,7 @@ Item {
             sourceComponent: Component {
                 Chart {
                     typeLocked: true
+                    spacePausesHeatmap: true
                     Component.onCompleted: {
                         type = "Spectrogram";
                         applicationSettings.setValue("rta/heatmapChart/type", "Spectrogram");
