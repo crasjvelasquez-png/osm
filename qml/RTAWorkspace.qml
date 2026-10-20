@@ -3,6 +3,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Layouts 1.3
+import QtQuick.Templates 2.15 as T
 import Audio 1.0
 import "elements"
 
@@ -14,7 +15,19 @@ Item {
     property bool initialized: false
     property bool showHeatmap: applicationSettings.value("rta/heatmap", true)
     property bool showControls: true
-    onShowHeatmapChanged: applicationSettings.setValue("rta/heatmap", showHeatmap)
+    onShowHeatmapChanged: {
+        applicationSettings.setValue("rta/heatmap", showHeatmap);
+        Qt.callLater(applySavedSplit);
+    }
+    property real plotSplitRatio: {
+        var saved = applicationSettings.value("rta/plotSplitRatio");
+        var ratio = Number(saved);
+        return saved !== undefined && saved !== null && isFinite(ratio) ?
+            Math.max(0, Math.min(1, ratio)) : 0.70;
+    }
+    readonly property real splitUsableHeight: Math.max(0, plotSplit.height - 8)
+    readonly property real heatmapPaneMinimum: heatmapHeading.implicitHeight + 4 + 120
+    readonly property real minimumScale: Math.min(1, splitUsableHeight / (120 + heatmapPaneMinimum))
     property int deviceRevision: 0
     readonly property int deviceIndex: {
         deviceRevision;
@@ -45,6 +58,7 @@ Item {
             showHeatmap = defaultsController.value("rta/heatmap", true);
             defaultsController.applyPlotDefaults(spectrum, "rta");
         }
+        Qt.callLater(applySavedSplit);
     }
 
     onSelectedChanged: {
@@ -56,6 +70,21 @@ Item {
         if (heatmap.item && heatmap.item.plot) heatmap.item.plot.selected = selected && selected.data ? [selected.uuid] : [];
     }
 
+    function applySavedSplit() {
+        if (!showHeatmap || plotSplit.resizing || splitUsableHeight <= 0) return;
+        // Dragging replaces the preferred-height binding. Reapply the saved share
+        // only when the available area changes or the heatmap is restored.
+        graph.SplitView.preferredHeight = Math.max(120 * minimumScale,
+            Math.min(splitUsableHeight - heatmapPaneMinimum * minimumScale,
+                splitUsableHeight * plotSplitRatio));
+    }
+
+    function saveSplitRatio() {
+        if (!showHeatmap || splitUsableHeight <= 0) return;
+        plotSplitRatio = Math.max(0, Math.min(1, graph.height / splitUsableHeight));
+        applicationSettings.setValue("rta/plotSplitRatio", plotSplitRatio);
+    }
+
     DeviceModel {
         id: devices
         scope: DeviceModel.InputOnly
@@ -64,7 +93,6 @@ Item {
         target: devices
         function onModelReset() { workspace.deviceRevision++; }
     }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 8
@@ -114,7 +142,7 @@ Item {
         ScrollView {
             Layout.fillWidth: true
             visible: workspace.showControls
-            Layout.preferredHeight: Math.min(240, workspace.height * 0.32)
+            Layout.preferredHeight: Math.min(controls.implicitHeight, 240, workspace.height * 0.32)
             clip: true
             contentWidth: availableWidth
             contentHeight: controls.implicitHeight
@@ -273,88 +301,132 @@ Item {
                 applicationSettings.setValue("rta/smooth", checked);
             }
         }
-        Label {
-            text: qsTr("Averaging affects all plots using this measurement. Microphone correction is not SPL calibration.")
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-            font.pixelSize: 12
-            color: applicationWindow.ui.secondaryText
-        }
             }
         }
-        Chart {
-            id: graph
+        SplitView {
+            id: plotSplit
+            orientation: Qt.Vertical
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.minimumHeight: 120
-            Layout.preferredHeight: workspace.height * 0.65
-            typeLocked: true
-            Connections {
-                target: sourceList
-                function onSelectedChanged() { workspace.followSource(); }
-            }
-            Component.onCompleted: {
-                applicationSettings.setValue("rta/chart/type", "Spectrum");
-                settings = applicationSettings.getGroup("rta/chart");
-                plot.smooth = applicationSettings.value("rta/smooth", true);
-                if (!applicationSettings.value("rta/displayInitialized", false)) {
-                    plot.pointsPerOctave = 12;
-                    plot.ymin = -100;
-                    plot.ymax = 0;
-                    applicationSettings.setValue("rta/displayInitialized", true);
-                }
-                workspace.followSource();
-            }
-        }
-        RowLayout {
-            visible: workspace.showHeatmap
-            Layout.fillWidth: true
-            Label { text: qsTr("Heatmap · last 4 seconds"); font.bold: true; Layout.fillWidth: true }
-            Label { text: qsTr("Quiet  −100"); font.pixelSize: 12 }
-            Rectangle {
-                width: 100; height: 8
-                gradient: Gradient {
-                    orientation: Gradient.Horizontal
-                    GradientStop { position: 0; color: "#2196F3" }
-                    GradientStop { position: 0.5; color: "#8BC34A" }
-                    GradientStop { position: 1; color: "#F44336" }
+            Layout.minimumHeight: 0
+            clip: true
+            property real dragStartHeight: 0
+            onHeightChanged: if (!resizing) Qt.callLater(workspace.applySavedSplit)
+            onResizingChanged: {
+                if (resizing) {
+                    dragStartHeight = graph.height;
+                } else if (Math.abs(graph.height - dragStartHeight) > 0.5) {
+                    Qt.callLater(workspace.saveSplitRatio);
                 }
             }
-            Label { text: qsTr("−20 dBFS  Loud"); font.pixelSize: 12 }
-        }
-        Loader {
-            id: heatmap
-            active: workspace.showHeatmap
-            visible: active
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.preferredHeight: workspace.height * 0.28
-            sourceComponent: Component {
-                Chart {
-                    typeLocked: true
-                    spacePausesHeatmap: true
-                    Component.onCompleted: {
-                        type = "Spectrogram";
-                        applicationSettings.setValue("rta/heatmapChart/type", "Spectrogram");
-                        settings = applicationSettings.getGroup("rta/heatmapChart");
-                        if (!applicationSettings.value("rta/historyInitialized", false)) {
-                            plot.pointsPerOctave = 24;
-                            plot.min = -100; plot.mid = -60; plot.max = -20;
-                            applicationSettings.setValue("rta/historyInitialized", true);
+            handle: Rectangle {
+                id: divider
+                implicitWidth: plotSplit.width
+                implicitHeight: 8
+                readonly property bool dragging: T.SplitHandle.pressed
+                color: dragging ? applicationWindow.ui.hover :
+                    T.SplitHandle.hovered ? applicationWindow.ui.control : applicationWindow.ui.panel
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 40
+                    height: 2
+                    radius: 1
+                    color: divider.dragging ? applicationWindow.accentColor : applicationWindow.ui.separator
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.NoButton
+                    hoverEnabled: true
+                    cursorShape: Qt.SizeVerCursor
+                }
+            }
+            Chart {
+                id: graph
+                SplitView.minimumHeight: workspace.showHeatmap ? 120 * workspace.minimumScale : 0
+                SplitView.preferredHeight: workspace.splitUsableHeight * workspace.plotSplitRatio
+                SplitView.fillHeight: !workspace.showHeatmap
+                clip: true
+                typeLocked: true
+                Connections {
+                    target: sourceList
+                    function onSelectedChanged() { workspace.followSource(); }
+                }
+                Component.onCompleted: {
+                    applicationSettings.setValue("rta/chart/type", "Spectrum");
+                    settings = applicationSettings.getGroup("rta/chart");
+                    plot.smooth = applicationSettings.value("rta/smooth", true);
+                    if (!applicationSettings.value("rta/displayInitialized", false)) {
+                        plot.pointsPerOctave = 12;
+                        plot.ymin = -100;
+                        plot.ymax = 0;
+                        applicationSettings.setValue("rta/displayInitialized", true);
+                    }
+                    workspace.followSource();
+                }
+            }
+            Item {
+                id: heatmapPane
+                visible: workspace.showHeatmap
+                SplitView.fillHeight: true
+                SplitView.minimumHeight: workspace.heatmapPaneMinimum * workspace.minimumScale
+                clip: true
+                RowLayout {
+                    id: heatmapHeading
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: Math.min(implicitHeight, heatmapPane.height)
+                    clip: true
+                    Label { text: qsTr("Heatmap · last 4 seconds"); font.bold: true; Layout.fillWidth: true }
+                    Label { text: qsTr("Quiet  −100"); font.pixelSize: 12 }
+                    Rectangle {
+                        width: 100; height: 8
+                        gradient: Gradient {
+                            orientation: Gradient.Horizontal
+                            GradientStop { position: 0; color: "#2196F3" }
+                            GradientStop { position: 0.5; color: "#8BC34A" }
+                            GradientStop { position: 1; color: "#F44336" }
                         }
+                    }
+                    Label { text: qsTr("−20 dBFS  Loud"); font.pixelSize: 12 }
+                }
+                Loader {
+                    id: heatmap
+                    active: workspace.showHeatmap
+                    visible: active
+                    anchors.top: heatmapHeading.bottom
+                    anchors.topMargin: Math.min(4, Math.max(0, heatmapPane.height - heatmapHeading.height))
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    sourceComponent: Component {
+                        Chart {
+                            typeLocked: true
+                            spacePausesHeatmap: true
+                            Component.onCompleted: {
+                                type = "Spectrogram";
+                                applicationSettings.setValue("rta/heatmapChart/type", "Spectrogram");
+                                settings = applicationSettings.getGroup("rta/heatmapChart");
+                                if (!applicationSettings.value("rta/historyInitialized", false)) {
+                                    plot.pointsPerOctave = 24;
+                                    plot.min = -100; plot.mid = -60; plot.max = -20;
+                                    applicationSettings.setValue("rta/historyInitialized", true);
+                                }
+                                workspace.followSource();
+                            }
+                            Connections {
+                                target: workspace.spectrum
+                                function onXminChanged() { if (plot) plot.xmin = workspace.spectrum.xmin; }
+                                function onXmaxChanged() { if (plot) plot.xmax = workspace.spectrum.xmax; }
+                            }
+                        }
+                    }
+                    onLoaded: {
+                        item.plot.xmin = workspace.spectrum.xmin;
+                        item.plot.xmax = workspace.spectrum.xmax;
                         workspace.followSource();
                     }
-                    Connections {
-                        target: workspace.spectrum
-                        function onXminChanged() { if (plot) plot.xmin = workspace.spectrum.xmin; }
-                        function onXmaxChanged() { if (plot) plot.xmax = workspace.spectrum.xmax; }
-                    }
                 }
-            }
-            onLoaded: {
-                item.plot.xmin = workspace.spectrum.xmin;
-                item.plot.xmax = workspace.spectrum.xmax;
-                workspace.followSource();
             }
         }
     }
