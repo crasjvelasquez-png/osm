@@ -22,6 +22,8 @@ Dialog {
     id: dialog
     title: ""
     modal: true
+    topPadding: 0
+    bottomPadding: 0
     Overlay.modal: Rectangle { color: applicationAppearance.darkMode ? "#99000000" : "#55000000" }
     background: Rectangle { radius: 6; color: applicationWindow.ui.panel; border.color: applicationWindow.ui.separator }
     focus: true
@@ -31,12 +33,7 @@ Dialog {
     onAccepted: {}
     onRejected: {}
 
-    Item {
-        focus: true
-        anchors.fill: parent
-        visible: dialog.visible
-        Keys.onReturnPressed: {
-            dialog.accept();
-        }
+    Keys.onReturnPressed: {
+        dialog.accept();
     }
 }

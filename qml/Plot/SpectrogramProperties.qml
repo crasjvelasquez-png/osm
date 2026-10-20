@@ -159,80 +159,173 @@ Item {
             onCurrentIndexChanged: dataObject.pointsPerOctave = model[currentIndex];
         }
 
-        SelectableSpinBox {
-            value: dataObject.min
-            onValueChanged: dataObject.min = value
-            from: -140
-            to: dataObject.mid - 1
-            editable: true
+        Item {
+            implicitWidth: 170
+            implicitHeight: 36
             Layout.fillWidth: true
-
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("min dB point")
-
-            textFromValue: function(value, locale) {
-                return Number(value) + "dB"
-            }
-
-            valueFromText: function(text, locale) {
-                return parseInt(text)
-            }
-            Rectangle {
-                color: "#2196F3"
+            SelectableSpinBox {
+                id: minDbControl
                 anchors.fill: parent
-                opacity: 0.15
+                value: dataObject.min
+                onValueChanged: dataObject.min = value
+                from: -140
+                to: dataObject.mid - 1
+                editable: true
+
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("min dB point")
+
+                textFromValue: function(value, locale) {
+                    return Number(value) + "dB"
+                }
+
+                valueFromText: function(text, locale) {
+                    return parseInt(text)
+                }
+                Rectangle {
+                    color: "#2196F3"
+                    anchors.fill: parent
+                    opacity: 0.15
+                }
+            }
+            MouseArea {
+                x: 28
+                width: Math.max(0, parent.width - 56)
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                z: 1
+                preventStealing: true
+                hoverEnabled: true
+                cursorShape: Qt.SizeHorCursor
+                ToolTip.visible: containsMouse || pressed
+                ToolTip.delay: 0
+                ToolTip.timeout: -1
+                ToolTip.text: qsTr("Minimum: %1 dB\nMin: %2 dB    Max: %3 dB")
+                    .arg(minDbControl.value).arg(minDbControl.from).arg(minDbControl.to)
+                function updateFromPosition(position) {
+                    var fraction = Math.max(0, Math.min(1, position / width));
+                    minDbControl.value = minDbControl.from + Math.round(fraction * (minDbControl.to - minDbControl.from));
+                }
+                SliderFeedback {
+                    control: minDbControl
+                    tint: "#2196F3"
+                }
+                onPressed: function(mouse) { updateFromPosition(mouse.x); }
+                onPositionChanged: function(mouse) { if (pressed) updateFromPosition(mouse.x); }
             }
         }
 
-        SelectableSpinBox {
-            value: dataObject.mid
-            onValueChanged: dataObject.mid = value
-            from: dataObject.min
-            to: dataObject.max
-            editable: true
+        Item {
+            implicitWidth: 170
+            implicitHeight: 36
             Layout.fillWidth: true
-
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("mid dB point")
-
-            textFromValue: function(value, locale) {
-                return Number(value) + "dB"
-            }
-
-            valueFromText: function(text, locale) {
-                return parseInt(text)
-            }
-
-            Rectangle {
-                color: "#8BC34A"
+            SelectableSpinBox {
+                id: midDbControl
                 anchors.fill: parent
-                opacity: 0.15
+                value: dataObject.mid
+                onValueChanged: dataObject.mid = value
+                from: dataObject.min
+                to: dataObject.max
+                editable: true
+
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("mid dB point")
+
+                textFromValue: function(value, locale) {
+                    return Number(value) + "dB"
+                }
+
+                valueFromText: function(text, locale) {
+                    return parseInt(text)
+                }
+
+                Rectangle {
+                    color: "#8BC34A"
+                    anchors.fill: parent
+                    opacity: 0.15
+                }
+            }
+            MouseArea {
+                x: 28
+                width: Math.max(0, parent.width - 56)
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                z: 1
+                preventStealing: true
+                hoverEnabled: true
+                cursorShape: Qt.SizeHorCursor
+                ToolTip.visible: containsMouse || pressed
+                ToolTip.delay: 0
+                ToolTip.timeout: -1
+                ToolTip.text: qsTr("Midpoint: %1 dB\nMin: %2 dB    Max: %3 dB")
+                    .arg(midDbControl.value).arg(midDbControl.from).arg(midDbControl.to)
+                function updateFromPosition(position) {
+                    var fraction = Math.max(0, Math.min(1, position / width));
+                    midDbControl.value = midDbControl.from + Math.round(fraction * (midDbControl.to - midDbControl.from));
+                }
+                SliderFeedback {
+                    control: midDbControl
+                    tint: "#8BC34A"
+                }
+                onPressed: function(mouse) { updateFromPosition(mouse.x); }
+                onPositionChanged: function(mouse) { if (pressed) updateFromPosition(mouse.x); }
             }
         }
 
-        SelectableSpinBox {
-            value: dataObject.max
-            onValueChanged: dataObject.max = value
-            from: dataObject.mid + 1
-            to: 20
-            editable: true
+        Item {
+            implicitWidth: 170
+            implicitHeight: 36
             Layout.fillWidth: true
-
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("max dB point")
-
-            textFromValue: function(value, locale) {
-                return Number(value) + "dB"
-            }
-
-            valueFromText: function(text, locale) {
-                return parseInt(text)
-            }
-
-            Rectangle {
-                color: "#F44336"
+            SelectableSpinBox {
+                id: maxDbControl
                 anchors.fill: parent
-                opacity: 0.15
+                value: dataObject.max
+                onValueChanged: dataObject.max = value
+                from: dataObject.mid + 1
+                to: 20
+                editable: true
+
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("max dB point")
+
+                textFromValue: function(value, locale) {
+                    return Number(value) + "dB"
+                }
+
+                valueFromText: function(text, locale) {
+                    return parseInt(text)
+                }
+
+                Rectangle {
+                    color: "#F44336"
+                    anchors.fill: parent
+                    opacity: 0.15
+                }
+            }
+            MouseArea {
+                x: 28
+                width: Math.max(0, parent.width - 56)
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                z: 1
+                preventStealing: true
+                hoverEnabled: true
+                cursorShape: Qt.SizeHorCursor
+                ToolTip.visible: containsMouse || pressed
+                ToolTip.delay: 0
+                ToolTip.timeout: -1
+                ToolTip.text: qsTr("Maximum: %1 dB\nMin: %2 dB    Max: %3 dB")
+                    .arg(maxDbControl.value).arg(maxDbControl.from).arg(maxDbControl.to)
+                function updateFromPosition(position) {
+                    var fraction = Math.max(0, Math.min(1, position / width));
+                    maxDbControl.value = maxDbControl.from + Math.round(fraction * (maxDbControl.to - maxDbControl.from));
+                }
+                SliderFeedback {
+                    control: maxDbControl
+                    tint: "#F44336"
+                }
+                onPressed: function(mouse) { updateFromPosition(mouse.x); }
+                onPositionChanged: function(mouse) { if (pressed) updateFromPosition(mouse.x); }
             }
         }
 
