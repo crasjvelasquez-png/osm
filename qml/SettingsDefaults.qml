@@ -156,26 +156,26 @@ ApplicationWindow {
                         Label { Layout.preferredWidth: 180; visible: settingsWindow.draft("measurement/averageType", 0) === 2; text: qsTr("FIFO count") }
                         SelectableSpinBox { Layout.minimumWidth: 240;
                             visible: settingsWindow.draft("measurement/averageType", 0) === 2
-                            from: 1; to: 100; editable: true; value: settingsWindow.draft("measurement/fifoCount", 8)
+                            from: 1; to: 100; editable: true; value: settingsWindow.draft("measurement/fifoCount", 2)
                             onValueModified: settingsWindow.put("measurement/fifoCount", value)
                         }
                         Label { Layout.preferredWidth: 180; visible: settingsWindow.draft("measurement/averageType", 0) === 1; text: qsTr("LPF frequency") }
                         DropDown { Layout.minimumWidth: 240;
                             visible: settingsWindow.draft("measurement/averageType", 0) === 1
                             model: ["0.25 Hz", "0.5 Hz", "1 Hz"]
-                            currentIndex: settingsWindow.draft("measurement/lpfFrequency", 1)
+                            currentIndex: settingsWindow.draft("measurement/lpfFrequency", 2)
                             onActivated: settingsWindow.put("measurement/lpfFrequency", index)
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Transform mode") }
                         DropDown { Layout.minimumWidth: 240;
                             model: ["FFT 10", "FFT 11", "FFT 12", "FFT 13", "FFT 14", "FFT 15", "FFT 16", "LFT"]
-                            currentIndex: settingsWindow.draft("measurement/mode", 0)
+                            currentIndex: settingsWindow.draft("measurement/mode", 3)
                             onActivated: settingsWindow.put("measurement/mode", index)
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Window function") }
                         DropDown { Layout.minimumWidth: 240;
                             model: measurement ? measurement.windows : ["Hann", "Hamming", "Blackman-Harris"]
-                            currentIndex: settingsWindow.draft("measurement/window", 0)
+                            currentIndex: settingsWindow.draft("measurement/window", 1)
                             onActivated: settingsWindow.put("measurement/window", index)
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Input filter") }
@@ -283,18 +283,18 @@ ApplicationWindow {
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
                         Label { Layout.preferredWidth: 180; text: qsTr("Display style") }
-                        DropDown { Layout.minimumWidth: 240; model: [qsTr("Line"), qsTr("Bars"), qsTr("Lines")]; currentIndex: settingsWindow.draft("rta/displayStyle", 0); onActivated: settingsWindow.put("rta/displayStyle", index) }
+                        DropDown { Layout.minimumWidth: 240; model: [qsTr("Line"), qsTr("Bars"), qsTr("Lines")]; currentIndex: settingsWindow.draft("rta/displayStyle", 1); onActivated: settingsWindow.put("rta/displayStyle", index) }
                         Label { Layout.preferredWidth: 180; text: qsTr("Resolution") }
                         DropDown { Layout.minimumWidth: 240;
                             property var values: [1, 3, 6, 12, 24, 48, 0]
                             model: [qsTr("1 octave"), qsTr("1/3 octave"), qsTr("1/6 octave"), qsTr("1/12 octave"), qsTr("1/24 octave"), qsTr("1/48 octave"), qsTr("FFT bins")]
-                            currentIndex: values.indexOf(settingsWindow.draft("rta/resolution", 0))
+                            currentIndex: values.indexOf(settingsWindow.draft("rta/resolution", 24))
                             onActivated: settingsWindow.put("rta/resolution", values[index])
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Peak display") }
                         CheckBox { text: qsTr("Hold peaks"); checked: settingsWindow.draft("rta/holdPeaks", true); onCheckedChanged: if (settingsWindow.visible) settingsWindow.put("rta/holdPeaks", checked) }
                         Label { Layout.preferredWidth: 180; text: qsTr("Trace motion") }
-                        CheckBox { text: qsTr("Smooth trace motion"); checked: settingsWindow.draft("rta/smooth", true); onCheckedChanged: if (settingsWindow.visible) settingsWindow.put("rta/smooth", checked) }
+                        CheckBox { text: qsTr("Smooth trace motion"); checked: settingsWindow.draft("rta/smooth", false); onCheckedChanged: if (settingsWindow.visible) settingsWindow.put("rta/smooth", checked) }
                         Label { Layout.preferredWidth: 180; text: qsTr("Heatmap") }
                         CheckBox { text: qsTr("Visible"); checked: settingsWindow.draft("rta/heatmap", true); onCheckedChanged: if (settingsWindow.visible) settingsWindow.put("rta/heatmap", checked) }
                     }

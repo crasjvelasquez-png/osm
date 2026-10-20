@@ -20,14 +20,14 @@
 using namespace Chart;
 
 SpectrogramPlot::SpectrogramPlot(Settings *settings, QQuickItem *parent): FrequencyBasedPlot(settings, parent),
-    m_min(-90), m_mid(-50), m_max(10), m_active(true)
+    m_min(-57), m_mid(-44), m_max(-38), m_active(true)
 {
     // Keep the heat map within the audible range, including restored views and gestures.
     m_x.configure(AxisType::Logarithmic, 12.f, 20'000.f);
     m_x.setReset(20.f, 20'000.f);
     m_x.reset();
     m_y.configure(AxisType::Linear, 0.f,    4.f,  4);
-    setPointsPerOctave(48);
+    setPointsPerOctave(24);
     setFlag(QQuickItem::ItemHasContents);
     m_y.setCentralLabel(m_y.min() - 1.f);
     m_y.setUnit("s");

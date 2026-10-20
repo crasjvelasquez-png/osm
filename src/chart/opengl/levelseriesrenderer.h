@@ -56,7 +56,7 @@ private:
         float time;
         float value;
     };
-    static const unsigned int MAX_HISTORY_SIZE = 750;
+    static const unsigned int MAX_HISTORY_SIZE = 3000;
     std::deque<timePoint> m_history;
 };
 

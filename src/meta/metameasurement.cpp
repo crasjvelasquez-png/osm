@@ -51,11 +51,11 @@ Measurement::Measurement() : Base(),
     m_polarity(false),
     m_gain(1.f), m_offset(1.f),
     m_dataChanel(0), m_referenceChanel(1), m_delay(0),
-    m_average(1),
-    m_mode(FFT14),
+    m_average(2),
+    m_mode(FFT13),
     m_inputFilter(InputFilter::Z),
-    m_averageType(AverageType::LPF),
-    m_filtersFrequency(Filter::Frequency::FourthHz),
+    m_averageType(AverageType::Off),
+    m_filtersFrequency(Filter::Frequency::OneHz),
     m_windowFunctionType(WindowFunction::Type::Hann)
 {
     qRegisterMetaType<Filter::Frequency>();

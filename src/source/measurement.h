@@ -92,7 +92,7 @@ public:
     explicit Measurement(QObject *parent = nullptr);
     ~Measurement() override;
 
-    static const unsigned int TIMER_INTERVAL = 80; //ms = 12.5 per sec
+    static const unsigned int TIMER_INTERVAL = 20; //ms = 50 per sec
 
     Shared::Source clone() const override;
 

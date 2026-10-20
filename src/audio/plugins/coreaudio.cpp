@@ -252,7 +252,7 @@ Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction 
     streamFormat.mBytesPerFrame       = streamFormat.mChannelsPerFrame * streamFormat.mBitsPerChannel / 8;
     streamFormat.mFramesPerPacket     = 1;
     streamFormat.mBytesPerPacket      = streamFormat.mBytesPerFrame;
-    auto bufferSize             = streamFormat.mChannelsPerFrame * 8192 * sizeof(float);
+    auto bufferSize             = streamFormat.mChannelsPerFrame * (mode == Input ? 1024 : 8192) * sizeof(float);
 
     AudioQueueRef queue;
     AudioQueueBufferRef buffers[3];

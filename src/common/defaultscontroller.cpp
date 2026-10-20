@@ -55,9 +55,9 @@ QVariantMap DefaultsController::factoryDefaults() const
     return {
         {"measurement/deviceId", QString()}, {"measurement/dataChannel", 0},
         {"measurement/referenceChannel", 1}, {"measurement/averageType", 0},
-        {"measurement/fifoCount", 8}, {"measurement/lpfFrequency", 1},
-        {"measurement/polarity", false}, {"measurement/mode", 0},
-        {"measurement/window", 0}, {"measurement/inputFilter", 0},
+        {"measurement/fifoCount", 2}, {"measurement/lpfFrequency", 2},
+        {"measurement/polarity", false}, {"measurement/mode", 3},
+        {"measurement/window", 1}, {"measurement/inputFilter", 0},
         {"measurement/calibrationFile", QString()}, {"measurement/calibrationEnabled", false},
         {"measurement/name", QStringLiteral("Measurement")},
         {"measurement/color", QColor("#673AB7")}, {"measurement/referenceOffset", 0.0},
@@ -68,8 +68,8 @@ QVariantMap DefaultsController::factoryDefaults() const
         {"magnitude/invert", false}, {"magnitude/coherence", true},
         {"magnitude/coherenceThreshold", 0.7}, {"magnitude/sensorResistance", 2.6},
         {"magnitude/sources", QStringList {QStringLiteral("all")}},
-        {"rta/displayStyle", 0}, {"rta/resolution", 0}, {"rta/holdPeaks", true},
-        {"rta/smooth", true}, {"rta/heatmap", true}
+        {"rta/displayStyle", 1}, {"rta/resolution", 24}, {"rta/holdPeaks", true},
+        {"rta/smooth", false}, {"rta/heatmap", true}
     };
 }
 

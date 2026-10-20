@@ -50,7 +50,7 @@ private:
         int time;
         historyRowData data;
     };
-    static const unsigned int MAX_HISTORY = 52;
+    static const unsigned int MAX_HISTORY = 250;
     std::deque<historyRow> m_history;
     bool m_refreshBuffers, m_plotActive;
     int m_min, m_mid, m_max;

@@ -202,15 +202,23 @@ Item {
                 ToolTip.timeout: -1
                 ToolTip.text: qsTr("Minimum: %1 dB\nMin: %2 dB    Max: %3 dB")
                     .arg(minDbControl.value).arg(minDbControl.from).arg(minDbControl.to)
+                property real pressX: 0
+                property int pressValue: 0
+                property int pressRange: 0
                 function updateFromPosition(position) {
-                    var fraction = Math.max(0, Math.min(1, position / width));
-                    minDbControl.value = minDbControl.from + Math.round(fraction * (minDbControl.to - minDbControl.from));
+                    var delta = Math.round((position - pressX) / Math.max(1, width) * pressRange);
+                    minDbControl.value = Math.max(minDbControl.from,
+                        Math.min(minDbControl.to, pressValue + delta));
                 }
                 SliderFeedback {
                     control: minDbControl
                     tint: "#2196F3"
                 }
-                onPressed: function(mouse) { updateFromPosition(mouse.x); }
+                onPressed: function(mouse) {
+                    pressX = mouse.x;
+                    pressValue = minDbControl.value;
+                    pressRange = minDbControl.to - minDbControl.from;
+                }
                 onPositionChanged: function(mouse) { if (pressed) updateFromPosition(mouse.x); }
             }
         }
@@ -259,15 +267,23 @@ Item {
                 ToolTip.timeout: -1
                 ToolTip.text: qsTr("Midpoint: %1 dB\nMin: %2 dB    Max: %3 dB")
                     .arg(midDbControl.value).arg(midDbControl.from).arg(midDbControl.to)
+                property real pressX: 0
+                property int pressValue: 0
+                property int pressRange: 0
                 function updateFromPosition(position) {
-                    var fraction = Math.max(0, Math.min(1, position / width));
-                    midDbControl.value = midDbControl.from + Math.round(fraction * (midDbControl.to - midDbControl.from));
+                    var delta = Math.round((position - pressX) / Math.max(1, width) * pressRange);
+                    midDbControl.value = Math.max(midDbControl.from,
+                        Math.min(midDbControl.to, pressValue + delta));
                 }
                 SliderFeedback {
                     control: midDbControl
                     tint: "#8BC34A"
                 }
-                onPressed: function(mouse) { updateFromPosition(mouse.x); }
+                onPressed: function(mouse) {
+                    pressX = mouse.x;
+                    pressValue = midDbControl.value;
+                    pressRange = midDbControl.to - midDbControl.from;
+                }
                 onPositionChanged: function(mouse) { if (pressed) updateFromPosition(mouse.x); }
             }
         }
@@ -316,15 +332,23 @@ Item {
                 ToolTip.timeout: -1
                 ToolTip.text: qsTr("Maximum: %1 dB\nMin: %2 dB    Max: %3 dB")
                     .arg(maxDbControl.value).arg(maxDbControl.from).arg(maxDbControl.to)
+                property real pressX: 0
+                property int pressValue: 0
+                property int pressRange: 0
                 function updateFromPosition(position) {
-                    var fraction = Math.max(0, Math.min(1, position / width));
-                    maxDbControl.value = maxDbControl.from + Math.round(fraction * (maxDbControl.to - maxDbControl.from));
+                    var delta = Math.round((position - pressX) / Math.max(1, width) * pressRange);
+                    maxDbControl.value = Math.max(maxDbControl.from,
+                        Math.min(maxDbControl.to, pressValue + delta));
                 }
                 SliderFeedback {
                     control: maxDbControl
                     tint: "#F44336"
                 }
-                onPressed: function(mouse) { updateFromPosition(mouse.x); }
+                onPressed: function(mouse) {
+                    pressX = mouse.x;
+                    pressValue = maxDbControl.value;
+                    pressRange = maxDbControl.to - maxDbControl.from;
+                }
                 onPositionChanged: function(mouse) { if (pressed) updateFromPosition(mouse.x); }
             }
         }

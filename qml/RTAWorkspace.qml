@@ -295,7 +295,7 @@ Item {
         }
         CheckBox {
             text: qsTr("Smooth trace motion")
-            checked: workspace.spectrum ? workspace.spectrum.smooth : true
+            checked: workspace.spectrum ? workspace.spectrum.smooth : false
             onClicked: {
                 workspace.spectrum.smooth = checked;
                 applicationSettings.setValue("rta/smooth", checked);
@@ -354,9 +354,11 @@ Item {
                 Component.onCompleted: {
                     applicationSettings.setValue("rta/chart/type", "Spectrum");
                     settings = applicationSettings.getGroup("rta/chart");
-                    plot.smooth = applicationSettings.value("rta/smooth", true);
+                    plot.smooth = applicationSettings.value("rta/smooth", false);
                     if (!applicationSettings.value("rta/displayInitialized", false)) {
-                        plot.pointsPerOctave = 12;
+                        plot.mode = 1;
+                        plot.pointsPerOctave = 24;
+                        plot.showPeaks = true;
                         plot.ymin = -100;
                         plot.ymax = 0;
                         applicationSettings.setValue("rta/displayInitialized", true);
@@ -378,7 +380,10 @@ Item {
                     height: Math.min(implicitHeight, heatmapPane.height)
                     clip: true
                     Label { text: qsTr("Heatmap · last 4 seconds"); font.bold: true; Layout.fillWidth: true }
-                    Label { text: qsTr("Quiet  −100"); font.pixelSize: 12 }
+                    Label {
+                        text: qsTr("Quiet  %1").arg(heatmap.item && heatmap.item.plot ? heatmap.item.plot.min : -57)
+                        font.pixelSize: 12
+                    }
                     Rectangle {
                         width: 100; height: 8
                         gradient: Gradient {
@@ -388,7 +393,10 @@ Item {
                             GradientStop { position: 1; color: "#F44336" }
                         }
                     }
-                    Label { text: qsTr("−20 dBFS  Loud"); font.pixelSize: 12 }
+                    Label {
+                        text: qsTr("%1 dBFS  Loud").arg(heatmap.item && heatmap.item.plot ? heatmap.item.plot.max : -38)
+                        font.pixelSize: 12
+                    }
                 }
                 Loader {
                     id: heatmap
@@ -409,7 +417,8 @@ Item {
                                 settings = applicationSettings.getGroup("rta/heatmapChart");
                                 if (!applicationSettings.value("rta/historyInitialized", false)) {
                                     plot.pointsPerOctave = 24;
-                                    plot.min = -100; plot.mid = -60; plot.max = -20;
+                                    plot.min = -57; plot.mid = -44; plot.max = -38;
+                                    plot.ymin = 0; plot.ymax = 4;
                                     applicationSettings.setValue("rta/historyInitialized", true);
                                 }
                                 workspace.followSource();

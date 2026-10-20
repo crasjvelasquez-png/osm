@@ -48,6 +48,7 @@ protected:
 private:
     int m_min, m_mid, m_max;
     unsigned int m_pointsPerOctave;
+    static const unsigned int MAX_HISTORY = 250;
     QElapsedTimer m_timer;
 
     unsigned int m_indexBufferId, m_sourceSize;

@@ -87,7 +87,7 @@ void SpectrogramSeriesRenderer::renderSeries()
 
     historyRowData rowData;
     historyRow row;
-    row.time = m_timer.isValid() ? static_cast<int>(m_timer.restart()) : 80;
+    row.time = m_timer.isValid() ? static_cast<int>(m_timer.restart()) : 20;
     if (!m_timer.isValid()) m_timer.start();
     row.data.reserve(m_pointsPerOctave * 11);
     float value = 0.f;
@@ -148,12 +148,12 @@ void SpectrogramSeriesRenderer::renderSeries()
 
         //TODO: change to fifo instead of deque
         history.push_back(std::move(row));
-        if (history.size() > 51) {
+        if (history.size() > MAX_HISTORY) {
             history.pop_front();
         }
     }
 
-    unsigned int maxBufferSize = 51 * (m_pointsPerOctave * 12 + 4) * 6,
+    unsigned int maxBufferSize = MAX_HISTORY * (m_pointsPerOctave * 12 + 4) * 6,
                  verticiesCount = 0, maxIndicesCount = 0, indicesCount = 0;
     if (m_vertices.size() != maxBufferSize) {
         m_vertices.resize(maxBufferSize);
@@ -162,7 +162,7 @@ void SpectrogramSeriesRenderer::renderSeries()
 
     if (history.size() < 2 || history.front().data.empty()) return;
     auto rowSize = history[0].data.size();
-    maxIndicesCount = 51 * (2 * rowSize + 2);
+    maxIndicesCount = MAX_HISTORY * (2 * rowSize + 2);
     if (m_indices.size() != maxIndicesCount) {
         m_indices.resize(maxIndicesCount);
         m_refreshBuffers = true;
