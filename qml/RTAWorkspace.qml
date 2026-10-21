@@ -40,10 +40,10 @@ Item {
     }
     readonly property bool available: measurement && deviceIndex >= 0 &&
         measurement.dataChanel >= 0 && measurement.dataChanel < channels.length
-    readonly property string stateText: !measurement ? qsTr("Select a measurement in the source list") :\
-        !available ? qsTr("Input unavailable — select a device or reconnect it") :\
-        measurement.error ? qsTr("Input unavailable — check microphone permission in System Settings or device access, then press Start") :\
-        !measurement.active ? qsTr("Stopped — displayed trace is held") :\
+    readonly property string stateText: !measurement ? qsTr("Select a measurement in the source list") :
+        !available ? qsTr("Input unavailable — select a device or reconnect it") :
+        measurement.error ? qsTr("Input unavailable — check microphone permission in System Settings or device access, then press Start") :
+        !measurement.active ? qsTr("Stopped — displayed trace is held") :
         !measurement.inputAvailable ? qsTr("Waiting for audio — displayed trace is held") : qsTr("Running • dBFS")
 
     Component.onCompleted: {
@@ -118,7 +118,6 @@ Item {
             }
             CheckBox {
                 height: controlsAction.height
-                verticalAlignment: Text.AlignVCenter
                 text: qsTr("Heatmap")
                 checked: workspace.showHeatmap
                 onClicked: workspace.showHeatmap = checked
