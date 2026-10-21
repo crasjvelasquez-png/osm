@@ -83,3 +83,16 @@ PVS-Studio.cfg
 *.PVS-Studio.cfg
 .pvsconfig
 pvs.log*
+
+# Local build output
+/build/
+*.o
+moc_*
+qrc_*.cpp
+/Makefile
+.qmake.stash
+OpenSoundMeter.app/
+*_metatypes.json
+*.qmltypes
+*_qmltyperegistrations.cpp
+.DS_Store
