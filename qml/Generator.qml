@@ -42,6 +42,7 @@ Item {
                 id: onoff
                 Layout.alignment: Qt.AlignCenter
 
+                enabled: remoteControlled || currentGenerator.type !== 9 || (!generatorModel.audioFileLoading && generatorModel.audioFile.ready)
                 checked: currentGenerator.enabled
                 onCheckedChanged: currentGenerator.enabled = checked
             }
@@ -74,7 +75,7 @@ Item {
                 Layout.alignment: Qt.AlignCenter
 
                 decimals: 0
-                from: -90
+                from: -140
                 step: 1
                 to: 0
                 units: "dB"
@@ -87,7 +88,7 @@ Item {
                 Layout.preferredWidth: 45
                 Layout.minimumWidth: 45
                 Layout.maximumWidth: 45
-                bottomPadding: 8
+                bottomPadding: 0
                 fontSize: label.font.pixelSize
 
                 Connections {
@@ -140,7 +141,8 @@ Item {
 
             Label {
                 Layout.fillWidth: true
-                font.pixelSize: 10
+                font.pixelSize: applicationWindow.ui.secondaryFontSize
+                color: applicationWindow.ui.secondaryText
                 text:  (remoteControlled && currentGenerator ? "@" + currentGenerator.host : "")
             }
         }

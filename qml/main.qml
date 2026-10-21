@@ -17,6 +17,7 @@
  */
 import QtQuick 2.7
 import QtQuick.Controls 2.15
+import QtQuick.Controls 2.15 as StudioControls
 import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
@@ -39,15 +40,7 @@ ApplicationWindow {
     property string backgroundColor: Material.backgroundColor
     property string accentColor: Material.accent
     property string foregroundColor: Material.foreground
-    readonly property QtObject ui: QtObject {
-        readonly property color shell: applicationAppearance.darkMode ? "#202226" : "#ECEEF1"
-        readonly property color panel: applicationAppearance.darkMode ? "#292C31" : "#F7F8FA"
-        readonly property color control: applicationAppearance.darkMode ? "#31353B" : "#FFFFFF"
-        readonly property color hover: applicationAppearance.darkMode ? "#3B4048" : "#E8ECF2"
-        readonly property color separator: applicationAppearance.darkMode ? "#41464F" : "#D0D5DD"
-        readonly property color text: applicationAppearance.darkMode ? "#F0F2F5" : "#20252D"
-        readonly property color secondaryText: applicationAppearance.darkMode ? "#B7BEC8" : "#5C6573"
-    }
+    readonly property QtObject ui: StudioTheme { darkMode: applicationAppearance.darkMode }
     readonly property bool narrowWindow: width < 1024
 
     visible: true
@@ -75,7 +68,7 @@ ApplicationWindow {
     visibility: applicationAppearance.visibility
     color: ui.shell
     Material.theme: applicationAppearance.darkMode ? Material.Dark : Material.Light
-    Material.accent: Material.Indigo
+    Material.accent: ui.primary
 
     Rectangle {
         color: applicationWindow.ui.shell
@@ -117,37 +110,56 @@ ApplicationWindow {
 
     menuBar: (applicationAppearance.showMenuBar ? topMenu : null)
 
-    GridLayout {
+    StudioControls.Control {
         anchors.fill: parent
-        flow: Qt.LeftToRight
-        columns: 2
-        columnSpacing: 0
-        rowSpacing: 0
+        font.family: applicationWindow.ui.fontFamily
+        font.pixelSize: applicationWindow.ui.controlFontSize
 
-        //Charts area
-        Charts {
-            id: charts
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        HeaderLevels {
+            id: levelHeader
+            anchors.top: parent.top
+            width: parent.width
         }
 
-        SideBar {
-            id: righttab
-            Layout.fillHeight: true
-            Layout.rowSpan: applicationWindow.narrowWindow ? 1 : 2
-            Layout.preferredWidth: 240
-            Layout.minimumWidth: 240
-        }
+        GridLayout {
+            anchors.top: levelHeader.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            flow: Qt.LeftToRight
+            columns: 2
+            columnSpacing: 0
+            rowSpacing: 0
 
-        //Properties area
-        PropetiesBar {
-            id: bottomtab
-            height: 120
-            Layout.fillWidth: true
-            Layout.columnSpan: applicationWindow.narrowWindow ? 2 : 1
+            //Charts area
+            Charts {
+                id: charts
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            SideBar {
+                id: righttab
+                Layout.fillHeight: true
+                Layout.rowSpan: applicationWindow.narrowWindow ? 1 : 2
+                Layout.preferredWidth: 240
+                Layout.minimumWidth: 240
+            }
+
+            //Properties area
+            PropetiesBar {
+                id: bottomtab
+                height: 120
+                Layout.fillWidth: true
+                Layout.columnSpan: applicationWindow.narrowWindow ? 2 : 1
+            }
+
         }
 
     }
+
+    property alias audioFilePlayer: filePlayer
+    AudioFilePlayer { id: filePlayer }
 
     SettingsDefaults { id: defaultsWindow }
 

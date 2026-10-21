@@ -28,6 +28,7 @@ Item {
     property alias type: chart.type
     property alias settings: chart.settings
     property alias plot: chart.plot
+    signal frequencyCursorMoved(real frequency)
     property bool typeLocked: false
     property bool spacePausesHeatmap: false
 
@@ -350,8 +351,17 @@ Item {
         property int cursorX : 0
         property int cursorY : 0
 
-        text: (chart.plot ? "%1".arg(chart.plot.y2v(cursor.cursorY).toFixed(2)) + chart.plot.yLabel + "\n" +
-              "%1".arg(chart.plot.x2v(cursor.cursorX).toFixed(2)) + chart.plot.xLabel : "");
+        text: {
+            if (!chart.plot) return "";
+            var base = "%1".arg(chart.plot.y2v(cursor.cursorY).toFixed(2)) + chart.plot.yLabel + "\n" +
+                       "%1".arg(chart.plot.x2v(cursor.cursorX).toFixed(2)) + chart.plot.xLabel;
+            if (chart.type === "Spectrogram" && chart.plot.hoverMetricsText) {
+                chart.plot.historyRevision;
+                var extra = chart.plot.hoverMetricsText(cursor.cursorX, cursor.cursorY);
+                if (extra && extra.length > 0) base += "\n" + extra;
+            }
+            return base;
+        }
         xRight:  cursorX + applicationAppearance.cursorOffset + cursor.fontInfo.pixelSize / 2
         xLeft:   cursorX - applicationAppearance.cursorOffset - cursor.width - cursor.fontInfo.pixelSize / 2
         yTop:    cursorY - applicationAppearance.cursorOffset - cursor.height / 2
@@ -388,6 +398,12 @@ Item {
             function onMouseXChanged() {
                 var x = touchPoint2.pressed ? touchPoint1.startX : opener.mouseX;
                 cursor.cursorX = x;
+                // Time-domain and Nyquist axes must not overwrite the frequency cursor.
+                if (chart.plot && chart.plot.xLabel === "Hz") {
+                    var frequency = chart.plot.x2v(x);
+                    if (isFinite(frequency) && frequency > 0)
+                        chartview.frequencyCursorMoved(frequency);
+                }
                 if (chart.plot) chart.plot.setHelper(cursor.cursorX, cursor.cursorY);
             }
             function onMouseYChanged() {

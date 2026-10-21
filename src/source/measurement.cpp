@@ -39,7 +39,7 @@ Measurement::Measurement(QObject *parent) : Abstract::Source(parent), Meta::Meas
     m_workingDelay(0), m_delayFinderCounter(0),
     m_estimatedDelay(0),
     m_error(false), m_onReset(false),
-    m_data(65536), m_reference(65536), m_loopBuffer(65536),
+    m_data(192000 * 10 + 8192), m_reference(192000 * 10 + 8192), m_loopBuffer(65536),
     m_enableCalibration(false), m_calibrationLoaded(false), m_calibrationList(), m_calibrationGain()
 {
     setName("Measurement");
@@ -228,6 +228,10 @@ float Measurement::measurementPeak() const
 {
     return m_levelMeters.m_meters.at({Weighting::Z, Meter::Slow}).peakdB();
 }
+float Measurement::inputHeadroom() const
+{
+    return -m_levelMeters.m_rawInput.peakdB();
+}
 float Measurement::referencePeak() const
 {
     return m_levelMeters.m_reference.peakdB();
@@ -335,8 +339,9 @@ void Measurement::applyInputFilters()
 void Measurement::onSampleRateChanged()
 {
     std::lock_guard<std::mutex> guard(m_dataMutex);
-    if (m_audioStream) {
-        setSampleRate(m_audioStream->format().sampleRate);
+    audio::Stream *stream = m_audioStream.load();
+    if (stream) {
+        setSampleRate(stream->format().sampleRate);
         m_dataFT.setSampleRate(sampleRate());
         m_dataFT.prepare();
         m_levelMeters.setSampleRate(sampleRate());
@@ -352,8 +357,8 @@ audio::DeviceInfo::Id Measurement::deviceId() const
 void Measurement::setDeviceId(const audio::DeviceInfo::Id &deviceId)
 {
     if (!deviceId.isNull() && deviceId != m_deviceId) {
-        m_error = false;
-        emit errorChanged(m_error);
+        m_error.store(false, std::memory_order_relaxed);
+        emit errorChanged(m_error.load(std::memory_order_relaxed));
         m_lastInputMs.store(0, std::memory_order_relaxed);
         m_deviceId = deviceId;
         emit deviceIdChanged(m_deviceId);
@@ -395,27 +400,29 @@ void Measurement::setActive(bool newActive)
 {
     if (newActive == active())
         return;
-    std::lock_guard<std::mutex> guard(m_dataMutex);
 
-    m_lastInputMs.store(0, std::memory_order_relaxed);
-    Abstract::Source::setActive(newActive);
-    m_error = false;
-    emit errorChanged(m_error);
+    {
+        std::lock_guard<std::mutex> guard(m_dataMutex);
+        m_lastInputMs.store(0, std::memory_order_relaxed);
+        Abstract::Source::setActive(newActive);
+        m_error.store(false, std::memory_order_relaxed);
+        m_levelMeters.reset();
+    }
+    emit errorChanged(m_error.load(std::memory_order_relaxed));
 
     updateAudio();
 
-    m_levelMeters.reset();
-    m_loopBuffer.reset();
+    m_loopResetRequested.store(true, std::memory_order_relaxed);
     emit levelChanged();
     emit referenceLevelChanged();
 }
 void Measurement::setError()
 {
     Abstract::Source::setActive(false);
-    m_error = true;
+    m_error.store(true, std::memory_order_relaxed);
     m_levelMeters.reset();
     m_input.close();
-    emit errorChanged(m_error);
+    emit errorChanged(m_error.load(std::memory_order_relaxed));
     emit levelChanged();
     emit referenceLevelChanged();
 }
@@ -425,8 +432,13 @@ void Measurement::newSampleFromGenerator(float sample)
 }
 void Measurement::resetLoopBuffer()
 {
-    std::lock_guard<std::mutex> guard(m_dataMutex);
-    m_loopBuffer.reset();
+    m_loopResetRequested.store(true, std::memory_order_relaxed);
+}
+void Measurement::setDelay(int delay)
+{
+    const int maxDelay = static_cast<int>(m_data.size() - 8192);
+    const int clamped = std::clamp(delay, -maxDelay, maxDelay);
+    Meta::Measurement::setDelay(clamped);
 }
 //this calls from timer thread
 void Measurement::updateDelay()
@@ -472,21 +484,35 @@ void Measurement::updateWindowFunction()
 }
 void Measurement::writeData(const char *data, qint64 len)
 {
-    if (!m_audioStream || m_onReset.load() || !active()) {
+    if (m_onReset.load() || !active()) {
         return;
     }
     std::lock_guard<std::mutex> guard(m_dataMutex);
-    if (!m_audioStream) {
+    audio::Stream *stream = m_audioStream.load();
+    if (!stream) {
         return;
     }
     if (len > 0) m_lastInputMs.store(QDateTime::currentMSecsSinceEpoch(), std::memory_order_relaxed);
+    if (m_loopResetRequested.exchange(false, std::memory_order_relaxed)) {
+        while (m_loopBuffer.collected() > 0) {
+            m_loopBuffer.read();
+        }
+    }
     float sample;
-    auto totalChanels = m_audioStream->format().channelCount;
+    auto totalChanels = stream->format().channelCount;
+    const size_t bytesPerFrame = totalChanels * sizeof(float);
+    if (bytesPerFrame > 0 && len > 0) {
+        const size_t blockFrames = len / bytesPerFrame;
+        const size_t maxAllowed = stream->depth() * blockFrames + blockFrames;
+        while (m_loopBuffer.collected() > maxAllowed) {
+            m_loopBuffer.read();
+        }
+    }
     unsigned int currentChanel = 0;
     bool forceRef = referenceChanel() >= totalChanels;
     bool forceData = dataChanel() >= totalChanels;
     float loopSample = 0;
-    bool loopAvailable = m_loopBuffer.collected() >= m_audioStream->depth() * len / (totalChanels * sizeof(float));
+    bool loopAvailable = m_loopBuffer.collected() >= stream->depth() * len / (totalChanels * sizeof(float));
     qint64 offset = 0;
     for (auto it = data; offset < len; ) {
         if (currentChanel == 0) {
@@ -495,6 +521,7 @@ void Measurement::writeData(const char *data, qint64 len)
 
         if (currentChanel == dataChanel()) {
             memcpy(&sample, it, sizeof(float));
+            m_levelMeters.m_rawInput.add(sample);
             m_data.write(m_polarity ? -m_gain *sample : sample * m_gain);
             m_levelMeters.add(sample * m_gain);
         }
@@ -511,6 +538,7 @@ void Measurement::writeData(const char *data, qint64 len)
                 m_levelMeters.addToReference(loopSample * m_offset);
             }
             if (forceData) {
+                m_levelMeters.m_rawInput.add(loopSample);
                 m_data.write(loopSample * m_gain);
                 m_levelMeters.add(loopSample * m_gain);
             }
@@ -523,7 +551,7 @@ void Measurement::writeData(const char *data, qint64 len)
 }
 void Measurement::transform()
 {
-    if (!active() || m_error)
+    if (!active() || m_error.load(std::memory_order_relaxed))
         return;
 
     lock();
@@ -551,12 +579,14 @@ void Measurement::transform()
     }
     m_dataFT.transform();
     m_deconvolution.transform(&m_dataFT);
-    if ((++m_delayFinderCounter % 25) == 0) {
+    const bool delayUpdated = (++m_delayFinderCounter % 25) == 0;
+    if (delayUpdated) {
         m_delayFinder.transform(nullptr);
         m_delayFinderCounter = 0;
     }
     averaging();
     unlock();
+    if (delayUpdated && inputAvailable()) emit delayEstimateUpdated();
     emit readyRead();
     emit levelChanged();
     emit referenceLevelChanged();
@@ -866,28 +896,27 @@ void Measurement::applyCalibration()
 }
 void Measurement::updateAudio()
 {
-    if (m_audioStream) {
+    audio::Stream *oldStream = m_audioStream.exchange(nullptr);
+    if (oldStream) {
         m_input.close();
-        m_audioStream->disconnect(this);
-        m_audioStream->close();
+        oldStream->disconnect(this);
+        oldStream->close();
     }
-    m_audioStream = nullptr;
     checkChannels();
     if (active()) {
-        std::async([this]() {
-            audio::Format format = audio::Client::getInstance()->deviceInputFormat(m_deviceId);
-            setSampleRate(format.sampleRate);
-            m_input.setCallback([this](const char *buffer, qint64 size) {
-                writeData(buffer, size);
-            });
-            m_audioStream = audio::Client::getInstance()->openInput(m_deviceId, &m_input, format);
-            if (!m_audioStream) {
-                setError();
-                return;
-            }
-            connect(m_audioStream, &audio::Stream::sampleRateChanged, this, &Measurement::onSampleRateChanged);
-            emit audioFormatChanged();
+        audio::Format format = audio::Client::getInstance()->deviceInputFormat(m_deviceId);
+        setSampleRate(format.sampleRate);
+        m_input.setCallback([this](const char *buffer, qint64 size) {
+            writeData(buffer, size);
         });
+        audio::Stream *newStream = audio::Client::getInstance()->openInput(m_deviceId, &m_input, format);
+        if (!newStream) {
+            setError();
+            return;
+        }
+        m_audioStream.store(newStream);
+        connect(newStream, &audio::Stream::sampleRateChanged, this, &Measurement::onSampleRateChanged);
+        emit audioFormatChanged();
     }
 }
 void Measurement::checkChannels()
@@ -928,13 +957,13 @@ void Measurement::resetAverage() noexcept
     m_phaseLPFs.each(reset);
 
     m_meters.each(reset);
-    m_loopBuffer.reset();
+    m_loopResetRequested.store(true, std::memory_order_relaxed);
     m_levelMeters.reset();
 
     m_onReset.store(false);
 }
 
-Measurement::Meters::Meters() : m_reference(Weighting::Z, Meter::Slow)
+Measurement::Meters::Meters() : m_reference(Weighting::Z, Meter::Slow), m_rawInput(Weighting::Z, Meter::Slow)
 {
     for (auto &curve : Weighting::allCurves) {
         for (auto &time : Meter::allTimes) {
@@ -956,6 +985,7 @@ void Measurement::Meters::setSampleRate(unsigned int sampleRate)
         meter.second.setSampleRate(sampleRate);
     }
     m_reference.setSampleRate(sampleRate);
+    m_rawInput.setSampleRate(sampleRate);
 }
 
 void Measurement::Meters::add(float value)
@@ -974,4 +1004,5 @@ void Measurement::Meters::reset()
         meter.second.reset();
     }
     m_reference.reset();
+    m_rawInput.reset();
 }

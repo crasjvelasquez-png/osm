@@ -25,6 +25,7 @@ import "elements"
 
 Item {
     id: control
+    property var dataObject
     property var currentGenerator : (remoteClient.controlledGenerator && remoteClient.controlledGenerator.data ? remoteClient.controlledGenerator.data : generatorModel)
 
     ColumnLayout {
@@ -39,8 +40,9 @@ Item {
                 id: type
                 implicitWidth: 140
                 currentIndex: control.currentGenerator.type
-                model: generatorModel.types
+                model: selectTarget.currentIndex === 0 ? generatorModel.types : generatorModel.types.slice(0, 9)
                 onCurrentIndexChanged: control.currentGenerator.type = currentIndex
+                onActivated: if (currentIndex === 9) applicationWindow.audioFilePlayer.open()
 
                 ToolTip.visible: hovered
                 ToolTip.text: qsTr("signal type")
@@ -64,6 +66,14 @@ Item {
 
                 ToolTip.visible: hovered
                 ToolTip.text: qsTr("gain")
+            }
+
+            StudioButton {
+                text: qsTr("Audio file…")
+                enabled: selectTarget.currentIndex === 0
+                onClicked: applicationWindow.audioFilePlayer.open()
+                ToolTip.visible: hovered
+                ToolTip.text: qsTr("Load audio, control playback and set a loop region")
             }
 
             //Sin frequency
@@ -147,7 +157,7 @@ Item {
                 ToolTip.text: qsTr("End frequency")
             }
 
-            Button {
+            StudioButton {
                 id: octaveDown
                 implicitWidth: 120
                 text: qsTr("Octave Down")
@@ -156,7 +166,7 @@ Item {
                 onClicked: frequencySpinBox.value /= 2
             }
 
-            Button {
+            StudioButton {
                 id:octaveUp
                 implicitWidth: 120
                 text: qsTr("Octave Up")
@@ -217,7 +227,7 @@ Item {
                 }
             }
 
-            Button {
+            StudioButton {
                 text: "even inv"
                 checkable: true
                 enabled: selectTarget.currentIndex === 0

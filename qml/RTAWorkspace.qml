@@ -40,10 +40,10 @@ Item {
     }
     readonly property bool available: measurement && deviceIndex >= 0 &&
         measurement.dataChanel >= 0 && measurement.dataChanel < channels.length
-    readonly property string stateText: !measurement ? qsTr("Select a measurement in the source list") :
-        !available ? qsTr("Input unavailable — select a device or reconnect it") :
-        measurement.error ? qsTr("Input unavailable — check microphone permission in System Settings or device access, then press Start") :
-        !measurement.active ? qsTr("Stopped — displayed trace is held") :
+    readonly property string stateText: !measurement ? qsTr("Select a measurement in the source list") :\
+        !available ? qsTr("Input unavailable — select a device or reconnect it") :\
+        measurement.error ? qsTr("Input unavailable — check microphone permission in System Settings or device access, then press Start") :\
+        !measurement.active ? qsTr("Stopped — displayed trace is held") :\
         !measurement.inputAvailable ? qsTr("Waiting for audio — displayed trace is held") : qsTr("Running • dBFS")
 
     Component.onCompleted: {
@@ -106,16 +106,19 @@ Item {
                 height: controlsAction.height
                 verticalAlignment: Text.AlignVCenter
                 text: qsTr("RTA / Spectrum") + (workspace.measurement ? " — " + workspace.measurement.name : "")
-                font.bold: true
+                font.pixelSize: applicationWindow.ui.sectionFontSize
+                font.weight: Font.DemiBold
                 elide: Text.ElideRight
             }
-            Button {
+            StudioButton {
                 id: controlsAction
                 font.capitalization: Font.MixedCase
                 text: workspace.showControls ? qsTr("Hide controls") : qsTr("Input & display")
                 onClicked: workspace.showControls = !workspace.showControls
             }
             CheckBox {
+                height: controlsAction.height
+                verticalAlignment: Text.AlignVCenter
                 text: qsTr("Heatmap")
                 checked: workspace.showHeatmap
                 onClicked: workspace.showHeatmap = checked
@@ -156,7 +159,7 @@ Item {
             Layout.preferredHeight: childrenRect.height
             spacing: 8
             Column {
-                width: Math.min(240, parent.width); spacing: 4
+                width: Math.min(200, parent.width); spacing: 4
                 Label { text: qsTr("Device"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 TitledCombo {
                     width: parent.width; height: 36; showTitleInValue: false
@@ -168,7 +171,7 @@ Item {
                 }
             }
             Column {
-                width: Math.min(96, parent.width); spacing: 4
+                width: Math.min(152, parent.width); spacing: 4
                 Label { text: qsTr("Input"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 TitledCombo {
                     width: parent.width; height: 36; showTitleInValue: false
@@ -179,7 +182,7 @@ Item {
                 }
             }
             Column {
-                width: Math.min(144, parent.width); spacing: 4
+                width: Math.min(224, parent.width); spacing: 4
                 Label { text: qsTr("Input meter • dBFS"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 Item {
                     width: parent.width; height: 36
@@ -192,9 +195,9 @@ Item {
                 }
             }
             Column {
-                width: Math.min(72, parent.width); spacing: 4
+                width: Math.min(112, parent.width); spacing: 4
                 Label { text: qsTr("Capture"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
-                Button {
+                StudioButton {
                     width: parent.width; height: 36
                     font.capitalization: Font.MixedCase
                     text: workspace.measurement && workspace.measurement.active ? qsTr("Stop") : qsTr("Start")
@@ -203,11 +206,10 @@ Item {
                 }
             }
             Column {
-                width: Math.min(168, parent.width); spacing: 4
+                width: Math.min(170, parent.width); spacing: 4
                 Label { text: qsTr("Settings"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
-                Button {
+                StudioButton {
                     width: parent.width; height: 36
-                    font.pixelSize: 12
                     font.capitalization: Font.MixedCase
                     text: qsTr("Measurement settings")
                     enabled: !!workspace.measurement
@@ -220,7 +222,7 @@ Item {
             Layout.preferredHeight: childrenRect.height
             spacing: 8
             Column {
-                width: Math.min(144, parent.width); spacing: 4
+                width: Math.min(200, parent.width); spacing: 4
                 Label { text: qsTr("Display"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 TitledCombo {
                     width: parent.width; height: 36; showTitleInValue: false
@@ -235,7 +237,7 @@ Item {
                 }
             }
             Column {
-                width: Math.min(176, parent.width); spacing: 4
+                width: Math.min(152, parent.width); spacing: 4
                 Label { text: qsTr("Resolution"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 TitledCombo {
                     width: parent.width; height: 36; showTitleInValue: false
@@ -251,7 +253,7 @@ Item {
                 }
             }
             Column {
-                width: Math.min(260, parent.width); spacing: 4
+                width: Math.min(224, parent.width); spacing: 4
                 Label { text: qsTr("Average"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 TitledCombo {
                     width: parent.width; height: 36; showTitleInValue: false
@@ -263,7 +265,7 @@ Item {
                 }
             }
             Column {
-                width: Math.min(144, parent.width); spacing: 4
+                width: Math.min(112, parent.width); spacing: 4
                 visible: workspace.measurement && workspace.measurement.averageType === 1
                 Label { text: qsTr("LPF"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 TitledCombo {
@@ -274,7 +276,7 @@ Item {
                 }
             }
             Column {
-                width: Math.min(144, parent.width); spacing: 4
+                width: Math.min(112, parent.width); spacing: 4
                 visible: workspace.measurement && workspace.measurement.averageType === 2
                 Label { text: qsTr("FIFO frames"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
                 SelectableSpinBox {
@@ -286,19 +288,29 @@ Item {
                     ToolTip.text: qsTr("Number of frames in the rolling average")
                 }
             }
-            CheckBox {
-                text: qsTr("Hold peaks")
-                enabled: workspace.spectrum && workspace.spectrum.mode !== 0
-                checked: workspace.spectrum ? workspace.spectrum.showPeaks : false
-                onClicked: workspace.spectrum.showPeaks = checked
+            Column {
+                width: Math.min(112, parent.width); spacing: 4
+                Label { text: qsTr("Peak display"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                CheckBox {
+                    width: parent.width; height: 36
+                    text: qsTr("Hold peaks")
+                    enabled: workspace.spectrum && workspace.spectrum.mode !== 0
+                    checked: workspace.spectrum ? workspace.spectrum.showPeaks : false
+                    onClicked: workspace.spectrum.showPeaks = checked
+                }
             }
-        }
-        CheckBox {
-            text: qsTr("Smooth trace motion")
-            checked: workspace.spectrum ? workspace.spectrum.smooth : false
-            onClicked: {
-                workspace.spectrum.smooth = checked;
-                applicationSettings.setValue("rta/smooth", checked);
+            Column {
+                width: Math.min(170, parent.width); spacing: 4
+                Label { text: qsTr("Trace motion"); font.pixelSize: 12; color: applicationWindow.ui.secondaryText }
+                CheckBox {
+                    width: parent.width; height: 36
+                    text: qsTr("Smooth trace motion")
+                    checked: workspace.spectrum ? workspace.spectrum.smooth : false
+                    onClicked: {
+                        workspace.spectrum.smooth = checked;
+                        applicationSettings.setValue("rta/smooth", checked);
+                    }
+                }
             }
         }
             }

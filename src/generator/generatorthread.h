@@ -21,6 +21,7 @@
 #include <QThread>
 
 #include "outputdevice.h"
+#include "audiofile.h"
 #include "sinsweep.h"
 #include "audio/deviceinfo.h"
 #include "audio/stream.h"
@@ -34,10 +35,18 @@ public:
     ~GeneratorThread();
 
     static GeneratorThread *getInstance();
+    AudioFile *audioFile() const { return m_audioFile; }
+    static constexpr int AudioFileType = 9;
 
 public slots:
     void init();
     void finish();
+    void loadAudioFile(QUrl url);
+    void seekAudioFile(double seconds);
+    void stopAudioFile();
+    void setAudioFileLoop(bool loop);
+    void setAudioFileMode(int mode);
+    void setAudioFileRegion(double start, double end);
 
     bool enabled() const
     {
@@ -90,6 +99,7 @@ public slots:
     void setEvenPolarity(bool evenPolarity);
 
 signals:
+    void audioFileLoaded();
     void enabledChanged(bool);
     void typeChanged(int);
     void frequencyChanged(int);
@@ -110,6 +120,8 @@ private:
     static GeneratorThread *s_instance;
     audio::DeviceInfo::Id m_deviceId;
     audio::Stream *m_audioStream;
+    AudioFile *m_audioFile;
+    quint64 m_playbackRevision = 0;
     QList<OutputDevice *> m_sources;
     QSet<int> m_channels;
     mutable std::mutex m_channelsMutex;

@@ -22,14 +22,31 @@ SpinBox {
     id: control
     implicitWidth: 160
     implicitHeight: 36
-    font.pixelSize: 14
+    font.family: applicationWindow.ui.fontFamily
+    font.pixelSize: applicationWindow.ui.controlFontSize
     leftPadding: down.indicator.width
     rightPadding: up.indicator.width
+    bottomPadding: 0
+    // Our outlined controls need a symmetric content area, unlike Material's underline style.
+    topPadding: bottomPadding
+    contentItem: TextInput {
+        text: control.displayText
+        font: control.font
+        color: control.uiTextColor
+        selectionColor: applicationWindow.accentColor
+        selectedTextColor: control.palette.highlightedText
+        horizontalAlignment: TextInput.AlignHCenter
+        verticalAlignment: TextInput.AlignVCenter
+        selectByMouse: true
+        readOnly: !control.editable
+        validator: control.validator
+        inputMethodHints: control.inputMethodHints
+    }
     background: Rectangle {
-        radius: 6
+        radius: applicationWindow.ui.controlRadius
         color: control.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control
         border.width: control.activeFocus ? 2 : 1
-        border.color: control.activeFocus ? applicationWindow.accentColor : applicationWindow.ui.separator
+        border.color: control.activeFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
     }
     down.indicator: Rectangle {
         x: 0; y: 1; width: 28; height: control.height - 2
@@ -38,15 +55,46 @@ SpinBox {
         Text { anchors.centerIn: parent; text: "−"; font.pixelSize: 16; visible: parent.width > 0; color: control.uiTextColor }
     }
     up.indicator: Rectangle {
-        x: control.width - 28; y: 1; width: 28; height: control.height - 2
+        x: control.width - width; y: 1; width: 28; height: control.height - 2
         color: "transparent"
         Rectangle { anchors.left: parent.left; width: 1; height: parent.height; visible: parent.width > 0; color: applicationWindow.ui.separator }
         Text { anchors.centerIn: parent; text: "+"; font.pixelSize: 16; visible: parent.width > 0; color: control.uiTextColor }
     }
     readonly property color uiTextColor: enabled ? applicationWindow.ui.text : applicationWindow.ui.secondaryText
-    Component.onCompleted: {
-        contentItem.selectByMouse = true;
-        contentItem.horizontalAlignment = Text.AlignHCenter;
+    MouseArea {
+        id: horizontalScrub
+        x: control.down.indicator.width
+        width: Math.max(0, control.width - control.down.indicator.width - control.up.indicator.width)
+        height: control.height
+        z: 2
+        enabled: control.enabled
+        hoverEnabled: true
+        preventStealing: true
+        cursorShape: pressed ? Qt.SizeHorCursor : Qt.IBeamCursor
+
+        property real pressX: 0
+        property int pressValue: 0
+        property int pressRange: 0
+
+        function updateFromPosition(position) {
+            var delta = Math.round((position - pressX) / Math.max(1, width) * pressRange);
+            var nextValue = Math.max(control.from, Math.min(control.to, pressValue + delta));
+            if (control.value !== nextValue) {
+                control.value = nextValue;
+                control.valueModified();
+            }
+        }
+
+        onPressed: function(mouse) {
+            pressX = mouse.x;
+            pressValue = control.value;
+            pressRange = control.to - control.from;
+            control.forceActiveFocus();
+            control.contentItem.selectAll();
+        }
+        onPositionChanged: function(mouse) {
+            if (pressed) updateFromPosition(mouse.x);
+        }
     }
 
     onFocusChanged: {

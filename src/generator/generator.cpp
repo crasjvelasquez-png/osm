@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "generator.h"
+#include <QTimer>
 
 Generator::Generator(Settings *settings, QObject *parent) : QObject(parent),
     m_thread(parent), m_settings(settings), m_uuid(QUuid::createUuid())
@@ -57,6 +58,16 @@ Generator::Generator(Settings *settings, QObject *parent) : QObject(parent),
         emit channelsChangedQList(channelsList);
     });
 
+    connect(&m_thread, &GeneratorThread::audioFileLoaded, this, [this]() {
+        m_audioFileLoading = false;
+        emit audioFileChanged();
+    });
+    auto fileTimer = new QTimer(this);
+    fileTimer->setInterval(100);
+    connect(fileTimer, &QTimer::timeout, this, [this]() {
+        if (m_thread.type() == GeneratorThread::AudioFileType && !m_audioFileLoading) emit audioFileChanged();
+    });
+    fileTimer->start();
     loadSettings();
 }
 Generator::~Generator()
@@ -154,6 +165,7 @@ QUuid Generator::uuid() const
 
 void Generator::setEnabled(bool enabled)
 {
+    if (enabled && m_audioFileLoading) return;
     QMetaObject::invokeMethod(
         &m_thread,
         "setEnabled",
@@ -221,4 +233,29 @@ void Generator::setDuration(float duration)
         Qt::QueuedConnection,
         Q_ARG(float, duration)
     );
+}
+
+void Generator::loadAudioFile(QUrl url)
+{
+    if (m_audioFileLoading || !url.isLocalFile()) return;
+    m_audioFileLoading = true;
+    emit audioFileChanged();
+    QMetaObject::invokeMethod(&m_thread, "loadAudioFile", Qt::QueuedConnection, Q_ARG(QUrl, url));
+}
+void Generator::seekAudioFile(double seconds)
+{
+    QMetaObject::invokeMethod(&m_thread, "seekAudioFile", Qt::QueuedConnection, Q_ARG(double, seconds));
+}
+void Generator::stopAudioFile() { QMetaObject::invokeMethod(&m_thread, "stopAudioFile", Qt::QueuedConnection); }
+void Generator::setAudioFileLoop(bool loop)
+{
+    QMetaObject::invokeMethod(&m_thread, "setAudioFileLoop", Qt::QueuedConnection, Q_ARG(bool, loop));
+}
+void Generator::setAudioFileMode(int mode)
+{
+    QMetaObject::invokeMethod(&m_thread, "setAudioFileMode", Qt::QueuedConnection, Q_ARG(int, mode));
+}
+void Generator::setAudioFileRegion(double start, double end)
+{
+    QMetaObject::invokeMethod(&m_thread, "setAudioFileRegion", Qt::QueuedConnection, Q_ARG(double, start), Q_ARG(double, end));
 }

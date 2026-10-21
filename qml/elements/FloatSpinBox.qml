@@ -34,7 +34,7 @@ Item {
     property bool background: true
     property int implicitWidth: 160
     property int fontSize: spinbox.font.pixelSize
-    property int bottomPadding: spinbox.bottomPadding
+    property int bottomPadding: 0
 
     property string units: ""
     width: spinbox.width

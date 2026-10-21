@@ -81,7 +81,7 @@ Item {
                 visible: dataObjectData.averageType === Measurement.OFF;
             }
 
-            Button {
+            StudioButton {
                 text: "+/–"
                 checkable: true
                 checked: dataObjectData.polarity
@@ -93,7 +93,7 @@ Item {
                 ToolTip.text: qsTr("inverse polarity at measurement chanel")
             }
 
-            Button {
+            StudioButton {
                 font.family: "Osm"
                 text: "\ue808"
                 onClicked: dataObjectData.resetAverage()
@@ -142,7 +142,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
-                Button {
+                StudioButton {
                     enabled: isLocal
                     implicitWidth: 30
                     anchors.verticalCenter: parent.verticalCenter
@@ -233,7 +233,7 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
             }
 
-            Button {
+            StudioButton {
                 text: qsTr("94 dB");
                 onClicked: {
                     dataObjectData.applyAutoGain(94 - 140);
@@ -271,7 +271,7 @@ Item {
                     .arg(Number(1000 * dataObjectData.estimatedDelta / dataObjectData.sampleRate).toLocaleString(locale, 'f', 2));
             }
 
-            Button {
+            StudioButton {
                 text: qsTr("%L1 ms")
                     .arg(Number(1000 * dataObjectData.estimated / dataObjectData.sampleRate).toLocaleString(locale, 'f', 2));
                 onClicked: {
@@ -385,7 +385,7 @@ Item {
                 }
             }
 
-            Button {
+            StudioButton {
                 text: qsTr("Store");
                 onClicked: measurementProperties.store()
                 ToolTip.visible: hovered

@@ -39,9 +39,9 @@ public:
     void close() final;
 
 public slots:
-    void setSamplerate(int sampleRate);
-    void setGain(float gaindB);
-    void setChanelCount(int count);
+    virtual void setSamplerate(int sampleRate);
+    virtual void setGain(float gaindB);
+    virtual void setChanelCount(int count);
 
 signals:
     void sampleError();

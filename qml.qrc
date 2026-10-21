@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/">
+        <file alias="StudioTheme.qml">qml/StudioTheme.qml</file>
         <file alias="main.qml">qml/main.qml</file>
+        <file alias="HeaderLevels.qml">qml/HeaderLevels.qml</file>
+        <file alias="AudioFilePlayer.qml">qml/AudioFilePlayer.qml</file>
         <file alias="Generator.qml">qml/Generator.qml</file>
         <file alias="source/Measurement.qml">qml/source/Measurement.qml</file>
         <file alias="Chart.qml">qml/Chart.qml</file>
@@ -27,6 +30,7 @@
         <file alias="Message.qml">qml/Message.qml</file>
         <file alias="ModalDialog.qml">qml/ModalDialog.qml</file>
         <file alias="Plot/GroupDelayProperties.qml">qml/Plot/GroupDelayProperties.qml</file>
+        <file alias="DelayFinder.qml">qml/DelayFinder.qml</file>
         <file alias="Calculator.qml">qml/Calculator.qml</file>
         <file alias="Shortcuts.qml">qml/Shortcuts.qml</file>
         <file alias="source/Union.qml">qml/source/Union.qml</file>
@@ -43,6 +47,9 @@
         <file alias="elements/TitledCombo.qml">qml/elements/TitledCombo.qml</file>
         <file alias="elements/ColorPicker.qml">qml/elements/ColorPicker.qml</file>
         <file alias="elements/NameField.qml">qml/elements/NameField.qml</file>
+        <file alias="elements/StudioButton.qml">qml/elements/StudioButton.qml</file>
+        <file alias="elements/StudioTextField.qml">qml/elements/StudioTextField.qml</file>
+        <file alias="elements/DefaultsSection.qml">qml/elements/DefaultsSection.qml</file>
         <file alias="elements/DropDown.qml">qml/elements/DropDown.qml</file>
         <file alias="TargetTrace.qml">qml/TargetTrace.qml</file>
         <file alias="TargetTraceProperties.qml">qml/TargetTraceProperties.qml</file>

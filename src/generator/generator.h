@@ -31,6 +31,9 @@ class Generator : public QObject
 {
     Q_OBJECT
 
+    Q_PROPERTY(QVariantMap audioFile READ audioFile NOTIFY audioFileChanged)
+    Q_PROPERTY(bool audioFileLoading READ audioFileLoading NOTIFY audioFileChanged)
+
     //On-off property
     Q_PROPERTY(bool enabled READ getEnabled WRITE setEnabled NOTIFY enabledChanged)
 
@@ -60,10 +63,20 @@ private:
     Settings *m_settings;
 
     void loadSettings();
+    bool m_audioFileLoading = false;
 
 public:
     explicit Generator(Settings *settings, QObject *parent = nullptr);
     ~Generator();
+    QVariantMap audioFile() const { auto info = m_thread.audioFile()->info(); info["outputs"] = m_thread.channels().size(); return info; }
+    bool audioFileLoading() const { return m_audioFileLoading; }
+    Q_INVOKABLE void loadAudioFile(QUrl url);
+    Q_INVOKABLE void seekAudioFile(double seconds);
+    Q_INVOKABLE void stopAudioFile();
+    Q_INVOKABLE void setAudioFileLoop(bool loop);
+    Q_INVOKABLE void setAudioFileMode(int mode);
+    Q_INVOKABLE void setAudioFileRegion(double start, double end);
+
 
     bool getEnabled() const
     {
@@ -122,6 +135,7 @@ public:
     QUuid uuid() const;
 
 signals:
+    void audioFileChanged();
     void enabledChanged(bool);
     void typeChanged();
     void frequencyChanged(int f);

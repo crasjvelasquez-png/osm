@@ -18,6 +18,10 @@
 #ifndef SPECTROGRAMPLOT_H
 #define SPECTROGRAMPLOT_H
 
+#include <deque>
+#include <vector>
+#include <QElapsedTimer>
+#include <QVariantMap>
 #include "frequencybasedplot.h"
 
 namespace Chart {
@@ -28,6 +32,7 @@ class SpectrogramPlot : public FrequencyBasedPlot
     Q_PROPERTY(int mid READ mid WRITE setMid NOTIFY midChanged)
     Q_PROPERTY(int max READ max WRITE setMax NOTIFY maxChanged)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
+    Q_PROPERTY(int historyRevision READ historyRevision NOTIFY historyChanged)
 
 public:
     SpectrogramPlot(Settings *settings, QQuickItem *parent = Q_NULLPTR);
@@ -46,17 +51,43 @@ public:
     bool active() const;
     void setActive(bool active);
 
+    int historyRevision() const noexcept;
+
+    Q_INVOKABLE QVariantMap hoverAdvice(qreal mouseX, qreal mouseY) const noexcept;
+    Q_INVOKABLE QString hoverMetricsText(qreal mouseX, qreal mouseY) const noexcept;
+
 signals:
     void minChanged(int);
     void midChanged(int);
     void maxChanged(int);
     void activeChanged(bool);
+    void historyChanged();
 
 protected:
     virtual SeriesItem *createSeriesFromSource(const Shared::Source &source) override;
+    void trackSource(const Shared::Source &source);
+
+    struct BandMetric {
+        float freq = 0.f;
+        float start = 0.f;
+        float end = 0.f;
+        float db = -140.f;
+    };
+    struct MetricRow {
+        int timeMs = 20;
+        std::vector<BandMetric> bands;
+    };
+
+    std::vector<BandMetric> collectBandsForSource(const Shared::Source &source) const;
+    void recordHistoryForSource(const QUuid &uuid);
 
     int m_min, m_mid, m_max;
     bool m_active;
+    int m_historyRevision = 0;
+    static const unsigned int MAX_HISTORY = 250;
+    std::deque<MetricRow> m_history;
+    QVector<Shared::Source> m_trackedSources;
+    QElapsedTimer m_historyTimer;
 };
 }
 #endif // SPECTROGRAMPLOT_H

@@ -21,12 +21,13 @@ import QtQuick.Controls 2.15 as Controls
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2 as Dialogs
 import Stored 1.0
+import "elements"
 
 Item {
     id: chartsLayout
     property int count: applicationSettings.value("layout/charts/count", 1)
     property alias rtaItem: rtaLoader.item
-    property bool sidebarOpen: applicationSettings.value("layout/chartCapture/sidebarOpen", true)
+    property bool sidebarOpen: false
     property int captureNumber: 1
     property string selectedCapture: ""
     property var selectedCaptures: []
@@ -120,23 +121,42 @@ Item {
     }
     onRtaWorkspaceChanged: applicationSettings.setValue("rta/workspace", rtaWorkspace)
 
-    Controls.Button {
-        id: workspaceAction
+    property real delayCursorFrequency: 0
+
+    Flow {
+        id: alignmentToolbar
         anchors.top: parent.top
-        anchors.left: parent.left
-        text: chartsLayout.rtaWorkspace ? qsTr("Return to chart layout") : qsTr("RTA")
-        onClicked: chartsLayout.rtaWorkspace = !chartsLayout.rtaWorkspace
-    }
-    Controls.Button {
-        id: captureToggle
-        anchors.top: parent.top
-        anchors.left: workspaceAction.right
-        text: chartsLayout.sidebarOpen ? qsTr("Hide traces") : qsTr("Traces")
-        onClicked: { chartsLayout.sidebarOpen = !chartsLayout.sidebarOpen; applicationSettings.setValue("layout/chartCapture/sidebarOpen", chartsLayout.sidebarOpen); }
+        anchors.topMargin: applicationWindow.ui.spacing
+        x: applicationWindow.ui.spacing
+        width: parent.width - 2 * applicationWindow.ui.spacing
+        spacing: applicationWindow.ui.spacing
+
+        StudioButton {
+            id: workspaceAction
+            height: applicationWindow.ui.controlHeight + 8
+            text: chartsLayout.rtaWorkspace ? qsTr("Return to chart layout") : qsTr("RTA")
+            onClicked: chartsLayout.rtaWorkspace = !chartsLayout.rtaWorkspace
+        }
+        StudioButton {
+            id: captureToggle
+            height: workspaceAction.height
+            text: chartsLayout.sidebarOpen ? qsTr("Hide traces") : qsTr("Traces")
+            onClicked: chartsLayout.sidebarOpen = !chartsLayout.sidebarOpen
+        }
+        DelayFinder {
+            surfaceColor: applicationWindow.ui.panel
+            textColor: applicationWindow.ui.text
+            outlineColor: applicationWindow.ui.separator
+            width: Math.min(implicitWidth, alignmentToolbar.width)
+            visible: !chartsLayout.rtaWorkspace
+            measurement: sourceList.selected && sourceList.selected.objectName === "Measurement" ? sourceList.selected.data : null
+            cursorFrequency: chartsLayout.delayCursorFrequency
+        }
     }
     SplitView {
         id: chartArea
-        anchors.top: workspaceAction.bottom
+        anchors.top: alignmentToolbar.bottom
+        anchors.topMargin: applicationWindow.ui.spacing
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -227,6 +247,7 @@ Item {
                 onHeightChanged: applicationSettings.setValue("layout/charts/1/height", height)
                 type: applicationSettings.value("layout/charts/1/type", "Spectrum")
                 onTypeChanged: applicationSettings.setValue("layout/charts/1/type", type)
+                onFrequencyCursorMoved: chartsLayout.delayCursorFrequency = frequency
                 onPlotChanged: Qt.callLater(function() { chartsLayout.applyDefaults(first); chartsLayout.applySelectedTraces(); })
                 Component.onCompleted: { settings = applicationSettings.getGroup("layout/charts/1"); Qt.callLater(function() { chartsLayout.applyDefaults(first); chartsLayout.applySelectedTraces(); }); }
             }
@@ -237,6 +258,7 @@ Item {
                 onHeightChanged: applicationSettings.setValue("layout/charts/2/height", height)
                 type: applicationSettings.value("layout/charts/2/type", "Spectrum")
                 onTypeChanged: applicationSettings.setValue("layout/charts/2/type", type)
+                onFrequencyCursorMoved: chartsLayout.delayCursorFrequency = frequency
                 onPlotChanged: Qt.callLater(function() { chartsLayout.applyDefaults(second); chartsLayout.applySelectedTraces(); })
                 Component.onCompleted: { settings = applicationSettings.getGroup("layout/charts/2"); Qt.callLater(function() { chartsLayout.applyDefaults(second); chartsLayout.applySelectedTraces(); }); }
             }
@@ -247,6 +269,7 @@ Item {
                 onHeightChanged: applicationSettings.setValue("layout/charts/3/height", height)
                 type: applicationSettings.value("layout/charts/3/type", "Spectrum")
                 onTypeChanged: applicationSettings.setValue("layout/charts/3/type", type)
+                onFrequencyCursorMoved: chartsLayout.delayCursorFrequency = frequency
                 onPlotChanged: Qt.callLater(function() { chartsLayout.applyDefaults(third); chartsLayout.applySelectedTraces(); })
                 Component.onCompleted: { settings = applicationSettings.getGroup("layout/charts/3"); Qt.callLater(function() { chartsLayout.applyDefaults(third); chartsLayout.applySelectedTraces(); }); }
             }
@@ -258,7 +281,8 @@ Item {
     Shortcut { sequences: ["Ctrl+Shift+C", "Meta+Shift+C"]; context: Qt.ApplicationShortcut; enabled: !chartsLayout.rtaWorkspace && !chartsLayout.textEntryFocused(); onActivated: chartsLayout.capture() }
     Loader {
         id: rtaLoader
-        anchors.top: workspaceAction.bottom
+        anchors.top: alignmentToolbar.bottom
+        anchors.topMargin: applicationWindow.ui.spacing
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom

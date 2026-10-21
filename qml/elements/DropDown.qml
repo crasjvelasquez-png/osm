@@ -21,13 +21,22 @@ import QtQuick.Controls 2.15
 
 ComboBox {
     id: control
+    implicitWidth: Math.max(110, valueMetrics.width + leftPadding + rightPadding)
     implicitHeight: 36
-    font.pixelSize: 14
+    leftPadding: 12
+    rightPadding: 36
+    font.family: applicationWindow.ui.fontFamily
+    font.pixelSize: applicationWindow.ui.controlFontSize
+    TextMetrics {
+        id: valueMetrics
+        font: control.font
+        text: control.displayText
+    }
     background: Rectangle {
-        radius: 6
+        radius: applicationWindow.ui.controlRadius
         color: control.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control
         border.width: control.activeFocus ? 2 : 1
-        border.color: control.activeFocus ? applicationWindow.accentColor : applicationWindow.ui.separator
+        border.color: control.activeFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
     }
 
     Connections {

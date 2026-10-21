@@ -17,9 +17,10 @@ ApplicationWindow {
     visible: false
     flags: Qt.Window
     color: applicationWindow.ui.shell
-    font.pixelSize: 14
+    font.family: applicationWindow.ui.fontFamily
+    font.pixelSize: applicationWindow.ui.controlFontSize
     Material.theme: applicationAppearance.darkMode ? Material.Dark : Material.Light
-    Material.accent: Material.Indigo
+    Material.accent: applicationWindow.ui.primary
 
     property var measurement: null
     property var magnitudePlot: null
@@ -69,10 +70,31 @@ ApplicationWindow {
 
     header: TabBar {
         id: tabs
+        padding: 8
+        spacing: 4
         background: Rectangle { color: applicationWindow.ui.panel }
-        TabButton { text: qsTr("Measurement"); background: Rectangle { color: applicationWindow.ui.panel; Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 2; color: parent.parent.checked ? applicationWindow.accentColor : "transparent" } } }
-        TabButton { text: qsTr("Magnitude"); background: Rectangle { color: applicationWindow.ui.panel; Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 2; color: parent.parent.checked ? applicationWindow.accentColor : "transparent" } } }
-        TabButton { text: qsTr("RTA / Spectrum"); background: Rectangle { color: applicationWindow.ui.panel; Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 2; color: parent.parent.checked ? applicationWindow.accentColor : "transparent" } } }
+        Repeater {
+            model: [qsTr("Measurement"), qsTr("Magnitude"), qsTr("RTA / Spectrum")]
+            TabButton {
+                text: modelData
+                implicitHeight: 36
+                font.pixelSize: applicationWindow.ui.controlFontSize
+                font.capitalization: Font.MixedCase
+                topInset: 0; bottomInset: 0
+                contentItem: Text {
+                    text: parent.text; font: parent.font
+                    color: applicationWindow.ui.text
+                    horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+                    elide: Text.ElideRight
+                }
+                background: Rectangle {
+                    radius: applicationWindow.ui.controlRadius
+                    color: parent.checked ? applicationWindow.ui.selection : parent.hovered ? applicationWindow.ui.hover : "transparent"
+                    border.width: parent.visualFocus ? 2 : parent.checked ? 1 : 0
+                    border.color: parent.visualFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
+                }
+            }
+        }
     }
 
     footer: Pane {
@@ -84,11 +106,11 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 font.pixelSize: 12
                 text: defaultsController.error.length ? defaultsController.error : qsTr("Saved defaults apply the next time you open the app.")
-                color: defaultsController.error.length ? Material.color(Material.Red) : applicationWindow.foregroundColor
+                color: defaultsController.error.length ? (applicationAppearance.darkMode ? "#FF9696" : "#B02030") : applicationWindow.ui.secondaryText
                 wrapMode: Text.WordWrap
             }
-            Button { text: qsTr("Cancel"); onClicked: settingsWindow.requestClose() }
-            Button {
+            StudioButton { text: qsTr("Cancel"); onClicked: settingsWindow.requestClose() }
+            StudioButton {
                 text: qsTr("Save defaults")
                 highlighted: true
                 onClicked: if (defaultsController.save()) settingsWindow.finishClose()
@@ -113,7 +135,7 @@ ApplicationWindow {
                     width: parent.width - 36
                     spacing: 14
 
-                    Label { text: qsTr("Audio routing"); font.bold: true }
+                    DefaultsSection { text: qsTr("Audio routing") }
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
                         Label { Layout.preferredWidth: 180; text: qsTr("Audio device") }
@@ -144,7 +166,7 @@ ApplicationWindow {
                         }
                     }
 
-                    Label { text: qsTr("Analysis"); font.bold: true }
+                    DefaultsSection { text: qsTr("Analysis") }
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
                         Label { Layout.preferredWidth: 180; text: qsTr("Averaging mode") }
@@ -191,32 +213,29 @@ ApplicationWindow {
                         }
                     }
 
-                    Label { text: qsTr("Identity and calibration"); font.bold: true }
+                    DefaultsSection { text: qsTr("Identity and calibration") }
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
                         Label { Layout.preferredWidth: 180; text: qsTr("Name") }
-                        TextField {
+                        StudioTextField {
                             Layout.fillWidth: true; text: settingsWindow.draft("measurement/name", "Measurement")
-                            implicitHeight: 36; font.pixelSize: 14
-                            background: Rectangle { radius: 6; color: parent.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? applicationWindow.accentColor : applicationWindow.ui.separator }
+                            implicitHeight: 36; font.pixelSize: applicationWindow.ui.controlFontSize
                             onEditingFinished: settingsWindow.put("measurement/name", text)
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Color") }
-                        TextField {
+                        StudioTextField {
                             text: settingsWindow.draft("measurement/color", "#673AB7").toString()
-                            implicitHeight: 36; font.pixelSize: 14
-                            background: Rectangle { radius: 6; color: parent.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control; border.width: parent.activeFocus ? 2 : 1; border.color: parent.activeFocus ? applicationWindow.accentColor : applicationWindow.ui.separator }
+                            implicitHeight: 36; font.pixelSize: applicationWindow.ui.controlFontSize
                             onEditingFinished: settingsWindow.put("measurement/color", text)
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Microphone correction") }
                         RowLayout {
                             Layout.fillWidth: true
-                            TextField {
+                            StudioTextField {
                                 Layout.fillWidth: true; readOnly: true; text: settingsWindow.draft("measurement/calibrationFile", "")
-                                implicitHeight: 36; font.pixelSize: 14
-                                background: Rectangle { radius: 6; color: applicationWindow.ui.control; border.color: applicationWindow.ui.separator }
+                                implicitHeight: 36; font.pixelSize: applicationWindow.ui.controlFontSize
                             }
-                            Button { text: qsTr("Choose…"); onClicked: correctionDialog.open() }
+                            StudioButton { text: qsTr("Choose…"); onClicked: correctionDialog.open() }
                         }
                         Label { Layout.preferredWidth: 180; text: qsTr("Correction state") }
                         CheckBox {
@@ -225,7 +244,7 @@ ApplicationWindow {
                         }
                     }
 
-                    Label { text: qsTr("Levels and timing"); font.bold: true }
+                    DefaultsSection { text: qsTr("Levels and timing") }
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
                         Label { Layout.preferredWidth: 180; text: qsTr("Reference offset") }
@@ -242,7 +261,7 @@ ApplicationWindow {
                 clip: true; contentWidth: availableWidth
                 ColumnLayout {
                     x: 18; width: parent.width - 36; spacing: 14
-                    Label { text: qsTr("Magnitude plot"); font.bold: true }
+                    DefaultsSection { text: qsTr("Magnitude plot") }
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
                         Label { Layout.preferredWidth: 180; text: qsTr("Minimum frequency") }
@@ -278,7 +297,7 @@ ApplicationWindow {
                 clip: true; contentWidth: availableWidth
                 ColumnLayout {
                     x: 18; width: parent.width - 36; spacing: 14
-                    Label { text: qsTr("RTA / Spectrum display"); font.bold: true }
+                    DefaultsSection { text: qsTr("RTA / Spectrum display") }
                     Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: qsTr("Input routing and averaging defaults come from the Measurement tab.") }
                     GridLayout {
                         columns: 2; columnSpacing: 16; rowSpacing: 8; Layout.fillWidth: true
@@ -307,13 +326,13 @@ ApplicationWindow {
             background: Rectangle { color: applicationWindow.ui.panel; Rectangle { anchors.top: parent.top; width: parent.width; height: 1; color: applicationWindow.ui.separator } }
             RowLayout {
                 anchors.fill: parent
-                Button {
+                StudioButton {
                     text: qsTr("Use current values")
                     flat: true
                     onClicked: defaultsController.useCurrentValues(settingsWindow.activeTab, measurement, magnitudePlot, rtaPlot)
                 }
                 Item { Layout.fillWidth: true }
-                Button {
+                StudioButton {
                     text: qsTr("Reset tab to factory defaults")
                     flat: true
                     onClicked: defaultsController.resetTab(settingsWindow.activeTab)
@@ -342,9 +361,9 @@ ApplicationWindow {
             spacing: 12
             Label { text: qsTr("You have unsaved changes."); wrapMode: Text.WordWrap }
             RowLayout {
-                Button { text: qsTr("Save"); highlighted: true; onClicked: { if (defaultsController.save()) { unsavedDialog.close(); settingsWindow.finishClose(); } } }
-                Button { text: qsTr("Discard"); onClicked: { defaultsController.discard(); unsavedDialog.close(); settingsWindow.finishClose(); } }
-                Button { text: qsTr("Keep editing"); onClicked: unsavedDialog.close() }
+                StudioButton { text: qsTr("Save"); highlighted: true; onClicked: { if (defaultsController.save()) { unsavedDialog.close(); settingsWindow.finishClose(); } } }
+                StudioButton { text: qsTr("Discard"); onClicked: { defaultsController.discard(); unsavedDialog.close(); settingsWindow.finishClose(); } }
+                StudioButton { text: qsTr("Keep editing"); onClicked: unsavedDialog.close() }
             }
         }
     }

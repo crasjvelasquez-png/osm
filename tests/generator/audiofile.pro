@@ -1,0 +1,10 @@
+QT += core testlib
+QT -= gui
+CONFIG += console testcase c++17
+CONFIG -= app_bundle
+TEMPLATE = app
+TARGET = audiofile-test
+INCLUDEPATH += ../../src
+SOURCES += audiofile-test.cpp ../../src/generator/audiofile.cpp ../../src/generator/outputdevice.cpp
+HEADERS += ../../src/generator/audiofile.h ../../src/generator/outputdevice.h
+LIBS += -framework AudioToolbox

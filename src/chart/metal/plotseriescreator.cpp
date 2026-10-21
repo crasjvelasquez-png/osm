@@ -97,6 +97,7 @@ SeriesItem *StepPlot::createSeriesFromSource(const Shared::Source &source)
 
 SeriesItem *SpectrogramPlot::createSeriesFromSource(const Shared::Source &source)
 {
+    trackSource(source);
     return itemNode<SpectrogramSeriesNode>(this, source);
 }
 

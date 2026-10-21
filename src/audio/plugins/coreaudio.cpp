@@ -64,6 +64,24 @@ static OSStatus audioObjectListener(AudioObjectID, UInt32, const AudioObjectProp
     return noErr;
 };
 
+void CoreaudioPlugin::addPropertyListener(AudioObjectID id, const AudioObjectPropertyAddress &address) const
+{
+    std::lock_guard<std::mutex> guard(m_listenerMutex);
+    PropertyListenerKey key{id, address};
+    if (m_registeredListeners.find(key) == m_registeredListeners.end()) {
+        OSStatus status = AudioObjectAddPropertyListener(id, &address, &audioObjectListener, const_cast<CoreaudioPlugin *>(this));
+        if (status == noErr) {
+            m_registeredListeners.insert(key);
+        }
+    }
+}
+
+size_t CoreaudioPlugin::registeredListenerCount() const
+{
+    std::lock_guard<std::mutex> guard(m_listenerMutex);
+    return m_registeredListeners.size();
+}
+
 CoreaudioPlugin::CoreaudioPlugin() : Plugin()
 {
     AudioObjectPropertyAddress propertyAddress = {
@@ -71,12 +89,17 @@ CoreaudioPlugin::CoreaudioPlugin() : Plugin()
         kAudioObjectPropertyScopeGlobal,
         kAudioObjectPropertyElementMaster
     };
-    AudioObjectAddPropertyListener(kAudioObjectSystemObject, &propertyAddress, &audioObjectListener, this);
+    addPropertyListener(kAudioObjectSystemObject, propertyAddress);
 }
 
 CoreaudioPlugin::~CoreaudioPlugin()
 {
     emit stopStreams({});
+    std::lock_guard<std::mutex> guard(m_listenerMutex);
+    for (const auto &key : m_registeredListeners) {
+        AudioObjectRemovePropertyListener(key.id, &key.address, &audioObjectListener, this);
+    }
+    m_registeredListeners.clear();
 }
 
 QString CoreaudioPlugin::name() const
@@ -201,8 +224,7 @@ unsigned int CoreaudioPlugin::getDeviceChannelCount(const int &deviceID, const D
     for (unsigned int i = 0; i < audioBuffers->mNumberBuffers; ++i) {
         number += audioBuffers->mBuffers[i].mNumberChannels;
     }
-    AudioObjectAddPropertyListener(deviceID, &propertyAddress, &audioObjectListener,
-                                   const_cast<CoreaudioPlugin *>(this));
+    addPropertyListener(deviceID, propertyAddress);
 
     return number;
 }
@@ -231,8 +253,7 @@ QStringList CoreaudioPlugin::getDeviceChannelNames(const int &deviceID, const Di
         );
         auto name = QString::fromCFString(channelNameRef);
         list.push_back(name.isEmpty() ? QString::number(channelNumber) : name);
-        AudioObjectAddPropertyListener(deviceID, &propertyAddress, &audioObjectListener,
-                                       const_cast<CoreaudioPlugin *>(this));
+        addPropertyListener(deviceID, propertyAddress);
     }
     return list;
 }
@@ -252,13 +273,23 @@ Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction 
     streamFormat.mBytesPerFrame       = streamFormat.mChannelsPerFrame * streamFormat.mBitsPerChannel / 8;
     streamFormat.mFramesPerPacket     = 1;
     streamFormat.mBytesPerPacket      = streamFormat.mBytesPerFrame;
-    auto bufferSize             = streamFormat.mChannelsPerFrame * (mode == Input ? 1024 : 8192) * sizeof(float);
+    const int requestedOutputFrames = endpoint->property("outputBufferFrames").toInt();
+    const int outputFrames = requestedOutputFrames > 0 ? std::clamp(requestedOutputFrames, 128, 8192) : 8192;
+    auto bufferSize = streamFormat.mChannelsPerFrame * (mode == Input ? 1024 : outputFrames) * sizeof(float);
 
     AudioQueueRef queue;
     AudioQueueBufferRef buffers[3];
 
+    struct StreamContext {
+        QIODevice *endpoint{nullptr};
+        std::atomic<bool> stopped{false};
+    };
+    auto context = new StreamContext{endpoint, false};
+
     auto outputCallback = [](void *inUserData, AudioQueueRef queue, AudioQueueBufferRef inBuffer) -> void {
-        auto endpoint = reinterpret_cast<QIODevice *>(inUserData);
+        auto ctx = reinterpret_cast<StreamContext *>(inUserData);
+        if (!ctx || ctx->stopped.load(std::memory_order_acquire)) return;
+        auto endpoint = ctx->endpoint;
         if (endpoint && endpoint->isReadable())
         {
             endpoint->read(reinterpret_cast<char *>(inBuffer->mAudioData), inBuffer->mAudioDataByteSize);
@@ -268,8 +299,9 @@ Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction 
 
     auto inputCallback = [](void *inUserData, AudioQueueRef queue, AudioQueueBufferRef inBuffer,
     const AudioTimeStamp *, UInt32, const AudioStreamPacketDescription *) -> void {
-
-        auto endpoint = reinterpret_cast<QIODevice *>(inUserData);
+        auto ctx = reinterpret_cast<StreamContext *>(inUserData);
+        if (!ctx || ctx->stopped.load(std::memory_order_acquire)) return;
+        auto endpoint = ctx->endpoint;
         if (endpoint && endpoint->isWritable())
         {
             endpoint->write(reinterpret_cast<char *>(inBuffer->mAudioData), inBuffer->mAudioDataByteSize);
@@ -282,18 +314,20 @@ Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction 
         if (endpoint->openMode() == QIODevice::NotOpen) {
             endpoint->open(QIODevice::ReadOnly);
         }
-        checkCall(AudioQueueNewOutput(&streamFormat, outputCallback, endpoint, NULL, NULL, 0, &queue),
-                  nullptr,
-                  "AudioQueueNewOutput");
+        if (!checkStatus(AudioQueueNewOutput(&streamFormat, outputCallback, context, NULL, NULL, 0, &queue), "AudioQueueNewOutput")) {
+            delete context;
+            return nullptr;
+        }
         break;
     }
     case Input:
         if (endpoint->openMode() == QIODevice::NotOpen) {
             endpoint->open(QIODevice::WriteOnly);
         }
-        checkCall(AudioQueueNewInput(&streamFormat, inputCallback, endpoint, NULL, NULL, 0, &queue),
-                  nullptr,
-                  "AudioQueueNewInput");
+        if (!checkStatus(AudioQueueNewInput(&streamFormat, inputCallback, context, NULL, NULL, 0, &queue), "AudioQueueNewInput")) {
+            delete context;
+            return nullptr;
+        }
         break;
     }
 
@@ -310,6 +344,7 @@ Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction 
                 "kAudioDevicePropertyDeviceUID"
             )) {
         AudioQueueDispose(queue, true);
+        delete context;
         return nullptr;
     }
 
@@ -317,34 +352,39 @@ Stream *CoreaudioPlugin::open(const DeviceInfo::Id &id, const Plugin::Direction 
     CFRelease(deviceUID);
 
     for (int i = 0; i < 3; i++) {
-        checkCall(AudioQueueAllocateBuffer(queue, bufferSize, &buffers[i]),
-                  nullptr,
-                  "AudioQueueAllocateBuffer");
+        if (!checkStatus(AudioQueueAllocateBuffer(queue, bufferSize, &buffers[i]), "AudioQueueAllocateBuffer")) {
+            AudioQueueDispose(queue, true);
+            delete context;
+            return nullptr;
+        }
         buffers[i]->mAudioDataByteSize = bufferSize;
         switch (mode) {
 
         case Output:
-            outputCallback(endpoint, queue, buffers[i]);
+            outputCallback(context, queue, buffers[i]);
             break;
         case Input:
-            inputCallback(endpoint, queue, buffers[i], nullptr, 0, nullptr);
+            inputCallback(context, queue, buffers[i], nullptr, 0, nullptr);
             break;
         }
     }
     auto res = AudioQueueStart(queue, NULL);
     if (!checkStatus(res, "start output")) {
         AudioQueueDispose(queue, true);
+        delete context;
         return nullptr;
     }
 
     auto stream = new Stream(format);
     stream->setDepth(std::size(buffers));
-    connect(stream, &Stream::closeMe, this, [queue, stream, endpoint]() {
+    connect(stream, &Stream::closeMe, this, [queue, stream, endpoint, context]() {
+        context->stopped.store(true, std::memory_order_release);
+        AudioQueueStop(queue, true);
+        AudioQueueDispose(queue, true);
         if (endpoint) {
             endpoint->close();
         }
-        AudioQueueStop(queue, true);
-        AudioQueueDispose(queue, true);
+        delete context;
         delete stream;
     }, Qt::DirectConnection);
     connect(this, &CoreaudioPlugin::stopStreams, stream, [stream]() {

@@ -42,24 +42,39 @@ public:
             return t;
         }
 
-        T *v = m_data.data() + m_read;
-        ++m_read;
-        --m_collected;
-        if (m_read >= m_size) {
-            m_read = 0;
+        size_t r = m_read.load();
+        const T *v = m_data.data() + r;
+        size_t nextRead = r + 1;
+        if (nextRead >= m_size) {
+            nextRead = 0;
         }
+        m_read = nextRead;
+        --m_collected;
         return *v;
     }
 
     void write(const T &value)
     {
+        if (m_size == 0) {
+            return;
+        }
+        if (m_collected >= m_size) {
+            size_t nextRead = m_read.load() + 1;
+            if (nextRead >= m_size) {
+                nextRead = 0;
+            }
+            m_read = nextRead;
+            m_collected.store(m_size.load());
+        } else {
+            ++m_collected;
+        }
         T *v = m_data.data() + m_write;
         *v = value;
-        ++m_write;
-        ++m_collected;
-        if (m_write >= m_size) {
-            m_write = 0;
+        size_t nextWrite = m_write.load() + 1;
+        if (nextWrite >= m_size) {
+            nextWrite = 0;
         }
+        m_write = nextWrite;
     }
 
     const T replace(const T &value)

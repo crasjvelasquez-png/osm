@@ -80,7 +80,7 @@ Item {
                     }
                 }
             }
-            Button {
+            StudioButton {
                 font.family: "Osm"
                 font.pixelSize: 30
                 text: "\uf0C9"
@@ -294,7 +294,7 @@ Item {
                 }
             }
 
-            Button {
+            StudioButton {
                 font.family: "Osm"
                 text: "\ue807"
                 flat: true

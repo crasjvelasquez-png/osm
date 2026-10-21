@@ -87,7 +87,7 @@ public:
     void setFiltersFrequency(QVariant frequency);
 
     int delay() const;
-    void setDelay(int delay);
+    virtual void setDelay(int delay);
 
     Meta::Measurement::InputFilter inputFilter() const;
     void setInputFilter(Meta::Measurement::InputFilter inputFilter);

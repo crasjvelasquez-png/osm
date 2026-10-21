@@ -17,6 +17,8 @@
  */
 
 #include <QVariant>
+#include <QTimer>
+#include <cmath>
 
 #include "generatorthread.h"
 #include "audio/client.h"
@@ -38,6 +40,7 @@ GeneratorThread::GeneratorThread(QObject *parent) :
     QThread(parent),
     m_deviceId(audio::Client::getInstance()->defaultDeviceId(audio::Plugin::Direction::Output)),
     m_audioStream(nullptr),
+    m_audioFile(new AudioFile(this)),
     m_sources(),
     m_gain(-6.f), m_duration(1.f),
     m_type(0),
@@ -111,6 +114,17 @@ void GeneratorThread::init()
     m_sources << new MLSPlus(this);
     m_sources << new BrownNoise(this);
     m_sources << new SinBurst(this);
+    m_sources << m_audioFile;
+    connect(m_audioFile, &AudioFile::playbackFinished, this, [this]() {
+        const auto revision = m_playbackRevision;
+        // Let the queued output buffers drain before closing the stream at EOF.
+        const int drainMs = m_audioStream ? int(std::ceil(1000.0 * 512 * m_audioStream->depth()
+                                                 / m_audioStream->format().sampleRate)) : 0;
+        QTimer::singleShot(drainMs, this, [this, revision]() {
+            if (revision == m_playbackRevision && m_type == AudioFileType && m_audioFile->playbackAtEnd())
+                setEnabled(false);
+        });
+    }, Qt::QueuedConnection);
 
     for (auto &source : m_sources) {
         connect(source, &OutputDevice::sampleError, this, &GeneratorThread::deviceError);
@@ -127,7 +141,16 @@ void GeneratorThread::finish()
 }
 void GeneratorThread::setEnabled(bool enabled)
 {
+    if (enabled && m_type == AudioFileType) {
+        if (!m_audioFile->ready()) {
+            emit enabledChanged(false);
+            emit Notifier::getInstance()->newMessage("Generator", "Choose an audio file before starting playback");
+            return;
+        }
+        if (m_audioFile->playbackAtEnd()) m_audioFile->seekSeconds(m_audioFile->info()["start"].toDouble());
+    }
     if (m_enabled != enabled) {
+        ++m_playbackRevision;
         m_enabled = enabled;
         updateAudio();
         if (m_type == 3 && m_enabled == false)
@@ -138,11 +161,12 @@ void GeneratorThread::setEnabled(bool enabled)
 }
 void GeneratorThread::setType(int type)
 {
-    if (m_sources.size() <= type) {
+    if (type < 0 || m_sources.size() <= type) {
         qDebug() << "type out of range";
         return;
     }
     if (m_type != type) {
+        if (m_enabled && (m_type == AudioFileType || type == AudioFileType)) setEnabled(false);
         m_type = type;
         updateAudio();
         emit typeChanged(m_type);
@@ -245,4 +269,29 @@ void GeneratorThread::setGain(float gain)
         m_gain = gain;
         emit gainChanged(gain);
     }
+}
+
+void GeneratorThread::loadAudioFile(QUrl url)
+{
+    setEnabled(false);
+    setType(AudioFileType);
+    m_audioFile->load(url);
+    emit audioFileLoaded();
+}
+void GeneratorThread::seekAudioFile(double seconds)
+{
+    ++m_playbackRevision;
+    const bool resume = m_type == AudioFileType && m_enabled;
+    if (resume) setEnabled(false);
+    m_audioFile->seekSeconds(seconds);
+    if (resume) setEnabled(true);
+}
+void GeneratorThread::setAudioFileLoop(bool loop) { m_audioFile->setLoop(loop); }
+void GeneratorThread::setAudioFileMode(int mode) { m_audioFile->setMode(mode); }
+void GeneratorThread::setAudioFileRegion(double start, double end) { m_audioFile->setRegion(start, end); }
+void GeneratorThread::stopAudioFile()
+{
+    if (m_type == AudioFileType) setEnabled(false);
+    ++m_playbackRevision;
+    m_audioFile->seekSeconds(m_audioFile->info()["start"].toDouble());
 }

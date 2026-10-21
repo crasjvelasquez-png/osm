@@ -99,6 +99,7 @@ SeriesFBO *StepPlot::createSeriesFromSource(const Shared::Source &source)
 
 SeriesFBO *SpectrogramPlot::createSeriesFromSource(const Shared::Source &source)
 {
+    trackSource(source);
     return new SeriesFBO(source, []() {
         return new SpectrogramSeriesRenderer();
     }, this);

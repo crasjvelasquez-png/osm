@@ -58,6 +58,7 @@ SOURCES += src/main.cpp \
     src/filesystem/dialogPlugin.cpp \
     src/filesystem/plugins/widgetdialogplugin.cpp \
     \
+    src/generator/audiofile.cpp \
     src/generator/generator.cpp \
     src/generator/generatorthread.cpp \
     src/generator/pinknoise.cpp \
@@ -251,6 +252,7 @@ HEADERS += \
     src/source/standardline.h \
     src/targettrace.h \
     src/source/union.h \
+    src/generator/audiofile.h \
     src/generator/generator.h \
     src/generator/generatorthread.h \
     src/generator/pinknoise.h \

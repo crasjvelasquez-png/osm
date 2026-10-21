@@ -19,6 +19,9 @@
 #define AUDIO_MACOS_H
 
 #include "../plugin.h"
+#include <CoreAudio/CoreAudio.h>
+#include <set>
+#include <mutex>
 
 namespace audio {
 
@@ -29,6 +32,18 @@ class CoreaudioPlugin : public Plugin
     Q_OBJECT
 
 public:
+    struct PropertyListenerKey {
+        AudioObjectID id;
+        AudioObjectPropertyAddress address;
+
+        bool operator<(const PropertyListenerKey &other) const {
+            if (id != other.id) return id < other.id;
+            if (address.mSelector != other.address.mSelector) return address.mSelector < other.address.mSelector;
+            if (address.mScope != other.address.mScope) return address.mScope < other.address.mScope;
+            return address.mElement < other.address.mElement;
+        }
+    };
+
     CoreaudioPlugin();
     ~CoreaudioPlugin();
 
@@ -39,6 +54,8 @@ public:
     Format deviceFormat(const DeviceInfo::Id &id, const Direction &mode) const override;
     Stream *open(const DeviceInfo::Id &id, const Direction &mode, const Format &format, QIODevice *endpoint) override;
 
+    size_t registeredListenerCount() const;
+
 signals:
     void stopStreams(QPrivateSignal);
 
@@ -46,6 +63,11 @@ private:
     unsigned int getDeviceDefaultSampleRate(const int &deviceID) const;
     unsigned int getDeviceChannelCount(const int &deviceID, const Direction &direction) const;
     QStringList getDeviceChannelNames(const int &deviceID, const Direction &direction) const;
+
+    void addPropertyListener(AudioObjectID id, const AudioObjectPropertyAddress &address) const;
+
+    mutable std::mutex m_listenerMutex;
+    mutable std::set<PropertyListenerKey> m_registeredListeners;
 };
 
 } // namespace audio

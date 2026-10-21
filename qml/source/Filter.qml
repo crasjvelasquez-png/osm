@@ -30,7 +30,10 @@ Source {
     width: parent.width
 
     RowLayout {
-        width: parent.width
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        spacing: 4
 
         MulticolorCheckBox {
             id: checkbox
@@ -51,6 +54,9 @@ Source {
 
             Label {
                 Layout.fillWidth: true
+                Layout.rightMargin: dataModelData && dataModelData.cloneable ? 62 : 28
+                elide: Text.ElideRight
+                font.pixelSize: applicationWindow.ui.controlFontSize
                 font.bold: highlight
                 text:  (dataModelData ? dataModelData.name : "")
             }

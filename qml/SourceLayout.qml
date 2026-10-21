@@ -245,7 +245,7 @@ ListView {
                     }
                 }
 
-                Button {
+                StudioButton {
                     id: cloneButton
                     font.family: "Osm"
                     text: "\uf24d"
@@ -261,9 +261,6 @@ ListView {
                     onClicked: {
                         sources.cloneItem(dragArea.source);
                     }
-                    background: Rectangle {
-                        color: "transparent"
-                    }
                 }
 
                 Rectangle {
@@ -277,7 +274,7 @@ ListView {
                     color: "transparent"
                 }
 
-                Button {
+                StudioButton {
                     id: deleteButton
                     font.family: "Osm"
                     text: "\ue801"
@@ -305,9 +302,6 @@ ListView {
                     function freeDialog() {
                         applicationWindow.dialog.accepted.disconnect(deleteModel);
                         applicationWindow.dialog.rejected.disconnect(freeDialog);
-                    }
-                    background: Rectangle {
-                        color: "transparent"
                     }
                 }
 
@@ -355,10 +349,9 @@ ListView {
     onCurrentIndexChanged: sources.selectedIndex = currentIndex
     currentIndex: -1
     highlight: Rectangle {
-        z: 2
+        z: -1
         visible: sources.selectedIndex >= 0 ? true : false
-        color: Qt.rgba(sources.highlightColor.r, sources.highlightColor.g, sources.highlightColor.b, 0.12)
-        Rectangle { width: 2; height: parent.height; color: sources.highlightColor }
+        color: applicationWindow.ui.selection
     }
 
     Item {

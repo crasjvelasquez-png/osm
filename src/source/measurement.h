@@ -72,6 +72,7 @@ class Measurement : public Abstract::Source, public Meta::Measurement
     Q_PROPERTY(float referenceLevel READ referenceLevel NOTIFY referenceLevelChanged REVISION NO_API_REVISION)
 
     Q_PROPERTY(float measurementPeak READ measurementPeak NOTIFY levelChanged REVISION NO_API_REVISION)
+    Q_PROPERTY(float inputHeadroom READ inputHeadroom NOTIFY levelChanged)
     Q_PROPERTY(float referencePeak READ referencePeak NOTIFY referenceLevelChanged REVISION NO_API_REVISION)
 
     Q_PROPERTY(long estimated READ estimated NOTIFY estimatedChanged)
@@ -79,7 +80,7 @@ class Measurement : public Abstract::Source, public Meta::Measurement
 
     Q_PROPERTY(bool inputAvailable READ inputAvailable NOTIFY levelChanged)
 
-    Q_PROPERTY(bool error MEMBER m_error NOTIFY errorChanged)
+    Q_PROPERTY(bool error READ error NOTIFY errorChanged)
 
     //calibration
     Q_PROPERTY(bool calibrationLoaded READ calibrationLoaded NOTIFY calibrationLoadedChanged)
@@ -107,6 +108,7 @@ public:
 
     bool inputAvailable() const noexcept;
     float measurementPeak() const;
+    float inputHeadroom() const;
     float referencePeak() const;
 
     Q_INVOKABLE void resetAverage() noexcept override;
@@ -120,11 +122,13 @@ public:
     void setCalibration(bool c) noexcept;
     Q_INVOKABLE bool loadCalibrationFile(const QUrl &fileName) noexcept;
     QString calibrationFile() const noexcept { return m_calibrationFile; }
+    bool error() const noexcept { return m_error.load(std::memory_order_relaxed); }
 
     audio::DeviceInfo::Id deviceId() const;
     void setDeviceId(const audio::DeviceInfo::Id &deviceId);
     QString deviceName() const;
     void selectDevice(const QString &name);
+    void setDelay(int delay) override;
 
     Q_INVOKABLE void applyAutoGain(const float reference) override;
     Q_INVOKABLE void destroy() override final;
@@ -151,7 +155,7 @@ private:
     InputDevice m_input;
 
     audio::DeviceInfo::Id m_deviceId;
-    audio::Stream *m_audioStream;
+    std::atomic<audio::Stream*> m_audioStream {nullptr};
 
     Settings *m_settings;
     Mode m_currentMode;
@@ -160,14 +164,16 @@ private:
     int m_workingDelay;
     unsigned int m_delayFinderCounter;
     long m_estimatedDelay;
-    bool m_error;
+    std::atomic<bool> m_error {false};
     std::atomic<qint64> m_lastInputMs {0};
     std::atomic<bool>       m_onReset;
+    std::atomic<bool>       m_loopResetRequested {false};
 
     Container::Circular<float> m_data, m_reference, m_loopBuffer;
     struct Meters {
         std::unordered_map<::Abstract::LevelsData::Key, Meter, ::Abstract::LevelsData::Key::Hash> m_meters;
         Meter m_reference;
+        Meter m_rawInput;
         std::shared_ptr<math::Filter> m_filter;
 
         Meters();
@@ -211,6 +217,7 @@ signals:
     void levelChanged();
     void referenceLevelChanged();
     void estimatedChanged();
+    void delayEstimateUpdated();
     void errorChanged(bool);
     void calibrationChanged(bool);
     void calibrationLoadedChanged(bool);
