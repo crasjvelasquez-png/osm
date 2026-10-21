@@ -10,6 +10,7 @@ Rectangle {
     height: 56
     color: applicationWindow.ui.shell
     property string monitoredId: ""
+    property Item splButtonRef: null
     readonly property var source: {
         sourceList.count;
         var item = monitoredId ? sourceList.getByUUid(monitoredId) : null;
@@ -68,6 +69,12 @@ Rectangle {
         source: header.source ? header.source.uuid : "00000000-0000-0000-0000-000000000000"
         curve: header.splCurve; time: header.splResponse; type: "RMS"
         peakHold: header.splPeakHold
+    }
+    Connections {
+        target: zSlow
+        function onSourceChanged() { zSlow.reset(); }
+        function onCurveChanged() { zSlow.reset(); }
+        function onTimeChanged() { zSlow.reset(); }
     }
     property bool averageSPL: false
     property string splCurve: "Z"
@@ -146,7 +153,7 @@ Rectangle {
             }
             contentItem: Row {
                 Repeater {
-                    model: [qsTr("dBA Slow"), qsTr("dBC Fast"), header.splLabel]
+                    model: 3
                     delegate: Item {
                         width: index === 2 ? 198 : 120
                         height: readings.height
@@ -172,13 +179,24 @@ Rectangle {
                             background: Item {}
                             contentItem: Item {}
                             Accessible.name: qsTr("SPL settings")
-                            onClicked: splPopup.open()
+                            Component.onCompleted: {
+                                if (index === 2) {
+                                    header.splButtonRef = splButton;
+                                }
+                            }
+                            onClicked: {
+                                if (splPopup.opened) {
+                                    splPopup.close();
+                                } else {
+                                    splPopup.open();
+                                }
+                            }
                             MouseArea {
                                 id: splMouse
                                 anchors.fill: parent
                                 hoverEnabled: true
+                                acceptedButtons: Qt.NoButton
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: { splButton.forceActiveFocus(); splPopup.open(); }
                             }
                         }
                         Column {
@@ -186,7 +204,7 @@ Rectangle {
                             spacing: 1
                             Label {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: modelData
+                                text: index === 0 ? qsTr("dBA Slow") : index === 1 ? qsTr("dBC Fast") : header.splLabel
                                 font.pixelSize: applicationWindow.ui.secondaryFontSize
                                 color: applicationWindow.ui.secondaryText
                             }
@@ -207,14 +225,14 @@ Rectangle {
     }
     Popup {
         id: splPopup
-        parent: header
-        x: Math.max(8, header.width - width - 16)
-        y: header.height + 6
+        parent: header.splButtonRef ? header.splButtonRef : header
+        x: parent ? parent.mapFromItem(header, Math.max(8, header.width - width - 16), 0).x : 0
+        y: parent ? parent.mapFromItem(header, 0, header.height + 6).y : 0
         width: 320
         padding: 20
         modal: false
         focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
         background: Rectangle {
             color: applicationWindow.ui.panel
             radius: 10
