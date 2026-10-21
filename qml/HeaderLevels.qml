@@ -134,6 +134,16 @@ Rectangle {
                 font.pixelSize: applicationWindow.ui.secondaryFontSize
             }
         }
+        DanteStatus {
+            id: danteStatus
+            Layout.alignment: Qt.AlignVCenter
+            compact: applicationWindow ? applicationWindow.width < 1024 : false
+            onClicked: {
+                if (typeof danteWindow !== "undefined" && danteWindow) {
+                    danteWindow.open();
+                }
+            }
+        }
         Control {
             id: readings
             Layout.preferredWidth: 438

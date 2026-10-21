@@ -53,6 +53,7 @@ SOURCES += src/main.cpp \
     src/common/notifier.cpp \
     src/common/profiler.cpp \
     src/common/settings.cpp \
+    src/dante/monitor.cpp \
     \
     src/filesystem/dialog.cpp \
     src/filesystem/dialogPlugin.cpp \
@@ -160,6 +161,7 @@ INCLUDEPATH += \
     src/meta \
     src/chart \
     src/common \
+    src/dante \
     src/remote \
     src/generator \
     src/source \
@@ -218,6 +220,7 @@ HEADERS += \
     src/generator/mnoise.h \
     src/common/notifier.h \
     src/common/profiler.h \
+    src/dante/monitor.h \
     src/math/bandpass.h \
     src/math/bessellpf.h \
     src/math/biquad.h \

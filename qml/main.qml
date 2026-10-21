@@ -162,6 +162,7 @@ ApplicationWindow {
     AudioFilePlayer { id: filePlayer }
 
     SettingsDefaults { id: defaultsWindow }
+    DanteMonitoring { id: danteWindow }
 
     About {
         id: aboutpopup

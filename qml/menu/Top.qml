@@ -237,6 +237,15 @@ MenuBar {
             }
         }
         MenuItem {
+            id: danteMonitoringItem
+            text: qsTr("&Dante monitoring")
+            shortcut: "Ctrl+Shift+D"
+            checkable: false
+            onTriggered: {
+                danteWindow.open();
+            }
+        }
+        MenuItem {
             id: experimentFunctions
             text: qsTr("&Experiment functions")
             checkable: true

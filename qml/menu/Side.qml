@@ -120,6 +120,13 @@ Drawer {
             }
             separator: true
         }
+        ListElement {
+            name: qsTr("Dante monitoring")
+            onclick: function() {
+                danteWindow.open();
+            }
+            separator: true
+        }
 
         ListElement {
             name: qsTr("Check for update")

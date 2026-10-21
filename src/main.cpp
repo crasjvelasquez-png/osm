@@ -40,6 +40,7 @@
 #include "common/appearance.h"
 #include "common/autosaver.h"
 #include "common/defaultscontroller.h"
+#include "dante/monitor.h"
 #include "filesystem/dialog.h"
 #include "remote/server.h"
 #include "remote/remoteclient.h"
@@ -94,6 +95,7 @@ int main(int argc, char *argv[])
     DefaultsController defaultsController(settings.getGroup("defaults"), sourceList.get());
     auto t = new TargetTrace(settings.getGroup("targettrace"));
     auto notifier = Notifier::getInstance();
+    dante::Monitor danteMonitor(settings.getGroup("dante"));
 
     auto client = remote::Client(settings.getGroup("apiClient"));
     client.setSourceList(sourceList);
@@ -139,6 +141,7 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("remoteServer", &server);
     engine.rootContext()->setContextProperty("remoteClient", &client);
+    engine.rootContext()->setContextProperty("danteMonitor", &danteMonitor);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     if (engine.rootObjects().isEmpty())
