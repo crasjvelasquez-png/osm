@@ -197,7 +197,7 @@ Rectangle {
                             onClicked: {
                                 if (splPopup.opened) {
                                     splPopup.close();
-                                } else {
+                                } else if (Date.now() - splPopup.lastClosedAt > 250) {
                                     splPopup.open();
                                 }
                             }
@@ -235,14 +235,24 @@ Rectangle {
     }
     Popup {
         id: splPopup
-        parent: header.splButtonRef ? header.splButtonRef : header
-        x: parent ? parent.mapFromItem(header, Math.max(8, header.width - width - 16), 0).x : 0
-        y: parent ? parent.mapFromItem(header, 0, header.height + 6).y : 0
-        width: 320
+        parent: Overlay.overlay
+        property double lastClosedAt: 0
+        // Outside presses dismiss before the button receives its click.
+        onAboutToHide: lastClosedAt = Date.now()
+        readonly property Item windowOverlay: Overlay.overlay
+        readonly property point windowPosition: Qt.point(
+            Math.max(8, Math.min(windowOverlay.width - width - 8,
+                header.mapToItem(windowOverlay, header.width - width - 16, 0).x)),
+            Math.max(8, Math.min(windowOverlay.height - height - 8,
+                header.mapToItem(windowOverlay, 0, header.height + 6).y)))
+        // Use window coordinates: the button can sit at the window's right edge.
+        x: windowPosition.x
+        y: windowPosition.y
+        width: Math.min(320, windowOverlay.width - 16)
         padding: 20
         modal: false
         focus: true
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         background: Rectangle {
             color: applicationWindow.ui.panel
             radius: 10

@@ -40,11 +40,6 @@ Item {
     }
     readonly property bool available: measurement && deviceIndex >= 0 &&
         measurement.dataChanel >= 0 && measurement.dataChanel < channels.length
-    readonly property string stateText: !measurement ? qsTr("Select a measurement in the source list") :
-        !available ? qsTr("Input unavailable — select a device or reconnect it") :
-        measurement.error ? qsTr("Input unavailable — check microphone permission in System Settings or device access, then press Start") :
-        !measurement.active ? qsTr("Stopped — displayed trace is held") :
-        !measurement.inputAvailable ? qsTr("Waiting for audio — displayed trace is held") : qsTr("Running • dBFS")
 
     Component.onCompleted: {
         var savedId = applicationSettings.value("rta/selectedSource", "");
@@ -121,24 +116,6 @@ Item {
                 text: qsTr("Heatmap")
                 checked: workspace.showHeatmap
                 onClicked: workspace.showHeatmap = checked
-            }
-        }
-        Rectangle {
-            Layout.fillWidth: true
-            implicitHeight: statusLabel.implicitHeight + 16
-            radius: 6
-            color: applicationWindow.ui.panel
-            border.color: workspace.measurement && (!workspace.available || workspace.measurement.error) ?
-                Material.color(Material.Orange) : applicationWindow.ui.separator
-            Label {
-                id: statusLabel
-                anchors.fill: parent
-                anchors.margins: 8
-                text: workspace.stateText
-                color: workspace.measurement && (!workspace.available || workspace.measurement.error) ?
-                    Material.color(Material.Orange) : applicationWindow.ui.secondaryText
-                wrapMode: Text.WordWrap
-                verticalAlignment: Text.AlignVCenter
             }
         }
         ScrollView {

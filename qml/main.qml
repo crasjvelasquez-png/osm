@@ -62,6 +62,8 @@ ApplicationWindow {
         applicationWindow.onHeightChanged.connect(function() {applicationSettings.setValue("mainwindow/height", height)});
         applicationWindow.onXChanged.connect(function() {applicationSettings.setValue("mainwindow/x", x)});
         applicationWindow.onYChanged.connect(function() {applicationSettings.setValue("mainwindow/y", y)});
+        // Fill the usable desktop on every launch, respecting the menu bar and Dock.
+        applicationWindow.showMaximized();
     }
     minimumWidth: 768
     minimumHeight: 540
