@@ -1,0 +1,24 @@
+{
+    "classes": [
+        {
+            "className": "CoreaudioPlugin",
+            "object": true,
+            "qualifiedClassName": "audio::CoreaudioPlugin",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "stopStreams",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Plugin"
+                }
+            ]
+        }
+    ],
+    "inputFile": "coreaudio.h",
+    "outputRevision": 67
+}

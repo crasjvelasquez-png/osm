@@ -1,0 +1,24 @@
+{
+    "classes": [
+        {
+            "className": "SeriesFBO",
+            "object": true,
+            "qualifiedClassName": "Chart::SeriesFBO",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "preSourceDeleted",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QQuickFramebufferObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "seriesfbo.h",
+    "outputRevision": 67
+}

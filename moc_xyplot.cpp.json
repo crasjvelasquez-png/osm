@@ -1,0 +1,289 @@
+{
+    "classes": [
+        {
+            "className": "XYPlot",
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "x",
+                            "type": "qreal"
+                        },
+                        {
+                            "name": "y",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "setHelper",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "unsetHelper",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mouseX",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "x2v",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "mouseY",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "y2v",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "value",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "v2x",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "value",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "v2y",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "name": "beginGesture",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "base",
+                            "type": "QPointF"
+                        },
+                        {
+                            "name": "move",
+                            "type": "QPointF"
+                        },
+                        {
+                            "name": "scale",
+                            "type": "QPointF"
+                        }
+                    ],
+                    "name": "applyGesture",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "resetAxis",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "xmin",
+                    "notify": "xminChanged",
+                    "read": "xmin",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setXMin"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "xmax",
+                    "notify": "xmaxChanged",
+                    "read": "xmax",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setXMax"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "ymin",
+                    "notify": "yminChanged",
+                    "read": "ymin",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setYMin"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "ymax",
+                    "notify": "ymaxChanged",
+                    "read": "ymax",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setYMax"
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "xLowLimit",
+                    "read": "xLowLimit",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "xHighLimit",
+                    "read": "xHighLimit",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "yLowLimit",
+                    "read": "yLowLimit",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "yHighLimit",
+                    "read": "yHighLimit",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "xScale",
+                    "read": "xScale",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "yScale",
+                    "read": "yScale",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false
+                }
+            ],
+            "qualifiedClassName": "Chart::XYPlot",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "xminChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "xmaxChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "yminChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "ymaxChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "sizeChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Plot"
+                }
+            ]
+        }
+    ],
+    "inputFile": "xyplot.h",
+    "outputRevision": 67
+}

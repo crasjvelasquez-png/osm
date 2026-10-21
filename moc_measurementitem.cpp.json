@@ -1,0 +1,405 @@
+{
+    "classes": [
+        {
+            "className": "MeasurementItem",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "resetAverage",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "store",
+                    "returnType": "Shared::Source"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "reference",
+                            "type": "float"
+                        }
+                    ],
+                    "name": "applyAutoGain",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "polarity",
+                    "notify": "polarityChanged",
+                    "read": "polarity",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setPolarity"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "gain",
+                    "notify": "gainChanged",
+                    "read": "gain",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setGain"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "offset",
+                    "notify": "offsetChanged",
+                    "read": "offset",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setOffset"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "dataChanel",
+                    "notify": "dataChanelChanged",
+                    "read": "dataChanel",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setDataChanel"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "referenceChanel",
+                    "notify": "referenceChanelChanged",
+                    "read": "referenceChanel",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setReferenceChanel"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "delay",
+                    "notify": "delayChanged",
+                    "read": "delay",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setDelay"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "average",
+                    "notify": "averageChanged",
+                    "read": "average",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setAverage"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "mode",
+                    "notify": "modeChanged",
+                    "read": "mode",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Meta::Measurement::Mode",
+                    "user": false,
+                    "write": "setMode"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "averageType",
+                    "notify": "averageTypeChanged",
+                    "read": "averageType",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Meta::Measurement::AverageType",
+                    "user": false,
+                    "write": "setAverageType"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "filtersFrequency",
+                    "notify": "filtersFrequencyChanged",
+                    "read": "filtersFrequency",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Filter::Frequency",
+                    "user": false,
+                    "write": "setFiltersFrequency"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "window",
+                    "notify": "windowFunctionTypeChanged",
+                    "read": "windowFunctionType",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "WindowFunction::Type",
+                    "user": false,
+                    "write": "setWindowFunctionType"
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "modes",
+                    "read": "getAvailableModes",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "inputFilters",
+                    "read": "getAvailableInputFilters",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "windows",
+                    "read": "getAvailableWindowTypes",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "estimated",
+                    "notify": "estimatedChanged",
+                    "read": "estimated",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setEstimated"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "estimatedDelta",
+                    "notify": "estimatedChanged",
+                    "read": "estimatedDelta",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setEstimatedDelta"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "inputFilter",
+                    "notify": "inputFilterChanged",
+                    "read": "inputFilter",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Meta::Measurement::InputFilter",
+                    "user": false,
+                    "write": "setInputFilter"
+                }
+            ],
+            "qualifiedClassName": "remote::MeasurementItem",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "polarityChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "gainChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "offsetChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "Meta::Measurement::Mode"
+                        }
+                    ],
+                    "name": "modeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "averageChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "dataChanelChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "referenceChanelChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "Meta::Measurement::AverageType"
+                        }
+                    ],
+                    "name": "averageTypeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "WindowFunction::Type"
+                        }
+                    ],
+                    "name": "windowFunctionTypeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "Filter::Frequency"
+                        }
+                    ],
+                    "name": "filtersFrequencyChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "int"
+                        }
+                    ],
+                    "name": "delayChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "Meta::Measurement::InputFilter"
+                        }
+                    ],
+                    "name": "inputFilterChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "estimatedChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "remote::Item"
+                },
+                {
+                    "access": "public",
+                    "name": "Meta::Measurement"
+                }
+            ]
+        }
+    ],
+    "inputFile": "measurementitem.h",
+    "outputRevision": 67
+}

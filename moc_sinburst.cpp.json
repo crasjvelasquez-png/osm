@@ -1,0 +1,30 @@
+{
+    "classes": [
+        {
+            "className": "SinBurst",
+            "object": true,
+            "qualifiedClassName": "SinBurst",
+            "slots": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "f",
+                            "type": "int"
+                        }
+                    ],
+                    "name": "setFrequency",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "OutputDevice"
+                }
+            ]
+        }
+    ],
+    "inputFile": "sinburst.h",
+    "outputRevision": 67
+}

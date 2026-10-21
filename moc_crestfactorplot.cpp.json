@@ -1,0 +1,45 @@
+{
+    "classes": [
+        {
+            "className": "CrestFactorPlot",
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "pointsPerOctave",
+                    "notify": "pointsPerOctaveChanged",
+                    "read": "pointsPerOctave",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "uint",
+                    "user": false,
+                    "write": "setPointsPerOctave"
+                }
+            ],
+            "qualifiedClassName": "Chart::CrestFactorPlot",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "pointsPerOctaveChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Chart::FrequencyBasedPlot"
+                }
+            ]
+        }
+    ],
+    "inputFile": "crestfactorplot.h",
+    "outputRevision": 67
+}

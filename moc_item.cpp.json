@@ -1,0 +1,178 @@
+{
+    "classes": [
+        {
+            "className": "Item",
+            "enums": [
+                {
+                    "isClass": false,
+                    "isFlag": false,
+                    "name": "State",
+                    "values": [
+                        "WAIT",
+                        "UPDATED",
+                        "ERROR_STATE"
+                    ]
+                }
+            ],
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "toJSON",
+                    "returnType": "QJsonObject"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "state",
+                    "notify": "stateChanged",
+                    "read": "state",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "State",
+                    "user": false,
+                    "write": "setState"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "host",
+                    "notify": "hostChanged",
+                    "read": "host",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "write": "setHost"
+                }
+            ],
+            "qualifiedClassName": "remote::Item",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "stateChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "hostChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "remote::Item*"
+                        }
+                    ],
+                    "name": "updateData",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "localChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QString"
+                        },
+                        {
+                            "name": "arg",
+                            "type": "QVariant"
+                        }
+                    ],
+                    "name": "sendCommand",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "sendCommand",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "public",
+                    "name": "refresh",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "hash",
+                            "type": "uint"
+                        },
+                        {
+                            "name": "deactivate",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "dataError",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "hash",
+                            "type": "uint"
+                        },
+                        {
+                            "name": "data",
+                            "type": "QJsonArray"
+                        },
+                        {
+                            "name": "timeData",
+                            "type": "QJsonArray"
+                        }
+                    ],
+                    "name": "dataReceived",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "name": "startResetTimer",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "name": "resetState",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "name": "properiesChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Abstract::Source"
+                }
+            ]
+        }
+    ],
+    "inputFile": "item.h",
+    "outputRevision": 67
+}

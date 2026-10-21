@@ -1,0 +1,135 @@
+{
+    "classes": [
+        {
+            "classInfos": [
+                {
+                    "name": "QML.Element",
+                    "value": "auto"
+                }
+            ],
+            "className": "GeneratorChannelModel",
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "int"
+                        },
+                        {
+                            "name": "checked",
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "check",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "checkedCount",
+                    "returnType": "int"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "list",
+                    "notify": "listChanged",
+                    "read": "list",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QStringList",
+                    "user": false,
+                    "write": "setList"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "checked",
+                    "notify": "checkedChanged",
+                    "read": "checked",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QStringList",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "checkedIndexes",
+                    "notify": "checkedChanged",
+                    "read": "checkedIndexes",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QSet<int>",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "member": "m_noneTitle",
+                    "name": "noneTitle",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "member": "m_allTitle",
+                    "name": "allTitle",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "member": "m_generator",
+                    "name": "generator",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Generator*",
+                    "user": false
+                }
+            ],
+            "qualifiedClassName": "GeneratorChannelModel",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "checkedChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "listChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QAbstractListModel"
+                }
+            ]
+        }
+    ],
+    "inputFile": "channelmodel.h",
+    "outputRevision": 67
+}

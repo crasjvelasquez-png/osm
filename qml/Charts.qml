@@ -231,7 +231,7 @@ Item {
                 Controls.MenuItem { text: qsTr("Rename in field below") }
                 Controls.MenuItem { text: qsTr("Delete…"); onTriggered: deleteDialog.open() }
             }
-            Dialogs.MessageDialog { id: deleteDialog; title: qsTr("Delete saved trace?"); text: qsTr("This removes the trace from the current session."); standardButtons: Dialogs.StandardButton.Cancel | Dialogs.StandardButton.Yes; onYes: { sourceList.removeItem(chartsLayout.selectedCapture); chartsLayout.selectedCaptures = []; chartsLayout.selectedCapture = ""; chartsLayout.applySelectedTraces(); } }
+            ModalDialog { id: deleteDialog; title: qsTr("Delete saved trace?"); detail: qsTr("This removes the trace from the current session."); onOpened: acceptText = qsTr("Delete"); onAccepted: { sourceList.removeItem(chartsLayout.selectedCapture); chartsLayout.selectedCaptures = []; chartsLayout.selectedCapture = ""; chartsLayout.applySelectedTraces(); } }
         }
         SplitView {
             id: sv

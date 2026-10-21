@@ -1,0 +1,140 @@
+{
+    "classes": [
+        {
+            "className": "StandardLine",
+            "enums": [
+                {
+                    "isClass": false,
+                    "isFlag": false,
+                    "name": "Mode",
+                    "values": [
+                        "ELC",
+                        "WEIGHTING_A",
+                        "WEIGHTING_B",
+                        "WEIGHTING_C",
+                        "FLAT"
+                    ]
+                }
+            ],
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "toJSON",
+                    "returnType": "QJsonObject"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "loudness",
+                    "notify": "loudnessChanged",
+                    "read": "loudness",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "float",
+                    "user": false,
+                    "write": "setLoudness"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "mode",
+                    "notify": "modeChanged",
+                    "read": "mode",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "StandardLine::Mode",
+                    "user": false,
+                    "write": "setMode"
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "modes",
+                    "read": "getAvailableModes",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "transformModes",
+                    "read": "getAvailableTransformModes",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "transformMode",
+                    "notify": "transformModeChanged",
+                    "read": "transformMode",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Meta::Measurement::Mode",
+                    "user": false,
+                    "write": "setTransformMode"
+                }
+            ],
+            "qualifiedClassName": "StandardLine",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "float"
+                        }
+                    ],
+                    "name": "loudnessChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "StandardLine::Mode"
+                        }
+                    ],
+                    "name": "modeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "transformModeChanged",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "private",
+                    "name": "update",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Abstract::Source"
+                }
+            ]
+        }
+    ],
+    "inputFile": "standardline.h",
+    "outputRevision": 67
+}

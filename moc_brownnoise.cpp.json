@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "BrownNoise",
+            "object": true,
+            "qualifiedClassName": "BrownNoise",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "OutputDevice"
+                }
+            ]
+        }
+    ],
+    "inputFile": "brownnoise.h",
+    "outputRevision": 67
+}

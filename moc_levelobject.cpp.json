@@ -1,0 +1,11 @@
+{
+    "classes": [
+        {
+            "className": "LevelObject",
+            "gadget": true,
+            "qualifiedClassName": "Chart::LevelObject"
+        }
+    ],
+    "inputFile": "levelobject.h",
+    "outputRevision": 67
+}

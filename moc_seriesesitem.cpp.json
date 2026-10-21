@@ -1,0 +1,39 @@
+{
+    "classes": [
+        {
+            "className": "SeriesesItem",
+            "object": true,
+            "qualifiedClassName": "Chart::SeriesesItem",
+            "slots": [
+                {
+                    "access": "public",
+                    "name": "parentWidthChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "parentHeightChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "update",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "updateZOrders",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QQuickItem"
+                }
+            ]
+        }
+    ],
+    "inputFile": "seriesesitem.h",
+    "outputRevision": 67
+}

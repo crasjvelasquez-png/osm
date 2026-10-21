@@ -1,0 +1,236 @@
+{
+    "classes": [
+        {
+            "className": "TargetTrace",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "size",
+                    "returnType": "uint"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "i",
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "frequency",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "i",
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "gain",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "i",
+                            "type": "uint"
+                        },
+                        {
+                            "name": "value",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "setFrequency",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "i",
+                            "type": "uint"
+                        },
+                        {
+                            "name": "value",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "setGain",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "active",
+                    "notify": "activeChanged",
+                    "read": "active",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setActive"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "show",
+                    "notify": "showChanged",
+                    "read": "show",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setShow"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "width",
+                    "notify": "widthChanged",
+                    "read": "width",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "qreal",
+                    "user": false,
+                    "write": "setWidth"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "color",
+                    "notify": "colorChanged",
+                    "read": "color",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QColor",
+                    "user": false,
+                    "write": "setColor"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "offset",
+                    "notify": "offsetChanged",
+                    "read": "offset",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "qreal",
+                    "user": false,
+                    "write": "setOffset"
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "presets",
+                    "read": "getAvailablePresets",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "preset",
+                    "notify": "presetChanged",
+                    "read": "preset",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "uint",
+                    "user": false,
+                    "write": "setPreset"
+                }
+            ],
+            "qualifiedClassName": "TargetTrace",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "changed",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "activeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "bool"
+                        }
+                    ],
+                    "name": "showChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "widthChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QColor"
+                        }
+                    ],
+                    "name": "colorChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "offsetChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "uint"
+                        }
+                    ],
+                    "name": "presetChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "targettrace.h",
+    "outputRevision": 67
+}

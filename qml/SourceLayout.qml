@@ -290,6 +290,7 @@ ListView {
                         applicationWindow.dialog.accepted.connect(deleteModel);
                         applicationWindow.dialog.rejected.connect(freeDialog);
                         applicationWindow.dialog.title = "Delete " + dragArea.source.data.name + "?";
+                        applicationWindow.dialog.acceptText = qsTr("Delete");
                         applicationWindow.dialog.open();
                     }
                     function deleteModel() {
@@ -300,6 +301,7 @@ ListView {
                         freeDialog();
                     }
                     function freeDialog() {
+                        applicationWindow.dialog.acceptText = qsTr("OK");
                         applicationWindow.dialog.accepted.disconnect(deleteModel);
                         applicationWindow.dialog.rejected.disconnect(freeDialog);
                     }

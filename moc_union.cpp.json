@@ -1,0 +1,221 @@
+{
+    "classes": [
+        {
+            "className": "Union",
+            "enums": [
+                {
+                    "isClass": false,
+                    "isFlag": false,
+                    "name": "Operation",
+                    "values": [
+                        "Summation",
+                        "Subtract",
+                        "Avg",
+                        "Min",
+                        "Max",
+                        "Diff",
+                        "Apply"
+                    ]
+                },
+                {
+                    "isClass": false,
+                    "isFlag": false,
+                    "name": "Type",
+                    "values": [
+                        "Vector",
+                        "Polar",
+                        "dB",
+                        "Power"
+                    ]
+                }
+            ],
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "int"
+                        }
+                    ],
+                    "name": "getSource",
+                    "returnType": "Shared::Source"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "int"
+                        }
+                    ],
+                    "name": "getSourceId",
+                    "returnType": "QUuid"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "index",
+                            "type": "int"
+                        },
+                        {
+                            "name": "s",
+                            "type": "Shared::Source"
+                        }
+                    ],
+                    "name": "setSource",
+                    "returnType": "bool"
+                },
+                {
+                    "access": "public",
+                    "name": "toJSON",
+                    "returnType": "QJsonObject"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "count",
+                    "notify": "countChanged",
+                    "read": "count",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setCount"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "autoName",
+                    "notify": "autoNameChanged",
+                    "read": "autoName",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setAutoName"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "operation",
+                    "notify": "operationChanged",
+                    "read": "operation",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Operation",
+                    "user": false,
+                    "write": "setOperation"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "type",
+                    "notify": "typeChanged",
+                    "read": "type",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Type",
+                    "user": false,
+                    "write": "setType"
+                }
+            ],
+            "qualifiedClassName": "Union",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "int"
+                        }
+                    ],
+                    "name": "countChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "Union::Operation"
+                        }
+                    ],
+                    "name": "operationChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "needUpdate",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "typeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "autoNameChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "modelChanged",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "public",
+                    "name": "update",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "calc",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "store",
+                    "returnType": "Shared::Source"
+                },
+                {
+                    "access": "public",
+                    "name": "applyAutoName",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "source",
+                            "type": "Source*"
+                        }
+                    ],
+                    "name": "sourceDestroyed",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Abstract::Source"
+                }
+            ]
+        }
+    ],
+    "inputFile": "union.h",
+    "outputRevision": 67
+}

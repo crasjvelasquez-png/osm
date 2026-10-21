@@ -1,0 +1,31 @@
+{
+    "classes": [
+        {
+            "className": "SourceList",
+            "gadget": true,
+            "properties": [
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "data",
+                    "read": "get",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "::SourceList*",
+                    "user": false
+                }
+            ],
+            "qualifiedClassName": "Shared::SourceList",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "std::shared_ptr< ::SourceList>"
+                }
+            ]
+        }
+    ],
+    "inputFile": "sourcelist_shared.h",
+    "outputRevision": 67
+}

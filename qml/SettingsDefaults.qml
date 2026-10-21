@@ -349,22 +349,21 @@ ApplicationWindow {
         onAccepted: settingsWindow.put("measurement/calibrationFile", fileUrl.toString().replace("file://", ""))
     }
 
-    Dialog {
+    ModalDialog {
         id: unsavedDialog
-        modal: true
-        Overlay.modal: Rectangle { color: applicationAppearance.darkMode ? "#99000000" : "#55000000" }
-        background: Rectangle { radius: 6; color: applicationWindow.ui.panel; border.color: applicationWindow.ui.separator }
-        width: 480
+        width: Math.min(480, parent.width - 32)
         title: qsTr("Save changes to defaults?")
-        anchors.centerIn: parent
-        contentItem: ColumnLayout {
-            spacing: 12
-            Label { text: qsTr("You have unsaved changes."); wrapMode: Text.WordWrap }
-            RowLayout {
-                StudioButton { text: qsTr("Save"); highlighted: true; onClicked: { if (defaultsController.save()) { unsavedDialog.close(); settingsWindow.finishClose(); } } }
-                StudioButton { text: qsTr("Discard"); onClicked: { defaultsController.discard(); unsavedDialog.close(); settingsWindow.finishClose(); } }
-                StudioButton { text: qsTr("Keep editing"); onClicked: unsavedDialog.close() }
-            }
+        detail: qsTr("You have unsaved changes.")
+        acceptOnReturn: false
+        footer: DialogButtonBox {
+            padding: 24
+            topPadding: 0
+            spacing: 8
+            alignment: Qt.AlignRight
+            background: Item {}
+            StudioButton { text: qsTr("Discard"); onClicked: { defaultsController.discard(); unsavedDialog.close(); settingsWindow.finishClose(); } }
+            StudioButton { text: qsTr("Keep editing"); onClicked: unsavedDialog.close() }
+            StudioButton { text: qsTr("Save"); highlighted: true; onClicked: { if (defaultsController.save()) { unsavedDialog.close(); settingsWindow.finishClose(); } } }
         }
     }
 }

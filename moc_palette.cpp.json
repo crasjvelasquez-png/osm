@@ -1,0 +1,24 @@
+{
+    "classes": [
+        {
+            "className": "Palette",
+            "object": true,
+            "qualifiedClassName": "Chart::Palette",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "changed",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "palette.h",
+    "outputRevision": 67
+}

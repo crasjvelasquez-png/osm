@@ -1,0 +1,34 @@
+{
+    "classes": [
+        {
+            "className": "Notifier",
+            "object": true,
+            "qualifiedClassName": "Notifier",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "title",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "text",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "newMessage",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "notifier.h",
+    "outputRevision": 67
+}

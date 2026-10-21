@@ -1,0 +1,73 @@
+{
+    "classes": [
+        {
+            "className": "Group",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "destroy",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "uuid",
+                            "type": "QUuid"
+                        }
+                    ],
+                    "name": "pop",
+                    "returnType": "Shared::Source"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "size",
+                    "notify": "sizeChanged",
+                    "read": "size",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "uint",
+                    "user": false
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "sourceList",
+                    "read": "sourceList",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "SourceList*",
+                    "user": false
+                }
+            ],
+            "qualifiedClassName": "Source::Group",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "sizeChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Abstract::Source"
+                },
+                {
+                    "access": "public",
+                    "name": "Meta::Group"
+                }
+            ]
+        }
+    ],
+    "inputFile": "group.h",
+    "outputRevision": 67
+}

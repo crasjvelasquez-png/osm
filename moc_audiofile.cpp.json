@@ -1,0 +1,24 @@
+{
+    "classes": [
+        {
+            "className": "AudioFile",
+            "object": true,
+            "qualifiedClassName": "AudioFile",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "playbackFinished",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "OutputDevice"
+                }
+            ]
+        }
+    ],
+    "inputFile": "audiofile.h",
+    "outputRevision": 67
+}

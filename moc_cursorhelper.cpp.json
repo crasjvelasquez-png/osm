@@ -1,0 +1,75 @@
+{
+    "classes": [
+        {
+            "className": "CursorHelper",
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "axis",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "value",
+                    "returnType": "qreal"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "axis",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "value",
+                            "type": "qreal"
+                        }
+                    ],
+                    "name": "setValue",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "type": "QString"
+                        },
+                        {
+                            "name": "axis",
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "unsetValue",
+                    "returnType": "void"
+                }
+            ],
+            "object": true,
+            "qualifiedClassName": "Chart::CursorHelper",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "valueUpdated",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "cursorhelper.h",
+    "outputRevision": 67
+}

@@ -1,0 +1,113 @@
+{
+    "classes": [
+        {
+            "classInfos": [
+                {
+                    "name": "QML.Element",
+                    "value": "auto"
+                }
+            ],
+            "className": "MeterTableModel",
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "columns",
+                    "notify": "columnsChanged",
+                    "read": "columns",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setColumns"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "rows",
+                    "notify": "rowsChanged",
+                    "read": "rows",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "int",
+                    "user": false,
+                    "write": "setRows"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "sourceList",
+                    "notify": "sourceListChanged",
+                    "read": "sourceList",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "SourceList*",
+                    "user": false,
+                    "write": "setSourceList"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "settings",
+                    "notify": "settingsChanged",
+                    "read": "settings",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Settings*",
+                    "user": false,
+                    "write": "setSettings"
+                }
+            ],
+            "qualifiedClassName": "MeterTableModel",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "int"
+                        }
+                    ],
+                    "name": "columnsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "int"
+                        }
+                    ],
+                    "name": "rowsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "sourceListChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "settingsChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QAbstractTableModel"
+                }
+            ]
+        }
+    ],
+    "inputFile": "metertablemodel.h",
+    "outputRevision": 67
+}

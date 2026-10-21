@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "MLSPlus",
+            "object": true,
+            "qualifiedClassName": "MLSPlus",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "OutputDevice"
+                }
+            ]
+        }
+    ],
+    "inputFile": "mlsplus.h",
+    "outputRevision": 67
+}

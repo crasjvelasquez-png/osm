@@ -1,0 +1,127 @@
+{
+    "classes": [
+        {
+            "className": "Equalizer",
+            "methods": [
+                {
+                    "access": "public",
+                    "name": "toJSON",
+                    "returnType": "QJsonObject"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "fileName",
+                            "type": "QUrl"
+                        }
+                    ],
+                    "name": "save",
+                    "returnType": "bool"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "modes",
+                    "read": "getAvailableModes",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QVariant",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "size",
+                    "notify": "sizeChanged",
+                    "read": "size",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "uint",
+                    "user": false,
+                    "write": "setSize"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "mode",
+                    "notify": "modeChanged",
+                    "read": "mode",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Meta::Measurement::Mode",
+                    "user": false,
+                    "write": "setMode"
+                },
+                {
+                    "constant": true,
+                    "designable": true,
+                    "final": false,
+                    "name": "sourceList",
+                    "read": "sourceList",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "SourceList*",
+                    "user": false
+                }
+            ],
+            "qualifiedClassName": "Source::Equalizer",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "Meta::Measurement::Mode"
+                        }
+                    ],
+                    "name": "modeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "sizeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "needUpdate",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "private",
+                    "name": "update",
+                    "returnType": "void"
+                },
+                {
+                    "access": "private",
+                    "name": "doUpdate",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Abstract::Source"
+                },
+                {
+                    "access": "public",
+                    "name": "Meta::Equalizer"
+                }
+            ]
+        }
+    ],
+    "inputFile": "equalizer.h",
+    "outputRevision": 67
+}

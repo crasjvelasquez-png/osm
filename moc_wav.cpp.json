@@ -1,0 +1,21 @@
+{
+    "classes": [
+        {
+            "className": "Wav",
+            "object": true,
+            "qualifiedClassName": "Wav",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "OutputDevice"
+                },
+                {
+                    "access": "public",
+                    "name": "WavFile"
+                }
+            ]
+        }
+    ],
+    "inputFile": "wav.h",
+    "outputRevision": 67
+}

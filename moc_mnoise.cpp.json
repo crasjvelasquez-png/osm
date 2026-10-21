@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "MNoise",
+            "object": true,
+            "qualifiedClassName": "MNoise",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Wav"
+                }
+            ]
+        }
+    ],
+    "inputFile": "mnoise.h",
+    "outputRevision": 67
+}

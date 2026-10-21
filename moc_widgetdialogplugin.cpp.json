@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "WidgetDialogPlugin",
+            "object": true,
+            "qualifiedClassName": "filesystem::WidgetDialogPlugin",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "DialogPlugin"
+                }
+            ]
+        }
+    ],
+    "inputFile": "widgetdialogplugin.h",
+    "outputRevision": 67
+}

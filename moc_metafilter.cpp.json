@@ -1,0 +1,38 @@
+{
+    "classes": [
+        {
+            "className": "Filter",
+            "enums": [
+                {
+                    "isClass": false,
+                    "isFlag": false,
+                    "name": "Type",
+                    "values": [
+                        "ButterworthLPF",
+                        "ButterworthHPF",
+                        "LinkwitzRileyLPF",
+                        "LinkwitzRileyHPF",
+                        "BesselLPF",
+                        "BesselHPF",
+                        "APF",
+                        "Peak",
+                        "HighShelf",
+                        "LowShelf",
+                        "Notch",
+                        "BPF"
+                    ]
+                }
+            ],
+            "gadget": true,
+            "qualifiedClassName": "Meta::Filter",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Base"
+                }
+            ]
+        }
+    ],
+    "inputFile": "metafilter.h",
+    "outputRevision": 67
+}

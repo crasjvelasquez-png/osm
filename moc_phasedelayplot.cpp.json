@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "PhaseDelayPlot",
+            "object": true,
+            "qualifiedClassName": "Chart::PhaseDelayPlot",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "FrequencyBasedPlot"
+                }
+            ]
+        }
+    ],
+    "inputFile": "phasedelayplot.h",
+    "outputRevision": 67
+}

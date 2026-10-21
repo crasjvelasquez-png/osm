@@ -1,0 +1,24 @@
+{
+    "classes": [
+        {
+            "className": "Plugin",
+            "object": true,
+            "qualifiedClassName": "audio::Plugin",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "deviceListChanged",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "plugin.h",
+    "outputRevision": 67
+}

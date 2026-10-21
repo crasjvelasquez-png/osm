@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "Equalizer",
+            "gadget": true,
+            "qualifiedClassName": "Meta::Equalizer",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "Base"
+                }
+            ]
+        }
+    ],
+    "inputFile": "metaequalizer.h",
+    "outputRevision": 67
+}

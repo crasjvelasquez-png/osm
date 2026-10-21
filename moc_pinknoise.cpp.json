@@ -1,0 +1,17 @@
+{
+    "classes": [
+        {
+            "className": "PinkNoise",
+            "object": true,
+            "qualifiedClassName": "PinkNoise",
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "OutputDevice"
+                }
+            ]
+        }
+    ],
+    "inputFile": "pinknoise.h",
+    "outputRevision": 67
+}

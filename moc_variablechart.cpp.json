@@ -1,0 +1,156 @@
+{
+    "classes": [
+        {
+            "className": "VariableChart",
+            "methods": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "source",
+                            "type": "Shared::Source"
+                        }
+                    ],
+                    "name": "removeDataSource",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "source",
+                            "type": "QUuid"
+                        },
+                        {
+                            "name": "index",
+                            "type": "int"
+                        }
+                    ],
+                    "name": "setSourceZIndex",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "name": "url",
+                            "type": "QUrl"
+                        }
+                    ],
+                    "name": "urlForGrab",
+                    "returnType": "QString"
+                }
+            ],
+            "object": true,
+            "properties": [
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "type",
+                    "notify": "typeChanged",
+                    "read": "typeString",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QString",
+                    "user": false,
+                    "write": "setTypeByString"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "settings",
+                    "notify": "settingsChanged",
+                    "read": "settings",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "Settings*",
+                    "user": false,
+                    "write": "setSettings"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "plot",
+                    "notify": "typeChanged",
+                    "read": "plot",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "QQuickItem*",
+                    "user": false
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "sources",
+                    "notify": "sourcesChanged",
+                    "read": "sources",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "SourceList*",
+                    "user": false,
+                    "write": "setSources"
+                },
+                {
+                    "constant": false,
+                    "designable": true,
+                    "final": false,
+                    "name": "darkMode",
+                    "notify": "darkModeChanged",
+                    "read": "darkMode",
+                    "required": false,
+                    "scriptable": true,
+                    "stored": true,
+                    "type": "bool",
+                    "user": false,
+                    "write": "setDarkMode"
+                }
+            ],
+            "qualifiedClassName": "Chart::VariableChart",
+            "signals": [
+                {
+                    "access": "public",
+                    "name": "typeChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "settingsChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "sourcesChanged",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "darkModeChanged",
+                    "returnType": "void"
+                }
+            ],
+            "slots": [
+                {
+                    "access": "public",
+                    "name": "updateZOrders",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QQuickItem"
+                }
+            ]
+        }
+    ],
+    "inputFile": "variablechart.h",
+    "outputRevision": 67
+}

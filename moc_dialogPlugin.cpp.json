@@ -1,0 +1,37 @@
+{
+    "classes": [
+        {
+            "className": "DialogPlugin",
+            "object": true,
+            "qualifiedClassName": "filesystem::DialogPlugin",
+            "signals": [
+                {
+                    "access": "public",
+                    "arguments": [
+                        {
+                            "type": "QList<QUrl>"
+                        },
+                        {
+                            "type": "QString"
+                        }
+                    ],
+                    "name": "accepted",
+                    "returnType": "void"
+                },
+                {
+                    "access": "public",
+                    "name": "rejected",
+                    "returnType": "void"
+                }
+            ],
+            "superClasses": [
+                {
+                    "access": "public",
+                    "name": "QObject"
+                }
+            ]
+        }
+    ],
+    "inputFile": "dialogPlugin.h",
+    "outputRevision": 67
+}
