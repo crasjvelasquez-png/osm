@@ -257,8 +257,10 @@ Item {
             }
 
             SelectableSpinBox {
-                title: qsTr("estimated delay delta: <b>%L1ms</b>")
+                title: qsTr("Delay")
                 id: delaySpin
+                Accessible.name: qsTr("Reference delay")
+                contentItem.clip: true
                 Layout.alignment: Qt.AlignVCenter
                 Layout.minimumWidth: 156
                 Layout.preferredWidth: spinboxWidth
@@ -291,7 +293,8 @@ Item {
                 onClicked: {
                     delaySpin.value = dataObjectData.estimated;
                 }
-                implicitWidth: 75
+                implicitWidth: Math.max(104, implicitContentWidth + leftPadding + rightPadding)
+                Layout.minimumWidth: implicitWidth
 
                 font.capitalization: Font.AllLowercase
                 ToolTip.visible: hovered || activeFocus

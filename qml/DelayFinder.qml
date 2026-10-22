@@ -294,10 +294,6 @@ Rectangle {
                 font.bold: true
                 font.family: applicationWindow.ui.fontFamily
                 font.pixelSize: applicationWindow.ui.controlFontSize
-                HoverHandler { id: titleHover }
-                ToolTip.visible: titleHover.hovered
-                ToolTip.text: (finder.measurement ? finder.measurement.name + "\n" : "")
-                              + qsTr("Total reference-delay target. Distance assumes 20 °C.\nMove the chart cursor to show wavelengths at that frequency.")
             }
 
             Label {

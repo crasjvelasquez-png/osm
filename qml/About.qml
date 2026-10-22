@@ -185,7 +185,6 @@ Popup {
     MouseArea {
         anchors.right: parent.right
         anchors.top: parent.top
-        activeFocusOnTab: true
         Accessible.role: Accessible.Button
         Accessible.name: qsTr("Close about window")
         ToolTip.visible: hovered || activeFocus
