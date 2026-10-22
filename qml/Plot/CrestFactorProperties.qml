@@ -36,6 +36,8 @@ Item {
         spacing: 0
 
         SelectableSpinBox {
+            Layout.minimumWidth: 150
+            title: qsTr("x from")
             value: dataObject.xmin
             onValueChanged: dataObject.xmin = value
             from: dataObject.xLowLimit
@@ -44,7 +46,7 @@ Item {
             implicitWidth: 170
             Layout.fillWidth: true
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("x from")
 
             textFromValue: function(value, locale) {
@@ -57,6 +59,8 @@ Item {
         }
 
         SelectableSpinBox {
+            Layout.minimumWidth: 150
+            title: qsTr("x to")
             value: dataObject.xmax
             onValueChanged: dataObject.xmax = value
             from: dataObject.xLowLimit
@@ -65,7 +69,7 @@ Item {
             implicitWidth: 170
             Layout.fillWidth: true
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("x to")
 
             textFromValue: function(value, locale) {
@@ -78,6 +82,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: yminFloatBox
             min: dataObject.yLowLimit
             max: dataObject.yHighLimit
@@ -89,6 +94,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: ymaxFloatBox
             min: dataObject.yLowLimit
             max: dataObject.yHighLimit
@@ -114,8 +120,10 @@ Item {
             text: "\ue804"
             implicitWidth: 60
             onClicked: fileDialog.open();
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("save chart as an image")
+            ToolTip.visible: hovered || activeFocus
+            ToolTip.text: qsTr("Save chart as an image")
+            Accessible.name: qsTr("Save chart as an image")
+            Accessible.role: Accessible.Button
         }
     }
     RowLayout {

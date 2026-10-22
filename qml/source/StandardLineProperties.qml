@@ -28,7 +28,7 @@ import "qrc:/elements"
 Item {
     property var dataObject
     property var dataObjectData : dataObject.data
-    readonly property int elementWidth: Math.min(200, width / 6)
+    readonly property int elementWidth: 170
 
     ColumnLayout {
         spacing: 0
@@ -37,10 +37,11 @@ Item {
         RowLayout {
 
             DropDown {
+                title: qsTr("Standard")
                 id: modeSelect
                 model: dataObjectData.modes
                 currentIndex: dataObjectData.mode
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Standard")
                 onCurrentIndexChanged: dataObjectData.mode = currentIndex;
                 Layout.preferredWidth: 200
@@ -79,7 +80,7 @@ Item {
                 Component.onCompleted: {
                     color = dataObjectData.color
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("series color")
             }
 
@@ -93,12 +94,13 @@ Item {
 
         RowLayout {
             DropDown {
+                title: qsTr("Transfrom mode")
                 id: transformModeSelect
                 model: dataObjectData.transformModes
                 currentIndex: dataObjectData.transformMode
                 displayText: (dataObjectData.transformMode === Measurement.LFT ? "LTW" : (transformModeSelect.width > 120 ? "Power:" : "") + currentText)
                 enabled: !dataObjectData.limited
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Transfrom mode")
                 onCurrentIndexChanged: dataObjectData.transformMode = currentIndex;
                 Layout.preferredWidth: elementWidth
@@ -106,12 +108,13 @@ Item {
             }
 
             DropDown {
+                title: qsTr("Sample rate")
                 model: [44100, 48000, 96000, 192000]
                 currentIndex: model.indexOf(dataObjectData.sampleRate)
                 onCurrentValueChanged: dataObjectData.sampleRate = currentValue;
                 enabled: !dataObjectData.limited
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Sample rate")
                 Layout.preferredWidth: elementWidth
             }

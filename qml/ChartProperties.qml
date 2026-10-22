@@ -49,8 +49,10 @@ Item {
             text: "\ue804"
             implicitWidth: 60
             onClicked: fileDialog.open();
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("save chart as an image")
+            ToolTip.visible: hovered || activeFocus
+            ToolTip.text: qsTr("Save chart as an image")
+            Accessible.name: qsTr("Save chart as an image")
+            Accessible.role: Accessible.Button
         }
     }
 

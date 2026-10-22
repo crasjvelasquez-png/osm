@@ -42,24 +42,57 @@ Item {
             Layout.alignment: Qt.AlignVCenter
             checked: (dataModelData ? dataModelData.active : false)
             checkedColor: (dataModelData ? dataModelData.color : "none")
+            Accessible.name: qsTr("Enable %1").arg(dataModelData ? dataModelData.name : qsTr("measurement"))
+            Accessible.role: Accessible.CheckBox
 
             onCheckStateChanged: {
                 if (dataModel && dataModelData)
                     dataModelData.active = checked
             }
-            error: (dataModelData ? dataModelData.error : false)
+            error: !!dataModelData && (dataModelData.error || !dataModelData.inputAvailable)
+            errorText: dataModelData && dataModelData.error ?
+                qsTr("Can't start the %1. Device is not supported or busy.").arg(dataModelData.name) :
+                qsTr("No audio input is available for %1.").arg(dataModelData ? dataModelData.name : qsTr("this source"))
         }
 
         ColumnLayout {
             Layout.fillWidth: true
 
-            Label {
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.rightMargin: dataModelData && dataModelData.cloneable ? 62 : 28
-                elide: Text.ElideRight
-                font.pixelSize: applicationWindow.ui.controlFontSize
-                font.bold: highlight
-                text:  (dataModelData ? dataModelData.name : "")
+                spacing: 4
+
+                Label {
+                    Layout.fillWidth: true
+                    Layout.rightMargin: dataModelData && dataModelData.cloneable ? 62 : 28
+                    elide: Text.ElideRight
+                    font.pixelSize: applicationWindow.ui.controlFontSize
+                    font.bold: highlight
+                    text:  (dataModelData ? dataModelData.name : "")
+                }
+
+                Label {
+                    id: inputWarning
+                    visible: !!dataModelData && (dataModelData.error || !dataModelData.inputAvailable)
+                    text: dataModelData && dataModelData.error ? qsTr("ERR") : qsTr("NO INPUT")
+                    color: applicationWindow.ui.text
+                    font.pixelSize: 10
+                    font.bold: true
+                    leftPadding: 5
+                    rightPadding: 5
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: dataModelData && dataModelData.error ? qsTr("Audio device error") : qsTr("No audio input")
+                    Accessible.description: checkbox.errorText
+                    activeFocusOnTab: true
+                    ToolTip.visible: visible && (hovered || activeFocus)
+                    ToolTip.text: checkbox.errorText
+                    background: Rectangle {
+                        radius: 3
+                        color: applicationWindow.ui.control
+                        border.width: 1
+                        border.color: applicationWindow.ui.primary
+                    }
+                }
             }
 
             Meter {

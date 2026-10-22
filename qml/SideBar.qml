@@ -57,24 +57,34 @@ Item {
                 Layout.fillWidth: true
                 model: ["Single", "Double", "Three"]
                 currentIndex: charts.count - 1
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Chart count: %1 / %2 / %3 charts; equal heights: %4")
+                    .arg(applicationWindow.shortcutRegistry.display("charts.one"))
+                    .arg(applicationWindow.shortcutRegistry.display("charts.two"))
+                    .arg(applicationWindow.shortcutRegistry.display("charts.three"))
+                    .arg(applicationWindow.shortcutRegistry.display("charts.equalHeights"))
                 onCurrentIndexChanged: {
                     applicationWindow.charts.count = currentIndex + 1
                 }
 
                 Shortcut {
-                    sequence: "Ctrl+1"
+                    sequence: applicationWindow.shortcutRegistry.sequence("charts.one")
+                    enabled: !applicationWindow.textEntryFocused
                     onActivated: chartsCount.currentIndex = 0;
                 }
                 Shortcut {
-                    sequence: "Ctrl+2"
+                    sequence: applicationWindow.shortcutRegistry.sequence("charts.two")
+                    enabled: !applicationWindow.textEntryFocused
                     onActivated: chartsCount.currentIndex = 1;
                 }
                 Shortcut {
-                    sequence: "Ctrl+3"
+                    sequence: applicationWindow.shortcutRegistry.sequence("charts.three")
+                    enabled: !applicationWindow.textEntryFocused
                     onActivated: chartsCount.currentIndex = 2;
                 }
                 Shortcut {
-                    sequence: "Ctrl+4"
+                    sequence: applicationWindow.shortcutRegistry.sequence("charts.equalHeights")
+                    enabled: !applicationWindow.textEntryFocused
                     onActivated: {
                         applicationWindow.charts.autoHeight();
                     }
@@ -85,6 +95,10 @@ Item {
                 font.pixelSize: 30
                 text: "\uf0C9"
                 flat: true
+                Accessible.name: qsTr("Open menu")
+                Accessible.role: Accessible.Button
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Open menu")
                 onClicked: applicationWindow.sideMenu.open();
                 visible: applicationAppearance.showMenuBar ? false : true
             }
@@ -94,9 +108,10 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
                 text: "⚙"
                 font.pixelSize: 16
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("Default settings")
-                Accessible.name: qsTr("Open default settings")
+                ToolTip.text: qsTr("Default settings and keyboard shortcuts")
+                ToolTip.visible: hovered || activeFocus
+                Accessible.name: qsTr("Open settings")
+                Accessible.role: Accessible.Button
                 onClicked: {
                     var selected = sourceList.selected;
                     var measurement = selected && selected.objectName === "Measurement" ? selected.data : null;
@@ -202,8 +217,9 @@ Item {
         }
 
         Shortcut {
-            sequence: "Ctrl+X"
+            sequence: applicationWindow.shortcutRegistry.sequence("measurement.storeAll")
             context: Qt.ApplicationShortcut
+            enabled: !applicationWindow.textEntryFocused
             onActivated: {
                 for (var i = 0; i < sourceList.count; i++) {
                     let source = sourceList.get(i).data;
@@ -220,8 +236,9 @@ Item {
         }
 
         Shortcut {
-            sequence: "Ctrl+R"
+            sequence: applicationWindow.shortcutRegistry.sequence("measurement.resetAverages")
             context: Qt.ApplicationShortcut
+            enabled: !applicationWindow.textEntryFocused
             onActivated: {
                 for (var i = 0; i < sourceList.count; i++) {
                     let source = sourceList.get(i).data;
@@ -298,6 +315,10 @@ Item {
                 font.family: "Osm"
                 text: "\ue807"
                 flat: true
+                Accessible.name: qsTr("Add remote source")
+                Accessible.role: Accessible.Button
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Add remote source")
 
                 PropertiesOpener {
                    propertiesQml: "qrc:/RemoteProperties.qml"

@@ -36,6 +36,7 @@ Item {
         RowLayout {
 
             DropDown {
+                title: qsTr("Math operation")
                 model: ["Summation", "Subtract", "Average", "Min", "Max", "Diff", "Apply"]
                 currentIndex: dataObjectData.operation
                 onCurrentIndexChanged: {
@@ -46,28 +47,30 @@ Item {
                 }
                 Layout.preferredWidth: 150
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Math operation")
             }
 
             DropDown {
+                title: qsTr("Complex numbers behaviour")
                 model: ["Vector", "Polar", "dB", "Power"]
                 currentIndex: dataObjectData.type
                 onCurrentIndexChanged: dataObjectData.type = currentIndex;
                 enabled: dataObjectData.operation !== UnionSource.Apply
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Complex numbers behaviour")
             }
 
             DropDown {
+                title: qsTr("count")
                 id: count
                 model: [2, 3, 4, 5, 6, 7, 8, 9, 10]
                 currentIndex: dataObjectData.count - 2
                 onCurrentIndexChanged: dataObjectData.count = currentIndex + 2;
                 displayText: currentIndex + 2
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("count")
             }
 
@@ -91,7 +94,7 @@ Item {
                 Component.onCompleted: {
                     color = dataObjectData.color
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("series color")
             }
 
@@ -110,7 +113,7 @@ Item {
                     stored.data.active = true;
                     sourceList.appendItem(stored, true);
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("store current measurement")
             }
         }
@@ -122,6 +125,7 @@ Item {
                 model: count.currentValue
 
                 DropDown {
+                    Layout.minimumWidth: 120
                     model: SourceModel {
                         id: sourceModel
                         addNone: (modelData > 1 ? true : false)

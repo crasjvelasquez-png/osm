@@ -47,7 +47,8 @@ ApplicationWindow {
     }
 
     Shortcut {
-        sequence: "Esc"
+        sequence: applicationWindow.shortcutRegistry.sequence("dante.close")
+        enabled: !applicationWindow.isTextEntryFocused(activeFocusItem)
         onActivated: window.close()
     }
 

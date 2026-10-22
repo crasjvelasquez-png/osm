@@ -22,7 +22,7 @@ import QtQuick.Controls.Material 2.1
 import "elements"
 
 Item {
-    readonly property int elementWidth: width / (targetTraceModel.size() * 2)
+    readonly property int elementWidth: 160
 
     ColumnLayout {
         anchors.fill: parent
@@ -66,10 +66,11 @@ Item {
             }
 
             DropDown {
+                title: qsTr("Preset")
                 id: modeSelect
                 model: targetTraceModel.presets
                 currentIndex: targetTraceModel.preset
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Preset")
                 onCurrentIndexChanged: targetTraceModel.preset = currentIndex;
                 Layout.preferredWidth: 200
@@ -86,6 +87,7 @@ Item {
                     Layout.fillWidth: true
 
                     FloatSpinBox {
+                        Layout.minimumWidth: 160
                         id: frequency
                         value: targetTraceModel.frequency( index )
                         from: 20
@@ -113,6 +115,7 @@ Item {
                     }
 
                     FloatSpinBox {
+                        Layout.minimumWidth: 160
                         id: gain
                         value: targetTraceModel.gain( index )
                         from: -20

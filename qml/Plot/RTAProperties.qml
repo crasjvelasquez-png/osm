@@ -38,6 +38,8 @@ Item {
             spacing: 0
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("x from")
                 value: dataObject.xmin
                 onValueChanged: dataObject.xmin = value
                 from: dataObject.xLowLimit
@@ -46,7 +48,7 @@ Item {
                 implicitWidth: 170
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("x from")
 
                 textFromValue: function(value, locale) {
@@ -59,6 +61,8 @@ Item {
             }
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("x to")
                 value: dataObject.xmax
                 onValueChanged: dataObject.xmax = value
                 from: dataObject.xLowLimit
@@ -67,7 +71,7 @@ Item {
                 implicitWidth: 170
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("x to")
 
                 textFromValue: function(value, locale) {
@@ -80,6 +84,8 @@ Item {
             }
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("y from")
                 id: ymin
                 value: dataObject.ymin
                 onValueChanged: dataObject.ymin = value
@@ -89,7 +95,7 @@ Item {
                 implicitWidth: 170
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("y from")
 
                 textFromValue: function(value, locale) {
@@ -102,6 +108,8 @@ Item {
             }
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("y to")
                 id: ymax
                 value: dataObject.ymax
                 onValueChanged: dataObject.ymax = value
@@ -111,7 +119,7 @@ Item {
                 implicitWidth: 170
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("y to")
 
                 textFromValue: function(value, locale) {
@@ -148,8 +156,10 @@ Item {
                 text: "\ue804"
                 implicitWidth: 60
                 onClicked: fileDialog.open();
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("save chart as an image")
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Save chart as an image")
+                Accessible.name: qsTr("Save chart as an image")
+                Accessible.role: Accessible.Button
             }
         }
         RowLayout {
@@ -161,6 +171,7 @@ Item {
                 title: qsTr("mode")
                 tooltip: qsTr("render data as")
                 model: ["line", "bars", "lines"]
+                displayLabels: [qsTr("Line"), qsTr("Bars"), qsTr("Lines")]
                 currentIndex: dataObject.mode;
                 onCurrentIndexChanged: {
                     dataObject.mode = currentIndex;
@@ -179,6 +190,7 @@ Item {
                 tooltip: qsTr("points per octave")
                 visible: mode.model[mode.currentIndex] !== "lines"
                 model: [1, 3, 6, 12, 24, 48, "off"]
+                displayLabels: ["1", "3", "6", "12", "24", "48", qsTr("Off")]
                 currentIndex: {
                     model.indexOf(dataObject.pointsPerOctave ? dataObject.pointsPerOctave : "off")
                 }
@@ -197,6 +209,7 @@ Item {
                 title: qsTr("")
                 tooltip: qsTr("Show values in")
                 model: ["dBfs", "SPL", "phons"]
+                displayLabels: ["dBFS", "SPL", qsTr("Phons")]
                 currentIndex: dataObject.scale;
                 onCurrentIndexChanged: {
                     dataObject.scale = currentIndex;
@@ -211,7 +224,7 @@ Item {
                 onCheckStateChanged: dataObject.showPeaks = checked
                 visible: mode.model[mode.currentIndex] !== "line"
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("show peaks")
             }
 

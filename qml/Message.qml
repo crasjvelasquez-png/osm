@@ -24,6 +24,7 @@ Popup {
     id: popup
     property string text : "";
     property color color: "transparent"
+    property var undoCallback: null
     width: 300
     height: 100
     x: (parent ? (parent.width  - width) / 2 : 100)
@@ -64,5 +65,64 @@ Popup {
         color = Material.color(Material.Red);
         text = message;
         open();
+    }
+
+    function showUndoable(message, callback) {
+        undoText.text = message;
+        undoCallback = callback;
+        undoToast.open();
+        undoTimer.restart();
+    }
+
+    function undo() {
+        var callback = undoCallback;
+        undoCallback = null;
+        undoTimer.stop();
+        undoToast.close();
+        return callback ? callback() : false;
+    }
+
+    Popup {
+        id: undoToast
+        parent: Overlay.overlay
+        x: Math.max(16, (parent ? parent.width - width : width) / 2)
+        y: parent ? parent.height - height - 24 : 0
+        width: Math.min(380, parent ? parent.width - 32 : 380)
+        height: 58
+        padding: 0
+        modal: false
+        focus: false
+        closePolicy: Popup.NoAutoClose
+        background: Rectangle {
+            color: applicationWindow.ui.panel
+            border.color: applicationWindow.ui.separator
+            border.width: 1
+            radius: 7
+        }
+        Row {
+            anchors.fill: parent
+            anchors.leftMargin: 16
+            anchors.rightMargin: 12
+            spacing: 12
+            Text {
+                id: undoText
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.max(0, parent.width - undoButton.implicitWidth - parent.spacing)
+                color: applicationWindow.ui.text
+                elide: Text.ElideRight
+            }
+            Button {
+                id: undoButton
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr("Undo")
+                onClicked: popup.undo()
+            }
+        }
+    }
+
+    Timer {
+        id: undoTimer
+        interval: 6000
+        onTriggered: undoToast.close()
     }
 }

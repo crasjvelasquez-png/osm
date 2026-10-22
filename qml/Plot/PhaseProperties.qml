@@ -36,6 +36,8 @@ Item {
             spacing: 0
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("x from")
                 value: dataObject.xmin
                 onValueChanged: dataObject.xmin = value
                 from: dataObject.xLowLimit
@@ -43,7 +45,7 @@ Item {
                 editable: true
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("x from")
 
                 textFromValue: function(value, locale) {
@@ -56,6 +58,8 @@ Item {
             }
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("x to")
                 value: dataObject.xmax
                 onValueChanged: dataObject.xmax = value
                 from: dataObject.xLowLimit
@@ -63,7 +67,7 @@ Item {
                 editable: true
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("x to")
 
                 textFromValue: function(value, locale) {
@@ -76,6 +80,8 @@ Item {
             }
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("rotate")
                 id: rotate
                 value: dataObject.rotate
                 onValueChanged: {
@@ -91,7 +97,7 @@ Item {
                 editable: true
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("rotate")
 
                 textFromValue: function(value, locale) {
@@ -116,6 +122,8 @@ Item {
             }
 
             SelectableSpinBox {
+                Layout.minimumWidth: 150
+                title: qsTr("range")
                 value: dataObject.range
                 onValueChanged: dataObject.range = value;
                 from: 0
@@ -123,7 +131,7 @@ Item {
                 editable: true
                 Layout.fillWidth: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("range")
 
                 textFromValue: function(value, locale) {
@@ -140,8 +148,10 @@ Item {
                 text: "\ue804"
                 implicitWidth: 60
                 onClicked: fileDialog.open();
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("save chart as an image")
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Save chart as an image")
+                Accessible.name: qsTr("Save chart as an image")
+                Accessible.role: Accessible.Button
             }
         }
         RowLayout {
@@ -176,11 +186,12 @@ Item {
                 checked: dataObject.coherence
                 onCheckStateChanged: dataObject.coherence = checked
                 Layout.fillWidth: true
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("use coherence as alpha channel")
             }
 
             FloatSpinBox {
+                Layout.minimumWidth: 160
                 min: 0.0
                 max: 1.0
                 step: 0.05

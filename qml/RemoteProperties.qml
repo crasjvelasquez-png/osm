@@ -46,7 +46,7 @@ Item {
                 onCheckedChanged: {
                     remoteServer.generatorEnable = checked;
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("enable for remote")
             }
 
@@ -84,6 +84,10 @@ Item {
                 font.family: "Osm"
                 font.bold: false
                 text: "\ue808"
+                Accessible.name: qsTr("Reset remote connection")
+                Accessible.role: Accessible.Button
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Reset remote connection")
 
                 Material.background: applicationWindow.ui.control
                 onClicked: remoteClient.reset()

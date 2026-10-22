@@ -23,7 +23,7 @@ DropDown {
     property string tooltip : ""
     property bool showTitleInValue: true
 
-    displayText: (showTitleInValue && title ? title + ": " : "") + currentText
+    displayText: (showTitleInValue && title ? title + ": " : "") + textForIndex(currentIndex)
     Accessible.name: tooltip || title || currentText
     ToolTip.visible: tooltip && (hovered || activeFocus)
     ToolTip.delay: 500

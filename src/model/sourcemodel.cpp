@@ -133,6 +133,12 @@ void SourceModel::setList(SourceList *list)
         connect(m_list, &SourceList::postItemAppended, this, [ = ](auto) {
             endInsertRows();
         });
+        connect(m_list, &SourceList::preItemInserted, this, [ = ](int index) {
+            beginInsertRows(QModelIndex(), index, index);
+        });
+        connect(m_list, &SourceList::postItemInserted, this, [ = ](auto) {
+            endInsertRows();
+        });
 
         connect(m_list, &SourceList::preItemRemoved, this, [ = ](auto uuid) {
             int index = m_list->getIndexByUUid(uuid);

@@ -77,7 +77,7 @@ MenuBar {
         title: qsTr("&File")
         MenuItem {
             text: qsTr("&New")
-            shortcut: StandardKey.New
+            shortcut: applicationWindow.shortcutRegistry.sequence("project.new")
             onTriggered: {
                 dialog.title = qsTr("Create new workspace?")
                 dialog.accepted.connect(closeAccepted);
@@ -96,12 +96,12 @@ MenuBar {
         }
         MenuItem {
             text: qsTr("&Save")
-            shortcut: StandardKey.Save
+            shortcut: applicationWindow.shortcutRegistry.sequence("project.save")
             onTriggered: saveDialog.open();
         }
         MenuItem {
             text: qsTr("&Open")
-            shortcut: StandardKey.Open
+            shortcut: applicationWindow.shortcutRegistry.sequence("project.open")
             onTriggered: openDialog.open()
         }
 
@@ -164,54 +164,54 @@ MenuBar {
         }
         MenuItem {
             text: qsTr("&Import")
-            shortcut: "Ctrl+I"
+            shortcut: applicationWindow.shortcutRegistry.sequence("project.import")
             onTriggered: importDialog.open()
         }
         MenuItem {
             text: qsTr("&Add measurement")
-            shortcut: "Ctrl+A"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addMeasurement")
             onTriggered: sourceList.addMeasurement();
         }
         MenuItem {
             text: qsTr("&Add math source")
-            shortcut: "Ctrl+M"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addMath")
             onTriggered: sourceList.addUnion();
         }
         MenuItem {
             text: qsTr("&Add standard line")
-            shortcut: "Ctrl+L"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addStandard")
             onTriggered: sourceList.addStandardLine();
         }
         MenuItem {
             text: qsTr("&Add filter")
-            shortcut: "Ctrl+F"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addFilter")
             onTriggered: sourceList.addFilter();
         }
         MenuItem {
             text: qsTr("&Add equalizer")
-            shortcut: "Ctrl+E"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addEqualizer")
             onTriggered: sourceList.addEqualizer();
         }
         MenuItem {
             text: qsTr("&Add windowing")
-            shortcut: "Ctrl+W"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addWindowing")
             onTriggered: sourceList.addWindowing();
         }
         MenuItem {
             text: qsTr("&Add Group")
-            shortcut: "Ctrl+0"
+            shortcut: applicationWindow.shortcutRegistry.sequence("source.addGroup")
             onTriggered: sourceList.addGroup();
         }
         MenuItem {
             text: qsTr("&Show target")
-            shortcut: "Ctrl+T"
+            shortcut: applicationWindow.shortcutRegistry.sequence("view.target")
             checkable: true
             checked: targetTraceModel.show
             onCheckedChanged: targetTraceModel.show = checked
         }
         MenuItem {
             text: qsTr("Quit")
-            shortcut: StandardKey.Quit
+            shortcut: applicationWindow.shortcutRegistry.sequence("project.quit")
             onTriggered: applicationWindow.close();
         }
     }
@@ -220,7 +220,7 @@ MenuBar {
         MenuItem {
             id: darkModeSelect
             text: qsTr("&Dark Mode")
-            shortcut: "Ctrl+D"
+            shortcut: applicationWindow.shortcutRegistry.sequence("view.darkMode")
             checkable: true
             checked: applicationAppearance.darkMode
             onCheckedChanged: {
@@ -230,7 +230,7 @@ MenuBar {
         MenuItem {
             id: calculator
             text: qsTr("&Calculator")
-            shortcut: "Ctrl+K"
+            shortcut: applicationWindow.shortcutRegistry.sequence("view.calculator")
             checkable: false
             onTriggered: {
                 applicationWindow.properiesbar.open(null, "qrc:/Calculator.qml");
@@ -239,7 +239,7 @@ MenuBar {
         MenuItem {
             id: danteMonitoringItem
             text: qsTr("&Dante monitoring")
-            shortcut: "Ctrl+Shift+D"
+            shortcut: applicationWindow.shortcutRegistry.sequence("view.dante")
             checkable: false
             onTriggered: {
                 danteWindow.open();
@@ -260,18 +260,22 @@ MenuBar {
         title: qsTr("&Help")
         MenuItem {
             text: qsTr("&Shortcuts")
-            shortcut: "F1"
+            shortcut: applicationWindow.shortcutRegistry.sequence("help.shortcutsF1")
             checkable: false
             onTriggered: shortcutsPopup.open();
         }
         MenuItem {
+            text: qsTr("Customize shortcuts…")
+            onTriggered: defaultsWindow.openFor(null, charts.magnitudePlot(), charts.spectrumPlot(), 3);
+        }
+        MenuItem {
             text: qsTr("About")
             onTriggered: aboutpopup.open();
-            shortcut: "F2"
+            shortcut: applicationWindow.shortcutRegistry.sequence("help.about")
         }
         MenuItem {
             text: qsTr("Check for update")
-            shortcut: "F3"
+            shortcut: applicationWindow.shortcutRegistry.sequence("help.update")
             onTriggered: update.show();
         }
     }

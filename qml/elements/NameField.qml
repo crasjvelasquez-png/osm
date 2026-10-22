@@ -25,7 +25,7 @@ StudioTextField {
     placeholderText: qsTr("title")
     text: target.data.name
     onTextEdited: target.data.name = text
-    ToolTip.visible: hovered
+    ToolTip.visible: hovered || activeFocus
     ToolTip.text: qsTr("title")
 
     selectByMouse: true

@@ -38,6 +38,7 @@ Item {
         spacing: 0
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: xminFloatBox
             min: dataObject.xLowLimit
             max: dataObject.xHighLimit
@@ -50,6 +51,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: xmaxFloatBox
             min: dataObject.xLowLimit
             max: dataObject.xHighLimit
@@ -62,6 +64,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: yminFloatBox
             min: dataObject.yLowLimit
             max: dataObject.yHighLimit
@@ -74,6 +77,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: ymaxFloatBox
             min: dataObject.yLowLimit
             max: dataObject.yHighLimit
@@ -90,8 +94,10 @@ Item {
             text: "\ue804"
             implicitWidth: 60
             onClicked: fileDialog.open();
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("save chart as an image")
+            ToolTip.visible: hovered || activeFocus
+            ToolTip.text: qsTr("Save chart as an image")
+            Accessible.name: qsTr("Save chart as an image")
+            Accessible.role: Accessible.Button
         }
 
         Connections {
@@ -121,6 +127,7 @@ Item {
     RowLayout {
 
         DropDown {
+            title: qsTr("type")
             Layout.preferredWidth: 100
 
             model: dataObject.availableTypes
@@ -128,7 +135,7 @@ Item {
 
             onCurrentValueChanged: dataObject.type = currentValue
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("type")
         }
 
@@ -136,34 +143,37 @@ Item {
             id: type
             Layout.preferredWidth: 100
             model: ["dBFs", "SPL"]
+            displayLabels: ["dBFS", "SPL"]
             enabled: dataObject.type === "RMS"
             currentIndex: dataObject.mode
             onCurrentIndexChanged: {
                 dataObject.mode = currentIndex;
             }
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("scale")
         }
 
         DropDown {
+            title: qsTr("weighting")
             Layout.preferredWidth: 100
             model: dataObject.availableCurves
             currentIndex: model.indexOf(dataObject.curve)
             onCurrentValueChanged: dataObject.curve = currentValue
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("weighting")
         }
 
         DropDown {
+            title: qsTr("time")
             Layout.preferredWidth: 100
 
             model: dataObject.availableTimes
             currentIndex: model.indexOf(dataObject ? dataObject.time : "")
             onCurrentValueChanged: if(dataObject && currentValue) { dataObject.time = currentValue; }
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("time")
         }
 
@@ -174,7 +184,7 @@ Item {
             onCheckedChanged: dataObject.pause = checked
             Material.background: parent.Material.background
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("pause updating")
         }
 

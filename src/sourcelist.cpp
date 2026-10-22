@@ -199,6 +199,11 @@ QUuid SourceList::getUUid(int i) const noexcept
 void SourceList::clean() noexcept
 {
     auto guard = lock();
+    if (m_removedItem.item) {
+        m_removedItem.item->destroy();
+        m_removedItem = {};
+        emit canUndoRemoveChanged();
+    }
     m_selected = -1;
     m_checked.clear();
     emit selectedChanged();
@@ -811,17 +816,34 @@ void SourceList::removeItem(const Shared::Source &item, bool deleteItem)
     if (!item) {
         return;
     }
+    const bool wasChecked = m_checked.contains(item.uuid());
     m_checked.removeAll(item.uuid());
     for (int i = 0; i < m_items.size(); ++i) {
         if (m_items.at(i) == item) {
-            auto item = get_ref(i);
-            emit preItemRemoved(item.uuid());
+            auto removed = get_ref(i);
+            if (deleteItem) {
+                if (m_removedItem.item) {
+                    m_removedItem.item->destroy();
+                }
+                m_removedItem.item = removed;
+                m_removedItem.index = i;
+                m_removedItem.active = removed->active();
+                m_removedItem.checked = wasChecked;
+                m_removedItem.selected = m_selected == i;
+                emit canUndoRemoveChanged();
+            }
+            emit preItemRemoved(removed.uuid());
             m_items.replace(i, Shared::Source{});
             m_items.removeAt(i);
-            if (deleteItem) {
-                item->destroy();
+            if (m_selected == i) {
+                m_selected = -1;
+                emit selectedChanged();
+            } else if (m_selected > i) {
+                --m_selected;
+                emit selectedChanged();
             }
             emit postItemRemoved();
+            emit countChanged();
             break;
         }
     }
@@ -832,6 +854,36 @@ void SourceList::removeItem(const QUuid &uuid, bool deleteItem)
     if (auto s = getByUUid(uuid)) {
         removeItem(s, deleteItem);
     }
+}
+
+bool SourceList::undoRemove()
+{
+    auto guard = lock();
+    if (!m_removedItem.item) {
+        return false;
+    }
+
+    const auto removed = m_removedItem;
+    const int index = qBound(0, removed.index, m_items.size());
+    removed.item->setActive(removed.active);
+    emit preItemInserted(index);
+    m_items.insert(index, removed.item);
+    if (removed.checked) {
+        check(removed.item.uuid());
+    }
+    if (removed.selected) {
+        m_selected = index;
+        emit selectedChanged();
+    } else if (m_selected >= index) {
+        ++m_selected;
+        emit selectedChanged();
+    }
+    emit postItemInserted(removed.item);
+    emit countChanged();
+
+    m_removedItem = {};
+    emit canUndoRemoveChanged();
+    return true;
 }
 void SourceList::cloneItem(const Shared::Source &item)
 {

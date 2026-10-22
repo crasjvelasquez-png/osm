@@ -37,6 +37,8 @@ Item {
         spacing: 0
 
         SelectableSpinBox {
+            Layout.minimumWidth: 150
+            title: qsTr("x from")
             value: dataObject.xmin
             onValueChanged: dataObject.xmin = value
             from: dataObject.xLowLimit
@@ -45,7 +47,7 @@ Item {
             implicitWidth: 170
             Layout.fillWidth: true
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("x from")
 
             textFromValue: function(value, locale) {
@@ -58,6 +60,8 @@ Item {
         }
 
         SelectableSpinBox {
+            Layout.minimumWidth: 150
+            title: qsTr("x to")
             value: dataObject.xmax
             onValueChanged: dataObject.xmax = value
             from: dataObject.xLowLimit
@@ -66,7 +70,7 @@ Item {
             implicitWidth: 170
             Layout.fillWidth: true
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("x to")
 
             textFromValue: function(value, locale) {
@@ -79,6 +83,8 @@ Item {
         }
 
         SelectableSpinBox {
+            Layout.minimumWidth: 150
+            title: qsTr("y from")
             value: dataObject.ymin
             onValueChanged: dataObject.ymin = value
             from: dataObject.yLowLimit
@@ -87,7 +93,7 @@ Item {
             implicitWidth: 170
             Layout.fillWidth: true
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("y from")
 
             textFromValue: function(value, locale) {
@@ -100,6 +106,8 @@ Item {
         }
 
         SelectableSpinBox {
+            Layout.minimumWidth: 150
+            title: qsTr("y to")
             value: dataObject.ymax
             onValueChanged: dataObject.ymax = value
             from: dataObject.yLowLimit
@@ -108,7 +116,7 @@ Item {
             implicitWidth: 170
             Layout.fillWidth: true
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("y to")
 
             textFromValue: function(value, locale) {
@@ -129,8 +137,10 @@ Item {
             onCheckedChanged: {
                 dataObject.active = !checked
             }
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("pause")
+            ToolTip.visible: hovered || activeFocus
+            ToolTip.text: qsTr("Pause updates")
+            Accessible.name: qsTr("Pause spectrogram updates")
+            Accessible.role: Accessible.Button
         }
 
         Item {
@@ -142,8 +152,10 @@ Item {
             text: "\ue804"
             implicitWidth: 60
             onClicked: fileDialog.open();
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("save chart as an image")
+            ToolTip.visible: hovered || activeFocus
+            ToolTip.text: qsTr("Save chart as an image")
+            Accessible.name: qsTr("Save chart as an image")
+            Accessible.role: Accessible.Button
         }
     }
     RowLayout {
@@ -164,6 +176,7 @@ Item {
             implicitHeight: 36
             Layout.fillWidth: true
             SelectableSpinBox {
+                title: qsTr("min dB point")
                 id: minDbControl
                 anchors.fill: parent
                 value: dataObject.min
@@ -172,7 +185,7 @@ Item {
                 to: dataObject.mid - 1
                 editable: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("min dB point")
 
                 textFromValue: function(value, locale) {
@@ -228,6 +241,7 @@ Item {
             implicitHeight: 36
             Layout.fillWidth: true
             SelectableSpinBox {
+                title: qsTr("mid dB point")
                 id: midDbControl
                 anchors.fill: parent
                 value: dataObject.mid
@@ -236,7 +250,7 @@ Item {
                 to: dataObject.max
                 editable: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("mid dB point")
 
                 textFromValue: function(value, locale) {
@@ -293,6 +307,7 @@ Item {
             implicitHeight: 36
             Layout.fillWidth: true
             SelectableSpinBox {
+                title: qsTr("max dB point")
                 id: maxDbControl
                 anchors.fill: parent
                 value: dataObject.max
@@ -301,7 +316,7 @@ Item {
                 to: 20
                 editable: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("max dB point")
 
                 textFromValue: function(value, locale) {

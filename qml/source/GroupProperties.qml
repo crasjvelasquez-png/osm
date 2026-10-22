@@ -52,7 +52,7 @@ Item {
                 Component.onCompleted: {
                     color = dataObjectData.color
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("series color")
             }
 

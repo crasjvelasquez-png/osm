@@ -58,7 +58,7 @@ Item {
             to: 200000
             value: frequency
             onValueModified: frequency = value;
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("frequency")
 
             textFromValue: function(value, locale) {
@@ -81,7 +81,7 @@ Item {
             onValueModified: {
                 frequency = Math.round(10000 * decimals / value) / 10;
             }
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("period")
 
             textFromValue: function(value, locale) {
@@ -110,7 +110,7 @@ Item {
             editable: true
             implicitWidth: 170
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: Number(value * 9/5 + 32).toLocaleString(locale, 'f', 0) + "ºF"
 
             textFromValue: function(value, locale) {
@@ -140,7 +140,7 @@ Item {
                 return Number(calculator.speed).toLocaleString(locale, 'f', 1) + " m/s";
             }
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("speed of sound");
         }
     }
@@ -157,7 +157,7 @@ Item {
             value: wave * decimals
             onValueModified: wave = value / decimals
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("wave length")
 
             textFromValue: function(value, locale) {
@@ -179,7 +179,7 @@ Item {
             value: wave * decimals / 2
             onValueModified: wave = value * 2 / decimals
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("wave length / 2")
 
             textFromValue: function(value, locale) {

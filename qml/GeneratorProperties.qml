@@ -37,6 +37,7 @@ Item {
 
             //generator type
             DropDown {
+                title: qsTr("signal type")
                 id: type
                 implicitWidth: 140
                 currentIndex: control.currentGenerator.type
@@ -44,11 +45,12 @@ Item {
                 onCurrentIndexChanged: control.currentGenerator.type = currentIndex
                 onActivated: if (currentIndex === 9) applicationWindow.audioFilePlayer.open()
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("signal type")
             }
 
             SelectableSpinBox {
+                title: qsTr("gain")
                 id: gainSpinBox
                 implicitWidth: 165
                 value: control.currentGenerator.gain
@@ -64,7 +66,7 @@ Item {
                     return parseInt(text)
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("gain")
             }
 
@@ -72,12 +74,13 @@ Item {
                 text: qsTr("Audio file…")
                 enabled: selectTarget.currentIndex === 0
                 onClicked: applicationWindow.audioFilePlayer.open()
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Load audio, control playback and set a loop region")
             }
 
             //Sin frequency
             SelectableSpinBox {
+                title: qsTr("frequency for sin")
                 id: frequencySpinBox
                 implicitWidth: 165
                 visible: type.currentText == 'Sin' || type.currentText == 'SinBurst'
@@ -95,7 +98,7 @@ Item {
                     return parseInt(text)
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("frequency for sin")
             }
 
@@ -113,6 +116,7 @@ Item {
             }
 
             SelectableSpinBox {
+                title: qsTr("Start frequency")
                 id: sinSweepStart
                 implicitWidth: 165
                 visible: type.currentText == 'SineSweep';
@@ -130,12 +134,13 @@ Item {
                     return parseInt(text)
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Start frequency")
             }
 
             //Sin Sweep to
             SelectableSpinBox {
+                title: qsTr("End frequency")
                 id: sinSweepEnd
                 implicitWidth: 165
                 visible: type.currentText == 'SineSweep';
@@ -153,7 +158,7 @@ Item {
                     return parseInt(text)
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("End frequency")
             }
 
@@ -180,6 +185,7 @@ Item {
             }
 
             DropDown {
+                title: qsTr("Controlled generator")
                 id: selectTarget
                 enabled: !control.currentGenerator.enabled
                 model: remoteClient.generatorsList
@@ -188,7 +194,7 @@ Item {
                             )
                 onCurrentValueChanged: remoteClient.selectGenerator(currentValue)
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Controlled generator")
 
                 Layout.preferredWidth: 240
@@ -197,6 +203,8 @@ Item {
 
         RowLayout {
             DropDown {
+                Layout.minimumWidth: 120
+                title: qsTr("audio output device")
                 id: deviceSelect
                 model: DeviceModel {
                     id: deviceModel
@@ -212,7 +220,7 @@ Item {
                     deviceSelect.updateChannelNames();
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("audio output device")
                 Connections {
                     target: deviceModel
@@ -235,7 +243,7 @@ Item {
                 onCheckedChanged: control.currentGenerator.evenPolarity = checked
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("inverse polarity at even channels")
             }
 

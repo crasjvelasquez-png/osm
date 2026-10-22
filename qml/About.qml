@@ -185,6 +185,11 @@ Popup {
     MouseArea {
         anchors.right: parent.right
         anchors.top: parent.top
+        activeFocusOnTab: true
+        Accessible.role: Accessible.Button
+        Accessible.name: qsTr("Close about window")
+        ToolTip.visible: hovered || activeFocus
+        ToolTip.text: qsTr("Close")
         cursorShape: Qt.PointingHandCursor
         implicitWidth: closeLabel.implicitWidth
         implicitHeight: closeLabel.implicitHeight
@@ -197,6 +202,15 @@ Popup {
         }
         onClicked: {
             popup.close();
+        }
+        Keys.onReturnPressed: popup.close()
+        Keys.onEnterPressed: popup.close()
+        Keys.onSpacePressed: popup.close()
+        Rectangle {
+            anchors.fill: parent
+            color: "transparent"
+            border.width: parent.activeFocus ? 2 : 0
+            border.color: applicationWindow.ui.primary
         }
     }
 }

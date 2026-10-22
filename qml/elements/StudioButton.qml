@@ -30,7 +30,7 @@ Button {
             (control.down ? applicationWindow.ui.primaryPressed : control.hovered ? applicationWindow.ui.primaryHover : applicationWindow.ui.primary) :
             control.down || control.checked ? applicationWindow.ui.selection : control.hovered ? applicationWindow.ui.hover :
             control.flat ? "transparent" : applicationWindow.ui.control
-        border.width: control.visualFocus ? 2 : control.flat || control.highlighted ? 0 : 1
-        border.color: control.visualFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
+        border.width: control.activeFocus ? 2 : control.flat || control.highlighted ? 0 : 1
+        border.color: control.activeFocus ? applicationWindow.ui.primary : applicationWindow.ui.separator
     }
 }

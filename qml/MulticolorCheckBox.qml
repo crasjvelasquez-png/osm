@@ -30,6 +30,12 @@ CheckBox {
 
     property color checkedColor;
     property bool error : false;
+    property string errorText: qsTr("Input unavailable")
+
+    Accessible.name: error ? qsTr("Input unavailable. %1").arg(errorText) : text
+    Accessible.description: error ? errorText : ""
+    ToolTip.visible: error && (hovered || activeFocus)
+    ToolTip.text: errorText
 
     //colored rectangular
     Rectangle {
@@ -63,8 +69,10 @@ CheckBox {
         y: checkImage.y
         z: checkImage.z
         font.pixelSize: checkImage.height - 2
-        text: "X"
+        text: "!"
         color: Material.color(Material.Red)
+        font.bold: true
+        Accessible.ignored: true
         visible: control.error
     }
 

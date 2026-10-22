@@ -42,6 +42,21 @@ ApplicationWindow {
     property string foregroundColor: Material.foreground
     readonly property QtObject ui: StudioTheme { darkMode: applicationAppearance.darkMode }
     readonly property bool narrowWindow: width < 1024
+    property alias shortcutRegistry: shortcutRegistry
+    function isTextEntryFocused(item) {
+        return item && (item instanceof TextInput || item instanceof TextEdit);
+    }
+    readonly property bool textEntryFocused: isTextEntryFocused(activeFocusItem)
+    property var undoRemovalList: null
+    function showUndoableRemoval(list, text, afterUndo) {
+        undoRemovalList = list;
+        message.showUndoable(text, function() {
+            var restored = list && list.undoRemove();
+            if (restored && afterUndo) afterUndo();
+            if (undoRemovalList === list) undoRemovalList = null;
+            return restored;
+        });
+    }
 
     visible: true
     flags: Qt.Window
@@ -101,6 +116,11 @@ ApplicationWindow {
         dialog.accepted.disconnect(closeAccepted);
         dialog.rejected.disconnect(closeRejected);
     }
+
+    ShortcutRegistry { id: shortcutRegistry }
+
+    Shortcut { sequence: shortcutRegistry.sequence("help.shortcuts"); enabled: !applicationWindow.textEntryFocused; onActivated: shortcutsPopup.open() }
+    Shortcut { sequence: shortcutRegistry.sequence("help.shortcutsSlash"); enabled: !applicationWindow.textEntryFocused; onActivated: shortcutsPopup.open() }
 
     Menu.Side {
         id:sideMenu
@@ -188,6 +208,13 @@ ApplicationWindow {
                 message.showError(title + "<br/>" + text);
             }
         }
+    }
+
+    Shortcut {
+        sequence: shortcutRegistry.sequence("edit.undoRemoval")
+        context: Qt.ApplicationShortcut
+        enabled: applicationWindow.undoRemovalList && applicationWindow.undoRemovalList.canUndoRemove && !applicationWindow.textEntryFocused
+        onActivated: message.undo()
     }
 
     ModalDialog {

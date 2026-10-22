@@ -30,8 +30,8 @@ Item {
     id: measurementProperties
     property var dataObject
     property var dataObjectData : dataObject.data
-    readonly property int elementWidth: width / 9
-    readonly property int spinboxWidth: width / 14
+    readonly property int elementWidth: 150
+    readonly property int spinboxWidth: 168
     readonly property bool isLocal : dataObjectData.objectName === "Measurement"
 
     ColumnLayout {
@@ -41,16 +41,21 @@ Item {
         RowLayout {
 
             DropDown {
+                title: qsTr("average type")
                 id: averageType
+                Layout.minimumWidth: 132
                 Layout.preferredWidth: elementWidth
                 model: ["off", "LPF", "FIFO"]
+                displayLabels: [qsTr("Off"), qsTr("LPF (Low-Pass)"), qsTr("FIFO (Running Avg)")]
                 currentIndex: dataObjectData.averageType
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("average type")
                 onCurrentIndexChanged: dataObjectData.averageType = currentIndex;
             }
 
             SelectableSpinBox {
+                title: qsTr("average count")
+                Layout.minimumWidth: 150
                 Layout.preferredWidth: elementWidth
                 value: dataObjectData.average
                 from: 1
@@ -58,19 +63,22 @@ Item {
                 editable: true
                 onValueChanged: dataObjectData.average = value
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("average count")
 
                 visible: dataObjectData.averageType === Measurement.FIFO;
             }
 
             DropDown {
+                title: qsTr("LPF frequency")
+                Layout.minimumWidth: 132
                 Layout.preferredWidth: elementWidth
                 model: [ "0.25Hz", "0.5Hz", "1Hz" ]
+                displayLabels: ["0.25 Hz", "0.5 Hz", "1 Hz"]
                 currentIndex: dataObjectData.filtersFrequency
                 onCurrentIndexChanged: dataObjectData.filtersFrequency = currentIndex;
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("LPF frequency")
 
                 visible: dataObjectData.averageType === Measurement.LPF;
@@ -89,7 +97,7 @@ Item {
                 Layout.preferredWidth: (elementWidth - 5) / 2
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("inverse polarity at measurement chanel")
             }
 
@@ -100,8 +108,10 @@ Item {
                 Layout.preferredWidth: (elementWidth - 5) / 2
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("reset buffers")
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Reset buffers")
+                Accessible.name: qsTr("Reset measurement buffers")
+                Accessible.role: Accessible.Button
             }
 
             Item {
@@ -129,7 +139,7 @@ Item {
                         }
                     }
 
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("apply calibration")
 
                     contentItem: Text {
@@ -152,7 +162,7 @@ Item {
                     spacing: 0
                     text: "..."
                     onClicked: {openCalibrationFileDialog.open();}
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("open calibration file")
                 }
                 FileDialog {
@@ -187,7 +197,7 @@ Item {
                 Component.onCompleted: {
                     color = dataObjectData.color
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("series color")
             }
 
@@ -205,6 +215,7 @@ Item {
 
             FloatSpinBox {
                 id: offsetSpinBox
+                Layout.minimumWidth: 156
                 Layout.preferredWidth: spinboxWidth
                 value: dataObjectData.offset
                 from: -90
@@ -220,6 +231,7 @@ Item {
 
             FloatSpinBox {
                 id: gainSpinBox
+                Layout.minimumWidth: 156
                 Layout.preferredWidth: spinboxWidth
                 value: dataObjectData.gain
                 from: -90
@@ -240,13 +252,15 @@ Item {
                     gainSpinBox.value = dataObjectData.gain;
                 }
                 font.capitalization: Font.MixedCase
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("apply estimated gain for 94 dB SPL")
             }
 
             SelectableSpinBox {
+                title: qsTr("estimated delay delta: <b>%L1ms</b>")
                 id: delaySpin
                 Layout.alignment: Qt.AlignVCenter
+                Layout.minimumWidth: 156
                 Layout.preferredWidth: spinboxWidth
                 value: dataObjectData.delay
                 implicitHeight: titleField.implicitHeight
@@ -266,7 +280,7 @@ Item {
                     return Number.fromLocaleString(locale, text.replace("ms", "")) * dataObjectData.sampleRate / 1000;
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("estimated delay delta: <b>%L1ms</b>")
                     .arg(Number(1000 * dataObjectData.estimatedDelta / dataObjectData.sampleRate).toLocaleString(locale, 'f', 2));
             }
@@ -280,8 +294,8 @@ Item {
                 implicitWidth: 75
 
                 font.capitalization: Font.AllLowercase
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("apply estimated delay")
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("apply estimated delay (%1)").arg(applicationWindow.shortcutRegistry.display("measurement.applyDelay"))
             }
         }
 
@@ -289,59 +303,66 @@ Item {
             Layout.fillWidth: true
 
             DropDown {
+                title: qsTr("Transfrom mode")
                 id: modeSelect
                 model: dataObjectData.modes
                 currentIndex: dataObjectData.mode
                 displayText: (dataObjectData.mode === Measurement.LFT ? "LTW" : (modeSelect.width > 120 ? "Power:" : "") + currentText)
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Transfrom mode")
                 onCurrentIndexChanged: dataObjectData.mode = currentIndex;
                 Layout.preferredWidth: elementWidth
             }
 
             DropDown {
+                title: qsTr("window function")
                 id: windowSelect
                 model: dataObjectData.windows
                 currentIndex: dataObjectData.window
                 onCurrentIndexChanged: dataObjectData.window = currentIndex
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("window function")
                 Layout.preferredWidth: elementWidth
             }
 
             DropDown {
+                title: qsTr("apply filter on M input")
                 id: inputFilterSelect
                 model: dataObjectData.inputFilters
                 currentIndex: dataObjectData.inputFilter
                 onCurrentIndexChanged: dataObjectData.inputFilter = currentIndex
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("apply filter on M input")
                 Layout.preferredWidth: elementWidth
             }
 
             DropDown {
+                title: qsTr("measurement chanel number")
                 id: measurementChannel
                 enabled: isLocal
                 currentIndex: dataObjectData.dataChanel
                 onCurrentIndexChanged: dataObjectData.dataChanel = currentIndex
                 displayText: "M: " + currentText
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("measurement chanel number")
                 Layout.preferredWidth: elementWidth
             }
 
             DropDown {
+                title: qsTr("reference chanel number")
                 id: referenceChannel
                 enabled: isLocal
                 currentIndex: dataObjectData.referenceChanel
                 onCurrentIndexChanged: dataObjectData.referenceChanel = currentIndex
                 displayText: "R: " + currentText
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("reference chanel number")
                 Layout.preferredWidth: elementWidth
             }
 
             DropDown {
+                Layout.minimumWidth: 120
+                title: qsTr("audio input device")
                 id: deviceSelect
                 enabled: isLocal
                 Layout.fillWidth: true
@@ -352,7 +373,7 @@ Item {
                 textRole: "name"
                 valueRole: "id"
                 currentIndex: { model.indexOf(dataObjectData.deviceId) }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("audio input device")
                 onCurrentIndexChanged: {
                     var measurementIndex = measurementChannel.currentIndex;
@@ -388,18 +409,20 @@ Item {
             StudioButton {
                 text: qsTr("Store");
                 onClicked: measurementProperties.store()
-                ToolTip.visible: hovered
-                ToolTip.text: qsTr("store current measurement")
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("store current measurement (%1)").arg(applicationWindow.shortcutRegistry.display("measurement.store"))
                 implicitWidth: 75
             }
 
             Shortcut {
-                sequence: "Ctrl+C"
+                sequence: applicationWindow.shortcutRegistry.sequence("measurement.store")
+                enabled: !applicationWindow.textEntryFocused
                 onActivated: measurementProperties.store()
             }
 
             Shortcut {
-                sequence: "Ctrl+9"
+                sequence: applicationWindow.shortcutRegistry.sequence("measurement.applyDelay")
+                enabled: !applicationWindow.textEntryFocused
                 onActivated: {
                     delaySpin.value = dataObjectData.estimated;
                 }

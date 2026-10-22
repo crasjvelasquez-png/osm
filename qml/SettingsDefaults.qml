@@ -28,10 +28,12 @@ ApplicationWindow {
     property int revision: 0
     property bool allowClose: false
     readonly property string activeTab: tabs.currentIndex === 0 ? "measurement" : tabs.currentIndex === 1 ? "magnitude" : "rta"
+    property string recordingShortcutId: ""
+    property string shortcutError: ""
 
     function draft(key, fallback) { revision; return defaultsController.value(key, fallback); }
     function put(key, value) { defaultsController.setValue(key, value); }
-    function openFor(measurementObject, magnitudeObject, rtaObject) {
+    function openFor(measurementObject, magnitudeObject, rtaObject, selectedTab) {
         measurement = measurementObject;
         magnitudePlot = magnitudeObject;
         rtaPlot = rtaObject;
@@ -39,6 +41,7 @@ ApplicationWindow {
         allowClose = false;
         show();
         raise();
+        if (selectedTab !== undefined) tabs.currentIndex = selectedTab;
         requestActivate();
     }
     function finishClose() {
@@ -57,7 +60,7 @@ ApplicationWindow {
         closeEvent.accepted = false;
         requestClose();
     }
-    Shortcut { sequence: "Esc"; onActivated: settingsWindow.requestClose() }
+    Shortcut { sequence: applicationWindow.shortcutRegistry.sequence("settings.close"); enabled: !applicationWindow.isTextEntryFocused(settingsWindow.activeFocusItem); onActivated: settingsWindow.requestClose() }
 
     Connections {
         target: defaultsController
@@ -74,7 +77,7 @@ ApplicationWindow {
         spacing: 4
         background: Rectangle { color: applicationWindow.ui.panel }
         Repeater {
-            model: [qsTr("Measurement"), qsTr("Magnitude"), qsTr("RTA / Spectrum")]
+            model: [qsTr("Measurement"), qsTr("Magnitude"), qsTr("RTA / Spectrum"), qsTr("Shortcuts")]
             TabButton {
                 text: modelData
                 implicitHeight: 36
@@ -105,13 +108,14 @@ ApplicationWindow {
             Label {
                 Layout.fillWidth: true
                 font.pixelSize: 12
-                text: defaultsController.error.length ? defaultsController.error : qsTr("Saved defaults apply the next time you open the app.")
-                color: defaultsController.error.length ? (applicationAppearance.darkMode ? "#FF9696" : "#B02030") : applicationWindow.ui.secondaryText
+                text: tabs.currentIndex === 3 ? (settingsWindow.shortcutError || qsTr("Click a shortcut field, then press the new key combination. Changes apply immediately.")) : (defaultsController.error.length ? defaultsController.error : qsTr("Saved defaults apply the next time you open the app."))
+                color: ((tabs.currentIndex === 3 && settingsWindow.shortcutError.length) || (tabs.currentIndex !== 3 && defaultsController.error.length)) ? (applicationAppearance.darkMode ? "#FF9696" : "#B02030") : applicationWindow.ui.secondaryText
                 wrapMode: Text.WordWrap
             }
-            StudioButton { text: qsTr("Cancel"); onClicked: settingsWindow.requestClose() }
+            StudioButton { text: tabs.currentIndex === 3 ? qsTr("Close") : qsTr("Cancel"); onClicked: settingsWindow.requestClose() }
             StudioButton {
                 text: qsTr("Save defaults")
+                visible: tabs.currentIndex !== 3
                 highlighted: true
                 onClicked: if (defaultsController.save()) settingsWindow.finishClose()
             }
@@ -319,9 +323,156 @@ ApplicationWindow {
                     }
                 }
             }
+
+            ScrollView {
+                clip: true
+                contentWidth: availableWidth
+                ColumnLayout {
+                    x: 18
+                    width: parent.width - 36
+                    spacing: 8
+                    DefaultsSection { text: qsTr("Keyboard shortcuts") }
+                    Label {
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                        color: applicationWindow.ui.secondaryText
+                        text: qsTr("Shortcuts apply immediately. Click a key field and press a combination to assign it. Press Backspace to clear one, or use Reset to restore an individual default. Reset all restores every default.")
+                    }
+                    GridLayout {
+                        id: shortcutGrid
+                        columns: 3
+                        columnSpacing: 12
+                        rowSpacing: 4
+                        Layout.fillWidth: true
+                        Layout.topMargin: 8
+                        Label { text: qsTr("Action"); font.bold: true; color: applicationWindow.ui.secondaryText }
+                        Label { text: qsTr("Shortcut"); font.bold: true; color: applicationWindow.ui.secondaryText }
+                        Item { Layout.preferredWidth: 64 }
+
+                        Repeater {
+                            model: applicationWindow.shortcutRegistry.entries
+                            delegate: Item {
+                                id: shortcutRow
+                                property var entryData: modelData
+                                Layout.columnSpan: 3
+                                Layout.fillWidth: true
+                                implicitHeight: categoryLabel.visible ? 72 : 44
+                                Label {
+                                    id: categoryLabel
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    height: visible ? 28 : 0
+                                    visible: index === 0 || modelData.category !== applicationWindow.shortcutRegistry.entries[index - 1].category
+                                    text: visible ? modelData.category : ""
+                                    font.pixelSize: applicationWindow.ui.secondaryFontSize
+                                    font.bold: true
+                                    color: applicationWindow.ui.secondaryText
+                                    verticalAlignment: Text.AlignBottom
+                                    bottomPadding: 4
+                                }
+                                RowLayout {
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.bottom: parent.bottom
+                                    height: 40
+                                    spacing: 12
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: modelData.title
+                                        color: applicationWindow.ui.text
+                                        elide: Text.ElideRight
+                                    }
+                                    TextField {
+                                        id: sequenceField
+                                        Layout.preferredWidth: 190
+                                        Layout.minimumWidth: 140
+                                        implicitHeight: 34
+                                        readOnly: true
+                                        selectByMouse: false
+                                        text: settingsWindow.recordingShortcutId === modelData.id ? qsTr("Press keys…") : applicationWindow.shortcutRegistry.display(modelData.id)
+                                        placeholderText: qsTr("Unassigned")
+                                        font.pixelSize: applicationWindow.ui.controlFontSize
+                                        background: Rectangle {
+                                            radius: applicationWindow.ui.controlRadius
+                                            color: sequenceField.activeFocus ? applicationWindow.ui.selection : applicationWindow.ui.control
+                                            border.width: sequenceField.activeFocus ? 2 : 1
+                                            border.color: sequenceField.activeFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
+                                        }
+                                        TapHandler {
+                                            onTapped: {
+                                                sequenceField.forceActiveFocus();
+                                                settingsWindow.recordingShortcutId = modelData.id;
+                                                settingsWindow.shortcutError = "";
+                                            }
+                                        }
+                                        Keys.onPressed: function(event) {
+                                            event.accepted = true;
+                                            if (event.key === Qt.Key_Escape) {
+                                                settingsWindow.recordingShortcutId = "";
+                                                return;
+                                            }
+                                            if (event.key === Qt.Key_Backspace && event.modifiers === Qt.NoModifier) {
+                                                applicationWindow.shortcutRegistry.assign(modelData.id, "");
+                                                settingsWindow.recordingShortcutId = "";
+                                                settingsWindow.shortcutError = "";
+                                                return;
+                                            }
+                                            if ([Qt.Key_Control, Qt.Key_Meta, Qt.Key_Shift, Qt.Key_Alt].indexOf(event.key) >= 0) return;
+                                            var parts = [];
+                                            if (event.modifiers & Qt.ControlModifier) parts.push("Ctrl");
+                                            if (event.modifiers & Qt.MetaModifier) parts.push("Meta");
+                                            if (event.modifiers & Qt.AltModifier) parts.push("Alt");
+                                            if (event.modifiers & Qt.ShiftModifier) parts.push("Shift");
+                                            var keyName = event.key >= Qt.Key_A && event.key <= Qt.Key_Z ? String.fromCharCode(event.key) :
+                                                          event.key >= Qt.Key_0 && event.key <= Qt.Key_9 ? String.fromCharCode(event.key) : "";
+                                            if (event.key === Qt.Key_Slash) keyName = "/";
+                                            else if (event.key === Qt.Key_Space) keyName = "Space";
+                                            else if (event.key >= Qt.Key_F1 && event.key <= Qt.Key_F12) keyName = "F" + (event.key - Qt.Key_F1 + 1);
+                                            else if (event.key === Qt.Key_Backspace) keyName = "Backspace";
+                                            else if (event.key === Qt.Key_Delete) keyName = "Delete";
+                                            else if (event.key === Qt.Key_Tab) keyName = "Tab";
+                                            if (!keyName.length) {
+                                                settingsWindow.shortcutError = qsTr("That key cannot be assigned here.");
+                                                return;
+                                            }
+                                            parts.push(keyName);
+                                            var sequence = parts.join("+");
+                                            var conflict = applicationWindow.shortcutRegistry.duplicate(modelData.id, sequence);
+                                            if (conflict.length) {
+                                                settingsWindow.shortcutError = qsTr("That combination is already assigned to %1.").arg(conflict);
+                                                return;
+                                            }
+                                            applicationWindow.shortcutRegistry.assign(modelData.id, sequence);
+                                            settingsWindow.recordingShortcutId = "";
+                                            settingsWindow.shortcutError = "";
+                                        }
+                                    }
+                                    StudioButton {
+                                        Layout.preferredWidth: 64
+                                        text: qsTr("Reset")
+                                        flat: true
+                                        onClicked: applicationWindow.shortcutRegistry.reset(modelData.id)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    StudioButton {
+                        text: qsTr("Reset all shortcuts")
+                        flat: true
+                        Layout.topMargin: 8
+                        onClicked: {
+                            applicationWindow.shortcutRegistry.resetAll();
+                            settingsWindow.shortcutError = "";
+                        }
+                    }
+                }
+            }
         }
 
         ToolBar {
+            visible: tabs.currentIndex !== 3
             Layout.fillWidth: true
             background: Rectangle { color: applicationWindow.ui.panel; Rectangle { anchors.top: parent.top; width: parent.width; height: 1; color: applicationWindow.ui.separator } }
             RowLayout {

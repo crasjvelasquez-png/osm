@@ -29,12 +29,14 @@ Item {
     property real step : 0.1
     property real scale : 1.0
     property string tooltiptext
+    property string title: ""
     property bool editable: true
     property bool indicators: true
     property bool background: true
     property int implicitWidth: 160
     property int fontSize: spinbox.font.pixelSize
     property int bottomPadding: 0
+    Accessible.role: Accessible.SpinBox
 
     property string units: ""
     width: spinbox.width
@@ -58,6 +60,7 @@ Item {
         anchors.fill: parent
         font.pixelSize: fontSize
         bottomPadding: floatspinbox.bottomPadding
+        title: floatspinbox.title
 
         /*
         value changes before a component is completed while applying limits (from and to)
@@ -102,7 +105,7 @@ Item {
             stepSize = Math.round(floatspinbox.step * Math.pow(10, floatspinbox.decimals));
         }
         editable:   floatspinbox.editable
-        ToolTip.visible: (tooltiptext ? hovered : false)
+        ToolTip.visible: (tooltiptext ? (hovered || activeFocus) : false)
         ToolTip.text: floatspinbox.tooltiptext
 
         validator: DoubleValidator {

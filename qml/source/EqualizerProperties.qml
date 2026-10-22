@@ -39,34 +39,37 @@ Item {
             Layout.fillWidth: true
 
             DropDown {
+                title: qsTr("Transfrom mode")
                 id: modeSelect
                 model: dataObjectData.modes
                 currentIndex: dataObjectData.mode
                 displayText: (dataObjectData.mode === Measurement.LFT ? "LTW" : (modeSelect.width > 120 ? "Power:" : "") + currentText)
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Transfrom mode")
                 onCurrentIndexChanged: dataObjectData.mode = currentIndex;
                 Layout.preferredWidth: elementWidth
             }
 
             DropDown {
+                title: qsTr("Sample rate")
                 model: [44100, 48000, 96000, 192000]
                 currentIndex: model.indexOf(dataObjectData.sampleRate)
                 onCurrentValueChanged: dataObjectData.sampleRate = currentValue;
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Sample rate")
                 Layout.preferredWidth: elementWidth
             }
 
             SelectableSpinBox {
+                title: qsTr("filter count")
                 value: dataObjectData.size
                 onValueChanged: dataObjectData.size = value
                 from: 1
                 to: 32
                 editable: true
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("filter count")
             }
 
@@ -83,7 +86,7 @@ Item {
                 Component.onCompleted: {
                     color = dataObjectData.color
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("series color")
             }
 
@@ -104,11 +107,12 @@ Item {
             Layout.fillWidth: true
 
             DropDown {
+                title: qsTr("export data")
                 model: ["osm"]
                 displayText: qsTr("Export to");
                 Layout.preferredWidth: elementWidth
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("export data")
 
                 onActivated: function() {

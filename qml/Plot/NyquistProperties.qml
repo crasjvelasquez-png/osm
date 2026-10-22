@@ -36,6 +36,7 @@ Item {
         spacing: 0
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: xminFloatBox
             min: dataObject.xLowLimit
             max: dataObject.xHighLimit
@@ -48,6 +49,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: xmaxFloatBox
             min: dataObject.xLowLimit
             max: dataObject.xHighLimit
@@ -60,6 +62,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: yminFloatBox
             min: dataObject.yLowLimit
             max: dataObject.yHighLimit
@@ -71,6 +74,7 @@ Item {
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             id: ymaxFloatBox
             min: dataObject.yLowLimit
             max: dataObject.yHighLimit
@@ -102,8 +106,10 @@ Item {
             text: "\ue804"
             implicitWidth: 60
             onClicked: fileDialog.open();
-            ToolTip.visible: hovered
-            ToolTip.text: qsTr("save chart as an image")
+            ToolTip.visible: hovered || activeFocus
+            ToolTip.text: qsTr("Save chart as an image")
+            Accessible.name: qsTr("Save chart as an image")
+            Accessible.role: Accessible.Button
         }
     }
     RowLayout {
@@ -131,11 +137,12 @@ Item {
             checked: dataObject.coherence
             onCheckStateChanged: dataObject.coherence = checked
 
-            ToolTip.visible: hovered
+            ToolTip.visible: hovered || activeFocus
             ToolTip.text: qsTr("use coherence as alpha channel")
         }
 
         FloatSpinBox {
+            Layout.minimumWidth: 160
             min: 0.0
             max: 1.0
             step: 0.05

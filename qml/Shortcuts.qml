@@ -1,98 +1,122 @@
 /**
  *  OSM
  *  Copyright (C) 2020  Pavel Smokotnin
-
- *  This program is free software: you can redistribute it and/or modify
+ *
+ *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
-
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
-
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import QtQuick 2.12
+import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.3
-import QtQuick.Controls.Material 2.1
+import QtQuick.Layouts 1.15
+import "elements"
 
 Popup {
     id: popup
     modal: true
     Overlay.modal: Rectangle { color: applicationAppearance.darkMode ? "#99000000" : "#55000000" }
-    background: Rectangle { radius: 6; color: applicationWindow.ui.panel; border.color: applicationWindow.ui.separator }
+    background: Rectangle { radius: applicationWindow.ui.controlRadius; color: applicationWindow.ui.panel; border.color: applicationWindow.ui.separator }
     focus: true
-    padding: 25
+    padding: 20
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-    width: text.paintedWidth + popup.padding * 2
-    height: applicationWindow.height - popup.padding * 2
+    width: Math.min(620, applicationWindow.width - 40)
+    height: Math.min(applicationWindow.height - 40, 680)
 
     ColumnLayout {
-        id: content
         anchors.fill: parent
+        spacing: 12
 
-        Flickable {
-            contentWidth: text.width
-            contentHeight: text.height
+        RowLayout {
+            Layout.fillWidth: true
+            Label {
+                Layout.fillWidth: true
+                text: qsTr("Keyboard shortcuts")
+                font.pixelSize: applicationWindow.ui.sectionFontSize
+                font.bold: true
+                color: applicationWindow.ui.text
+            }
+            StudioButton {
+                text: qsTr("Customize…")
+                flat: true
+                onClicked: {
+                    popup.close();
+                    defaultsWindow.openFor(null, charts.magnitudePlot(), charts.spectrumPlot(), 3);
+                }
+            }
+        }
+
+        ScrollView {
+            clip: true
+            contentWidth: availableWidth
             Layout.fillWidth: true
             Layout.fillHeight: true
-            clip: true
 
-            Label {
-                id:text
-                horizontalAlignment: Text.AlignHCenter
-                textFormat: Text.RichText
-                text: qsTr("
-                    <style>
-                    td {padding:2px;}
-                    th {padding-top:20px;}
-                    </style>
-                    <table>
-                    <tr><th colspan='2' style='padding-top:0px;'>Project</th></tr>
-                    <tr><td width='200'>%1+N</td><td>new project</td></tr>
-                    <tr><td>%1+S</td><td>save current measurements and stores</td></tr>
-                    <tr><td>%1+O</td><td>open saved project</td></tr>
-                    <tr><td>%1+I</td><td>import data</td></tr>
+            GridLayout {
+                columns: 2
+                columnSpacing: 16
+                rowSpacing: 0
+                width: availableWidth
+            Label { text: qsTr("Shortcut"); font.bold: true; color: applicationWindow.ui.secondaryText; Layout.bottomMargin: 6 }
+            Label { text: qsTr("Action"); font.bold: true; color: applicationWindow.ui.secondaryText; Layout.bottomMargin: 6 }
 
-                    <tr><th colspan='2'>Measurements</th></tr>
-                    <tr><td>%1+A</td><td>append new measurement</td></tr>
-                    <tr><td>%1+M</td><td>append new math source</td></tr>
-                    <tr><td>%1+L</td><td>append new equal Loudness contour</td></tr>
-                    <tr><td>%1+F</td><td>append new filter</td></tr>
-                    <tr><td>%1+E</td><td>append new equalizer</td></tr>
-                    <tr><td>%1+X</td><td>store all measurements</td></tr>
-                    <tr><td>%1+R</td><td>reset aveverages</td></tr>
-                    <tr><td>%1+C</td><td>store current measurement</td></tr>
-                    <tr><td>%1+9</td><td>apply estimated delay for current measuremts</td></tr>
-
-                    <tr><th colspan='2'>Generator</th></tr>
-                    <tr><td>%1+G</td><td>enable/disable generator</td></tr>
-
-                    <tr><th colspan='2'>Charts</th></tr>
-                    <tr><td>%1+1</td><td>show 1 chart</td></tr>
-                    <tr><td>%1+2</td><td>show 2 charts</td></tr>
-                    <tr><td>%1+3</td><td>show 3 charts</td></tr>
-                    <tr><td>%1+4</td><td>equal heights</td></tr>
-                    <tr><td>%1+5</td><td>show hidden sources</td></tr>
-                    <tr><td>right click</td><td>open wavelength calculator for current frequency (time for impulse)</td></tr>
-
-                    <tr><th colspan='2'>Tools</th></tr>
-                    <tr><td>%1+W</td><td>show wavelength calculator</td></tr>
-                    <tr><td>%1+D</td><td>toggle dark mode</td></tr>
-                    <tr><td>%1+T</td><td>show target trace</td></tr>
-                    <tr><td>%1+0</td><td>add group</td></tr>
-                    <tr><td>F1</td><td>show keys combinations</td></tr>
-                    <tr><td>F2</td><td>show info</td></tr>
-                    <tr><td>F3</td><td>check for update</td></tr>
-                    </table>
-                ").arg((Qt.platform.os == "osx" ? "⌘" : "Ctrl"));
+            Repeater {
+                model: applicationWindow.shortcutRegistry.entries
+                delegate: Item {
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+                    implicitHeight: categoryTitle.visible ? 58 : 34
+                    Label {
+                        id: categoryTitle
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        height: visible ? 25 : 0
+                        visible: index === 0 || modelData.category !== applicationWindow.shortcutRegistry.entries[index - 1].category
+                        text: visible ? modelData.category : ""
+                        font.pixelSize: applicationWindow.ui.secondaryFontSize
+                        font.bold: true
+                        color: applicationWindow.ui.text
+                        verticalAlignment: Text.AlignBottom
+                        bottomPadding: 3
+                    }
+                    Rectangle {
+                        anchors.fill: actionRow
+                        color: index % 2 ? "transparent" : applicationWindow.ui.control
+                        opacity: 0.42
+                        radius: 3
+                    }
+                    RowLayout {
+                        id: actionRow
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        height: 32
+                        spacing: 16
+                        Label {
+                            Layout.preferredWidth: 150
+                            text: applicationWindow.shortcutRegistry.display(modelData.id)
+                            color: applicationWindow.ui.secondaryText
+                            font.bold: true
+                            elide: Text.ElideRight
+                        }
+                        Label {
+                            Layout.fillWidth: true
+                            text: modelData.title
+                            color: applicationWindow.ui.text
+                            elide: Text.ElideRight
+                        }
+                    }
+                }
             }
-
-            ScrollIndicator.vertical: ScrollIndicator {}
+            }
+        }
+        Label {
+            Layout.fillWidth: true
+            text: qsTr("Right-click a plot point to open the wavelength calculator. Shortcuts are also available in Settings → Shortcuts.")
+            wrapMode: Text.WordWrap
+            color: applicationWindow.ui.secondaryText
+            font.pixelSize: applicationWindow.ui.secondaryFontSize
         }
     }
 }

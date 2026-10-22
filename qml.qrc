@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file alias="StudioTheme.qml">qml/StudioTheme.qml</file>
+        <file alias="ShortcutRegistry.qml">qml/ShortcutRegistry.qml</file>
         <file alias="main.qml">qml/main.qml</file>
         <file alias="HeaderLevels.qml">qml/HeaderLevels.qml</file>
         <file alias="AudioFilePlayer.qml">qml/AudioFilePlayer.qml</file>

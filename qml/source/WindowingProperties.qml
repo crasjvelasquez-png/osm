@@ -28,7 +28,7 @@ import "qrc:/elements"
 Item {
     property var dataObject
     property var dataObjectData : dataObject.data
-    readonly property int elementWidth: width / 5
+    readonly property int elementWidth: 160
 
     ColumnLayout {
         spacing: 0
@@ -37,10 +37,11 @@ Item {
         RowLayout {
 
             DropDown {
+                title: qsTr("Take data from")
                 id: domainSelect
                 model: ["Time", "Frequency"]
                 currentIndex: dataObjectData.domain
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Take data from")
                 onCurrentIndexChanged: dataObjectData.domain = currentIndex;
                 Layout.preferredWidth: elementWidth
@@ -162,6 +163,7 @@ Item {
             }
 
             DropDown {
+                title: qsTr("Transfrom mode")
                 id: modeSelect
                 model:[
                     { text: "FFT 8",  enabled: true },
@@ -191,18 +193,19 @@ Item {
                 currentIndex: dataObjectData.mode
                 onCurrentIndexChanged: dataObjectData.mode = currentIndex;
                 Layout.preferredWidth: elementWidth
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Transfrom mode")
             }
 
             DropDown {
+                title: qsTr("window function")
                 id: windowSelect
                 model: dataObjectData.windows
                 currentIndex: dataObjectData.window
                 onCurrentIndexChanged: dataObjectData.window = currentIndex
                 visible: dataObjectData.domain === 0
                 Layout.preferredWidth: elementWidth
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("window function")
             }
 
@@ -217,7 +220,7 @@ Item {
                     stored.data.active = true;
                     sourceList.appendItem(stored, true);
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("store current result")
             }
         }

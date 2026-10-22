@@ -271,108 +271,118 @@ Rectangle {
         }
     }
 
-    Flow {
-        id: content
+    Flickable {
         x: 12; y: 4
         width: parent.width - 24
-        spacing: 8
+        height: content.implicitHeight
+        contentWidth: content.implicitWidth
+        contentHeight: height
+        flickableDirection: Flickable.HorizontalFlick
+        boundsBehavior: Flickable.StopAtBounds
+        clip: true
 
-        Label {
-            id: title
-            color: finder.textColor
-            height: applicationWindow.ui.controlHeight
-            verticalAlignment: Text.AlignVCenter
-            text: qsTr("Delay Finder")
-            font.bold: true
-            font.family: applicationWindow.ui.fontFamily
-            font.pixelSize: applicationWindow.ui.controlFontSize
-            HoverHandler { id: titleHover }
-            ToolTip.visible: titleHover.hovered
-            ToolTip.text: (finder.measurement ? finder.measurement.name + "\n" : "")
-                          + qsTr("Total reference-delay target. Distance assumes 20 °C.\nMove the chart cursor to show wavelengths at that frequency.")
-        }
+        Row {
+            id: content
+            spacing: 8
 
-        Label {
-            id: time
-            objectName: "delayTime"
-            color: finder.textColor
-            height: applicationWindow.ui.controlHeight
-            verticalAlignment: Text.AlignVCenter
-            font.family: applicationWindow.ui.fontFamily
-            font.pixelSize: applicationWindow.ui.controlFontSize
-            width: (finder.state === "held" || finder.state === "applied") ?
-                   Math.max(76, contentWidth) : contentWidth
-            text: (finder.state === "held" || finder.state === "applied") ?
-                  (finder.delayMs.toFixed(2) + " ms") : finder.status
-        }
-
-        Label {
-            id: appliedBadge
-            objectName: "appliedBadge"
-            visible: finder.state === "applied"
-            color: applicationWindow.ui.secondaryText
-            height: applicationWindow.ui.controlHeight
-            verticalAlignment: Text.AlignVCenter
-            font.family: applicationWindow.ui.fontFamily
-            font.pixelSize: applicationWindow.ui.secondaryFontSize
-            text: qsTr("Applied")
-        }
-
-        StudioButton {
-            id: findButton
-            objectName: "findDelay"
-            height: applicationWindow.ui.controlHeight
-            font.capitalization: Font.MixedCase
-            implicitWidth: Math.max(96, contentItem.implicitWidth + leftPadding + rightPadding)
-            text: finder.state === "capturing" ? qsTr("Cancel") :
-                  (finder.hasHeldResult || finder.state === "unstable" || finder.state === "applied") ?
-                  qsTr("Find again") : qsTr("Find Delay")
-            enabled: finder.state === "capturing" ? true : finder.live
-            onClicked: {
-                if (finder.state === "capturing") {
-                    finder.cancelCapture();
-                } else {
-                    finder.startCapture();
-                }
+            Label {
+                id: title
+                color: finder.textColor
+                height: applicationWindow.ui.controlHeight
+                verticalAlignment: Text.AlignVCenter
+                text: qsTr("Delay Finder")
+                font.bold: true
+                font.family: applicationWindow.ui.fontFamily
+                font.pixelSize: applicationWindow.ui.controlFontSize
+                HoverHandler { id: titleHover }
+                ToolTip.visible: titleHover.hovered
+                ToolTip.text: (finder.measurement ? finder.measurement.name + "\n" : "")
+                              + qsTr("Total reference-delay target. Distance assumes 20 °C.\nMove the chart cursor to show wavelengths at that frequency.")
             }
-            ToolTip.visible: hovered || activeFocus
-            ToolTip.text: finder.state === "capturing" ? qsTr("Cancel delay capture") :
-                          finder.hasHeldResult ? qsTr("Capture delay estimate again") :
-                          qsTr("Capture delay estimate over 2 seconds")
-        }
 
-        StudioButton {
-            id: apply
-            objectName: "applyReferenceDelay"
-            height: applicationWindow.ui.controlHeight
-            font.capitalization: Font.MixedCase
-            implicitWidth: Math.max(64, contentItem.implicitWidth + leftPadding + rightPadding)
-            text: qsTr("Apply")
-            Accessible.name: qsTr("Apply to Reference Delay")
-            enabled: finder.state === "held" && finder.live && finder.hasHeldResult
-            onClicked: finder.applyDelay()
-            ToolTip.visible: hovered || activeFocus
-            ToolTip.text: qsTr("Apply to Reference Delay")
-        }
-
-        StudioButton {
-            id: detailsButton
-            objectName: "delayDetails"
-            height: applicationWindow.ui.controlHeight
-            font.capitalization: Font.MixedCase
-            implicitWidth: Math.max(68, contentItem.implicitWidth + leftPadding + rightPadding)
-            text: qsTr("Details")
-            enabled: finder.hasHeldResult
-            onClicked: {
-                if (detailsPopup.opened) {
-                    detailsPopup.close();
-                } else {
-                    detailsPopup.open();
-                }
+            Label {
+                id: time
+                objectName: "delayTime"
+                color: finder.textColor
+                height: applicationWindow.ui.controlHeight
+                verticalAlignment: Text.AlignVCenter
+                font.family: applicationWindow.ui.fontFamily
+                font.pixelSize: applicationWindow.ui.controlFontSize
+                width: (finder.state === "held" || finder.state === "applied") ?
+                       Math.max(76, contentWidth) : contentWidth
+                text: (finder.state === "held" || finder.state === "applied") ?
+                      (finder.delayMs.toFixed(2) + " ms") : finder.status
             }
-            ToolTip.visible: hovered || activeFocus
-            ToolTip.text: qsTr("Show delay details, distance, and wavelength")
+
+            Label {
+                id: appliedBadge
+                objectName: "appliedBadge"
+                visible: finder.state === "applied"
+                color: applicationWindow.ui.secondaryText
+                height: applicationWindow.ui.controlHeight
+                verticalAlignment: Text.AlignVCenter
+                font.family: applicationWindow.ui.fontFamily
+                font.pixelSize: applicationWindow.ui.secondaryFontSize
+                text: qsTr("Applied")
+            }
+
+            StudioButton {
+                id: findButton
+                objectName: "findDelay"
+                height: applicationWindow.ui.controlHeight
+                font.capitalization: Font.MixedCase
+                implicitWidth: Math.max(96, contentItem.implicitWidth + leftPadding + rightPadding)
+                text: finder.state === "capturing" ? qsTr("Cancel") :
+                      (finder.hasHeldResult || finder.state === "unstable" || finder.state === "applied") ?
+                      qsTr("Find again") : qsTr("Find Delay")
+                enabled: finder.state === "capturing" ? true : finder.live
+                onClicked: {
+                    if (finder.state === "capturing") {
+                        finder.cancelCapture();
+                    } else {
+                        finder.startCapture();
+                    }
+                }
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: finder.state === "capturing" ? qsTr("Cancel delay capture") :
+                              finder.hasHeldResult ? qsTr("Capture delay estimate again") :
+                              qsTr("Capture delay estimate over 2 seconds")
+            }
+
+            StudioButton {
+                id: apply
+                objectName: "applyReferenceDelay"
+                height: applicationWindow.ui.controlHeight
+                font.capitalization: Font.MixedCase
+                implicitWidth: Math.max(64, contentItem.implicitWidth + leftPadding + rightPadding)
+                text: qsTr("Apply")
+                Accessible.name: qsTr("Apply to Reference Delay")
+                enabled: finder.state === "held" && finder.live && finder.hasHeldResult
+                onClicked: finder.applyDelay()
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Apply to Reference Delay")
+            }
+
+            StudioButton {
+                id: detailsButton
+                objectName: "delayDetails"
+                height: applicationWindow.ui.controlHeight
+                font.capitalization: Font.MixedCase
+                implicitWidth: Math.max(68, contentItem.implicitWidth + leftPadding + rightPadding)
+                text: qsTr("Details")
+                enabled: finder.hasHeldResult
+                onClicked: {
+                    if (detailsPopup.opened) {
+                        detailsPopup.close();
+                    } else {
+                        detailsPopup.open();
+                    }
+                }
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Show delay details, distance, and wavelength")
+            }
         }
+
     }
 
     Popup {

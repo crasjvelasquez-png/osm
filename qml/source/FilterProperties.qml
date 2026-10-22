@@ -28,7 +28,7 @@ import "qrc:/elements"
 Item {
     property var dataObject
     property var dataObjectData : dataObject.data
-    readonly property int elementWidth: Math.min(200, width / 6)
+    readonly property int elementWidth: 170
 
     ColumnLayout {
         spacing: 0
@@ -38,12 +38,13 @@ Item {
             Layout.fillWidth: true
 
             DropDown {
+                title: qsTr("Transfrom mode")
                 id: modeSelect
                 model: dataObjectData.modes
                 currentIndex: dataObjectData.mode
                 displayText: (dataObjectData.mode === Measurement.LFT ? "LTW" : (modeSelect.width > 120 ? "Power:" : "") + currentText)
                 enabled: !dataObjectData.limited
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Transfrom mode")
                 onCurrentIndexChanged: dataObjectData.mode = currentIndex;
                 Layout.preferredWidth: elementWidth
@@ -51,12 +52,13 @@ Item {
             }
 
             DropDown {
+                title: qsTr("Sample rate")
                 model: [44100, 48000, 96000, 192000]
                 currentIndex: model.indexOf(dataObjectData.sampleRate)
                 onCurrentValueChanged: dataObjectData.sampleRate = currentValue;
                 enabled: !dataObjectData.limited
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Sample rate")
                 Layout.preferredWidth: elementWidth
             }
@@ -69,7 +71,7 @@ Item {
                 visible: dataObjectData.limited
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("active")
             }
 
@@ -81,7 +83,7 @@ Item {
                 visible: !dataObjectData.limited
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("inverse polarity")
             }
 
@@ -111,7 +113,7 @@ Item {
                 Component.onCompleted: {
                     color = dataObjectData.color
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("series color")
             }
 
@@ -133,10 +135,11 @@ Item {
             Layout.fillWidth: true
 
             DropDown {
+                title: qsTr("Filter type")
                 id: typeSelect
                 model: dataObjectData.types
                 currentIndex: dataObjectData.type
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("Filter type")
                 onCurrentIndexChanged: {
                     dataObjectData.type = currentIndex;
@@ -146,12 +149,13 @@ Item {
             }
 
             DropDown {
+                title: qsTr("order")
                 id: selectOrder
                 model: dataObjectData.orders
                 currentIndex: model.indexOf(dataObjectData.order)
                 onCurrentValueChanged: dataObjectData.order = currentValue;
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("order")
                 Layout.preferredWidth: elementWidth
 
@@ -227,7 +231,7 @@ Item {
 
             Button {
                 text: qsTr("Store");
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("store current measurement")
                 implicitWidth: 75
                 visible: !dataObjectData.limited

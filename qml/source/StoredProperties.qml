@@ -93,7 +93,7 @@ Item {
 
                     Material.background: parent.Material.background
 
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("inverse magnitude data")
                 }
 
@@ -105,7 +105,7 @@ Item {
 
                     Material.background: parent.Material.background
 
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("inverse polarity")
                 }
 
@@ -117,11 +117,12 @@ Item {
 
                     Material.background: parent.Material.background
 
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("ignore coherence")
                 }
 
                 DropDown {
+                    title: qsTr("export data")
                     displayText: qsTr("Save data as");
 
                     implicitWidth: 170
@@ -132,7 +133,7 @@ Item {
                         fileDialog.open();
                     }
 
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("export data")
 
                     enabled: dataObjectData.objectName === "Stored"

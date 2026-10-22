@@ -114,11 +114,44 @@ ListView {
         list: sources
     }
     clip: true
+    Item {
+        id: emptySources
+        anchors.fill: sideList
+        z: 1
+        visible: sideList.count === 0
+
+        Column {
+            anchors.centerIn: parent
+            width: Math.max(implicitWidth, parent.width - 24)
+            spacing: 8
+            Label {
+                width: parent.width
+                text: qsTr("No sources yet")
+                color: applicationWindow.ui.secondaryText
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+            }
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Add Measurement")
+                onClicked: sourceList.addMeasurement()
+            }
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Open Project")
+                onClicked: openDialog.open()
+            }
+        }
+    }
     delegate: Component {
         id: delegateComponent
 
         MouseArea {
             id: dragArea
+            activeFocusOnTab: true
+            Accessible.role: Accessible.ListItem
+            Accessible.name: source && source.data ? source.data.name : qsTr("Source")
+            Accessible.description: qsTr("Press Enter or Space to open source properties. Use the source list to select items.")
             property bool held: false
             property int swipeStart: 0
             property var source: model.source
@@ -132,6 +165,15 @@ ListView {
 
             height: content.height
             clip: true
+
+            Keys.onReturnPressed: openFocusedSource()
+            Keys.onEnterPressed: openFocusedSource()
+            Keys.onSpacePressed: openFocusedSource()
+
+            function openFocusedSource() {
+                if (loaded.status == Loader.Ready && loaded.item.dataModel && loaded.item.propertiesQml)
+                    applicationWindow.properiesbar.open(loaded.item.dataModel, loaded.item.propertiesQml);
+            }
 
             drag.target:    dragArea.held ? content : undefined
             drag.axis:      Drag.YAxis
@@ -159,7 +201,9 @@ ListView {
                     if (applicationWindow && applicationWindow.properiesbar.currentObject === dragArea.source) {
                         applicationWindow.properiesbar.reset();
                     }
+                    var removedName = dragArea.source.name;
                     sources.removeItem(dragArea.source.data.uuid);
+                    applicationWindow.showUndoableRemoval(sources, qsTr("%1 removed").arg(removedName));
                 } else if ((swipeStart - mouseX) / content.width <= -0.5) {
                     content.opacity = 0;
                     content.height = 0;
@@ -210,6 +254,14 @@ ListView {
                 Drag.hotSpot.x: width / 2
                 Drag.hotSpot.y: height / 2
 
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.width: dragArea.activeFocus ? 2 : 0
+                    border.color: applicationWindow.ui.primary
+                    z: 10
+                }
+
                 Loader {
                     id: loaded
                     property var modelData: dragArea.source
@@ -258,6 +310,10 @@ ListView {
                     rightPadding: 4
                     leftPadding: 4
                     visible: (dragArea.source && dragArea.source.data ? dragArea.source.data.cloneable : false)
+                    Accessible.name: qsTr("Clone %1").arg(dragArea.source && dragArea.source.data ? dragArea.source.data.name : qsTr("source"))
+                    Accessible.role: Accessible.Button
+                    ToolTip.visible: hovered || activeFocus
+                    ToolTip.text: qsTr("Clone source")
                     onClicked: {
                         sources.cloneItem(dragArea.source);
                     }
@@ -286,6 +342,10 @@ ListView {
                     height: 28
                     rightPadding: 4
                     leftPadding: 4
+                    Accessible.name: qsTr("Delete %1").arg(dragArea.source && dragArea.source.data ? dragArea.source.data.name : qsTr("source"))
+                    Accessible.role: Accessible.Button
+                    ToolTip.visible: hovered || activeFocus
+                    ToolTip.text: qsTr("Delete source")
                     onClicked: {
                         applicationWindow.dialog.accepted.connect(deleteModel);
                         applicationWindow.dialog.rejected.connect(freeDialog);
@@ -297,7 +357,9 @@ ListView {
                         if (applicationWindow.properiesbar.currentObject === dragArea.source) {
                             applicationWindow.properiesbar.reset();
                         }
+                        var removedName = dragArea.source.name;
                         sources.removeItem(dragArea.source.data.uuid);
+                        applicationWindow.showUndoableRemoval(sources, qsTr("%1 removed").arg(removedName));
                         freeDialog();
                     }
                     function freeDialog() {
@@ -307,19 +369,6 @@ ListView {
                     }
                 }
 
-                ToolTip {
-                    text: "delete source"
-                    visible: deleteButton.hovered
-                    y: bottomPadding - deleteButton.height
-                    x: content.width - rightPadding - availableWidth - leftMargin - rightMargin
-                }
-
-                ToolTip {
-                    text: "clone source"
-                    visible: cloneButton.hovered
-                    y: bottomPadding - cloneButton.height
-                    x: content.width - rightPadding - availableWidth - leftMargin - rightMargin
-                }
             }
 
             DropArea {
@@ -369,7 +418,8 @@ ListView {
     }
 
     Shortcut {
-        sequence: "Ctrl+5"
+        sequence: applicationWindow.shortcutRegistry.sequence("charts.showHidden")
+        enabled: !applicationWindow.textEntryFocused
         onActivated: {
             sourceModel.layoutChanged();
         }

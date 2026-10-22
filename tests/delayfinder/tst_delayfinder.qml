@@ -216,10 +216,18 @@ TestCase {
     function test_cursorAndNarrowLayout() {
         pill.cursorFrequency = 0;
         verify(!pill.hasFrequency);
+        wait(30);
+        var rowHeight = pill.height;
         pill.width = 280;
         wait(30);
-        verify(pill.height > 30);
+        compare(pill.height, rowHeight);
         var findBtn = findChild(pill, "findDelay");
-        verify(findBtn.x + findBtn.width <= pill.width);
+        var applyBtn = findChild(pill, "applyReferenceDelay");
+        var detailsBtn = findChild(pill, "delayDetails");
+        compare(findBtn.y, applyBtn.y);
+        compare(findBtn.y, detailsBtn.y);
+        verify(applyBtn.x >= findBtn.x + findBtn.width);
+        verify(detailsBtn.x >= applyBtn.x + applyBtn.width);
+        verify(pill.implicitWidth > pill.width);
     }
 }

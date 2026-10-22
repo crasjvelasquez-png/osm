@@ -260,7 +260,7 @@ Item {
                     from: 1; to: 100; editable: true
                     value: workspace.measurement ? workspace.measurement.average : 1
                     onValueModified: workspace.measurement.average = value
-                    ToolTip.visible: hovered
+                    ToolTip.visible: hovered || activeFocus
                     ToolTip.text: qsTr("Number of frames in the rolling average")
                 }
             }

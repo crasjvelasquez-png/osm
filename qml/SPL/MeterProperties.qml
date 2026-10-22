@@ -63,7 +63,7 @@ Item {
 
                 onCurrentValueChanged: dataObject.meter.type = currentValue
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("type")
             }
 
@@ -82,7 +82,7 @@ Item {
                          dataObject.meter.type !== "Gain"  &&
                          dataObject.meter.type !== "Delay"
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("scale")
             }
 
@@ -97,7 +97,7 @@ Item {
                          dataObject.meter.type !== "Gain" &&
                          dataObject.meter.type !== "Delay"
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("weighting")
             }
 
@@ -113,7 +113,7 @@ Item {
                          dataObject.meter.type !== "Gain" &&
                          dataObject.meter.type !== "Delay"
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("integration time")
             }
 
@@ -150,7 +150,7 @@ Item {
                 onCurrentIndexChanged: {
                     dataObject.grid.model.rows = currentIndex + 1;
                 }
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("meter rows")
             }
 
@@ -162,7 +162,7 @@ Item {
                     dataObject.grid.model.columns = currentIndex + 1;
                 }
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("meter columns")
             }
 
@@ -173,7 +173,7 @@ Item {
                 onCheckedChanged: dataObject.meter.peakHold = checked
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("hold on peak")
                 enabled: dataObject.meter.type !== "Time"  &&
                          dataObject.meter.type !== "THD+N" &&
@@ -185,7 +185,7 @@ Item {
                 onClicked: dataObject.meter.reset()
                 Material.background: parent.Material.background
 
-                ToolTip.visible: hovered
+                ToolTip.visible: hovered || activeFocus
                 ToolTip.text: qsTr("reset peak")
                 enabled: dataObject.meter.type !== "Time"  &&
                          dataObject.meter.type !== "THD+N" &&

@@ -123,13 +123,15 @@ Item {
         font.pixelSize: 12
         rightPadding: 31
         leftPadding: 4
+        Accessible.name: qsTr("Refresh %1").arg(dataModelData ? dataModelData.name : qsTr("remote source"))
+        Accessible.role: Accessible.Button
 
         background: Rectangle {
             color: "transparent"
         }
 
-        ToolTip.visible: hovered
-        ToolTip.text: qsTr("refresh data")
+        ToolTip.visible: hovered || activeFocus
+        ToolTip.text: qsTr("Refresh data")
 
         onClicked: dataModelData.refresh();
     }

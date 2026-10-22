@@ -68,10 +68,6 @@ Item {
         update(first); update(second.visible ? second : null); update(third.visible ? third : null);
     }
     function isStored(source) { return source && source.objectName === "Stored"; }
-    function textEntryFocused() {
-        var item = applicationWindow.activeFocusItem;
-        return item && (item instanceof TextInput || item instanceof TextEdit);
-    }
     function toggleCaptureSelection(uuid, modifiers) {
         var values = selectedCaptures.slice(0);
         var index = values.indexOf(uuid);
@@ -182,7 +178,7 @@ Item {
                         currentIndex: model.indexOf(first.type === "Spectrum" ? "Spectrum" : first.type === "Phase" ? "Phase" : "Magnitude")
                         Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Capture magnitude, spectrum, or phase data")
                     }
-                    Controls.Button { text: qsTr("Capture"); highlighted: true; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Capture the selected live trace (⌘/Ctrl+Shift+C)"); onClicked: chartsLayout.capture() }
+                    Controls.Button { text: qsTr("Capture"); highlighted: true; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Capture the selected live trace (%1)").arg(applicationWindow.shortcutRegistry.display("charts.capture")); onClicked: chartsLayout.capture() }
                     Controls.Button { text: qsTr("Average selected"); enabled: chartsLayout.selectedCaptures.length > 1; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Create a new linear-amplitude and complex-phase average"); onClicked: chartsLayout.averageSelection() }
                 }
                 Controls.Label { Layout.fillWidth: true; text: qsTr("Saved traces"); font.bold: true }
@@ -231,7 +227,7 @@ Item {
                 Controls.MenuItem { text: qsTr("Rename in field below") }
                 Controls.MenuItem { text: qsTr("Delete…"); onTriggered: deleteDialog.open() }
             }
-            ModalDialog { id: deleteDialog; title: qsTr("Delete saved trace?"); detail: qsTr("This removes the trace from the current session."); onOpened: acceptText = qsTr("Delete"); onAccepted: { sourceList.removeItem(chartsLayout.selectedCapture); chartsLayout.selectedCaptures = []; chartsLayout.selectedCapture = ""; chartsLayout.applySelectedTraces(); } }
+            ModalDialog { id: deleteDialog; title: qsTr("Delete saved trace?"); detail: qsTr("This removes the trace from the current session."); onOpened: acceptText = qsTr("Delete"); onAccepted: { var removed = sourceList.getByUUid(chartsLayout.selectedCapture); if (removed) { sourceList.removeItem(chartsLayout.selectedCapture); chartsLayout.selectedCaptures = []; chartsLayout.selectedCapture = ""; chartsLayout.applySelectedTraces(); applicationWindow.showUndoableRemoval(sourceList, qsTr("%1 removed").arg(removed.name), function() { chartsLayout.selectedCapture = removed.uuid.toString(); chartsLayout.selectedCaptures = [removed.uuid]; chartsLayout.applySelectedTraces(); }); } } }
         }
         SplitView {
             id: sv
@@ -278,7 +274,40 @@ Item {
         }
     }
 
-    Shortcut { sequences: ["Ctrl+Shift+C", "Meta+Shift+C"]; context: Qt.ApplicationShortcut; enabled: !chartsLayout.rtaWorkspace && !chartsLayout.textEntryFocused(); onActivated: chartsLayout.capture() }
+    Rectangle {
+        id: emptyWorkspace
+        anchors.fill: chartArea
+        z: 2
+        visible: chartArea.visible && sourceList.count === 0
+        color: applicationWindow.ui.panel
+        opacity: 0.96
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 32, 320)
+            spacing: 10
+            Controls.Label {
+                Layout.fillWidth: true
+                text: qsTr("No measurements in this workspace.")
+                color: applicationWindow.ui.secondaryText
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+            }
+            Controls.Button {
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("Add Measurement")
+                highlighted: true
+                onClicked: sourceList.addMeasurement()
+            }
+            Controls.Button {
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("Open Project")
+                onClicked: openDialog.open()
+            }
+        }
+    }
+
+    Shortcut { sequence: applicationWindow.shortcutRegistry.sequence("charts.capture"); context: Qt.ApplicationShortcut; enabled: !chartsLayout.rtaWorkspace && !applicationWindow.textEntryFocused; onActivated: chartsLayout.capture() }
     Loader {
         id: rtaLoader
         anchors.top: alignmentToolbar.bottom

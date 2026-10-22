@@ -21,22 +21,35 @@ import QtQuick.Controls 2.15
 
 ComboBox {
     id: control
+    property string title: ""
+    displayText: title ? title + ": " + textForIndex(currentIndex) : textForIndex(currentIndex)
+    property var displayLabels: null
+    function textForIndex(index) {
+        return displayLabels && index >= 0 && index < displayLabels.length ? displayLabels[index] : textAt(index);
+    }
     implicitWidth: Math.max(110, valueMetrics.width + leftPadding + rightPadding)
     implicitHeight: 36
     leftPadding: 12
     rightPadding: 36
     font.family: applicationWindow.ui.fontFamily
     font.pixelSize: applicationWindow.ui.controlFontSize
+    Accessible.role: Accessible.ComboBox
     TextMetrics {
         id: valueMetrics
         font: control.font
         text: control.displayText
     }
+    delegate: ItemDelegate {
+        required property int index
+        width: control.width
+        text: control.textForIndex(index)
+        highlighted: control.highlightedIndex === index
+    }
     background: Rectangle {
         radius: applicationWindow.ui.controlRadius
         color: control.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control
         border.width: control.activeFocus ? 2 : 1
-        border.color: control.activeFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
+        border.color: control.activeFocus ? applicationWindow.ui.primary : applicationWindow.ui.separator
     }
 
     Connections {

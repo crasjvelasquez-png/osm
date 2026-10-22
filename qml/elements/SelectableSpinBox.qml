@@ -27,10 +27,11 @@ SpinBox {
     leftPadding: down.indicator.width
     rightPadding: up.indicator.width
     bottomPadding: 0
+    property string title: ""
     // Our outlined controls need a symmetric content area, unlike Material's underline style.
     topPadding: bottomPadding
     contentItem: TextInput {
-        text: control.displayText
+        text: (control.title && !control.activeFocus ? control.title + ": " : "") + control.displayText
         font: control.font
         color: control.uiTextColor
         selectionColor: applicationWindow.accentColor
@@ -46,7 +47,7 @@ SpinBox {
         radius: applicationWindow.ui.controlRadius
         color: control.hovered ? applicationWindow.ui.hover : applicationWindow.ui.control
         border.width: control.activeFocus ? 2 : 1
-        border.color: control.activeFocus ? applicationWindow.ui.focus : applicationWindow.ui.separator
+        border.color: control.activeFocus ? applicationWindow.ui.primary : applicationWindow.ui.separator
     }
     down.indicator: Rectangle {
         x: 0; y: 1; width: 28; height: control.height - 2

@@ -44,6 +44,7 @@ class SourceList : public QObject
     Q_PROPERTY(QColor highlightColor READ highlightColor NOTIFY selectedChanged)
     Q_PROPERTY(bool isRoot READ isRoot CONSTANT)
     Q_PROPERTY(bool loadingProject READ loadingProject NOTIFY loadingProjectChanged)
+    Q_PROPERTY(bool canUndoRemove READ canUndoRemove NOTIFY canUndoRemoveChanged)
     using iterator = QVector<Shared::Source>::iterator;
     using const_iterator = QVector<Shared::Source>::const_iterator;
 
@@ -101,6 +102,7 @@ public:
         return !!parent();
     }
     bool loadingProject() const noexcept { return m_loadingProject; }
+    bool canUndoRemove() const noexcept { return static_cast<bool>(m_removedItem.item); }
 
     enum {
         TRANSFER_TXT    = 0,
@@ -133,6 +135,7 @@ public slots:
     Q_INVOKABLE void takeItem(Shared::Source item);
     void removeItem(const Shared::Source &item, bool deleteItem = true);
     Q_INVOKABLE void removeItem(const QUuid &uuid, bool deleteItem = true);
+    Q_INVOKABLE bool undoRemove();
     Q_INVOKABLE void cloneItem(const Shared::Source &item);
     Q_INVOKABLE void storeItem(const Shared::Source &item);
     Q_INVOKABLE Shared::Source averageStored(const QList<QUuid> &ids, const QString &name, QString *error = nullptr);
@@ -144,6 +147,9 @@ public slots:
 signals:
     void preItemAppended();
     void postItemAppended(const Shared::Source &);
+
+    void preItemInserted(int index);
+    void postItemInserted(const Shared::Source &);
 
     void preItemRemoved(QUuid index);
     void postItemRemoved();
@@ -158,6 +164,7 @@ signals:
 
     void countChanged();
     void loadingProjectChanged();
+    void canUndoRemoveChanged();
 
 private:
     bool loadList(const QJsonDocument &document, const QUrl &fileName) noexcept;
@@ -167,6 +174,14 @@ private:
     void appendItemsFrom(const SourceList *list, QUuid filter, bool unrollGroups);
 
     QVector<Shared::Source> m_items; //TODO: unordered_map<uuid, shared_ptr>
+    struct RemovedItem {
+        Shared::Source item;
+        int index = -1;
+        bool active = false;
+        bool checked = false;
+        bool selected = false;
+    };
+    RemovedItem m_removedItem;
     QList<QUuid> m_checked{};
     QUrl m_currentFile;
     const QList<QColor> m_colors {

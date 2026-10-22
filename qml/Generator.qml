@@ -44,6 +44,8 @@ Item {
 
                 enabled: remoteControlled || currentGenerator.type !== 9 || (!generatorModel.audioFileLoading && generatorModel.audioFile.ready)
                 checked: currentGenerator.enabled
+                ToolTip.visible: hovered || activeFocus
+                ToolTip.text: qsTr("Toggle generator (%1)").arg(applicationWindow.shortcutRegistry.display("generator.toggle"))
                 onCheckedChanged: currentGenerator.enabled = checked
             }
 
@@ -100,7 +102,8 @@ Item {
             }
 
             Shortcut {
-                sequence: "Ctrl+G"
+                sequence: applicationWindow.shortcutRegistry.sequence("generator.toggle")
+                enabled: !applicationWindow.textEntryFocused
                 onActivated: currentGenerator.enabled = !currentGenerator.enabled;
             }
         }
