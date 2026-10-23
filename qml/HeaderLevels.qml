@@ -126,13 +126,6 @@ Rectangle {
                 color: applicationWindow.ui.text
                 font.pixelSize: 13; font.weight: Font.DemiBold
             }
-            Label {
-                Layout.fillWidth: true
-                text: header.state
-                elide: Text.ElideRight
-                color: header.clipping ? header.clipColor : header.lowHeadroom ? header.warningColor : applicationWindow.ui.secondaryText
-                font.pixelSize: applicationWindow.ui.secondaryFontSize
-            }
         }
         DanteStatus {
             id: danteStatus

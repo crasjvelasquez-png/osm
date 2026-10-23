@@ -18,6 +18,7 @@
 import QtQuick 2.12
 import QtQuick.Layouts 1.3
 import QtQuick.Controls 2.15 as Controls
+import QtQuick.Templates 2.15 as T
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2 as Dialogs
 import Stored 1.0
@@ -149,7 +150,7 @@ Item {
             cursorFrequency: chartsLayout.delayCursorFrequency
         }
     }
-    SplitView {
+    Controls.SplitView {
         id: chartArea
         anchors.top: alignmentToolbar.bottom
         anchors.topMargin: applicationWindow.ui.spacing
@@ -158,32 +159,61 @@ Item {
         anchors.bottom: parent.bottom
         orientation: Qt.Horizontal
         visible: !chartsLayout.rtaWorkspace
+        handle: Rectangle {
+            implicitWidth: 8
+            color: T.SplitHandle.pressed ? applicationWindow.ui.hover : applicationWindow.ui.panel
+            Rectangle {
+                anchors.centerIn: parent
+                width: 2; height: 40; radius: 1
+                color: T.SplitHandle.hovered || T.SplitHandle.pressed ? applicationWindow.accentColor : applicationWindow.ui.separator
+            }
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                cursorShape: Qt.SizeHorCursor
+            }
+        }
         Item {
             id: captureSidebar
             visible: chartsLayout.sidebarOpen
             onWidthChanged: applicationSettings.setValue("layout/chartCapture/sidebarWidth", width)
-            Layout.preferredWidth: applicationSettings.value("layout/chartCapture/sidebarWidth", 276)
-            Layout.minimumWidth: 230
-            Layout.maximumWidth: 420
-            Layout.fillHeight: true
+            clip: true
+            Controls.SplitView.preferredWidth: applicationSettings.value("layout/chartCapture/sidebarWidth", 276)
+            Controls.SplitView.minimumWidth: 230
+            Controls.SplitView.maximumWidth: Math.max(230, chartArea.width - 300 - 8)
             ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 10
-                spacing: 8
-                RowLayout {
-                    Layout.fillWidth: true
-                    Controls.ComboBox {
-                        id: captureTypeSelection
-                        model: ["Magnitude", "Spectrum", "Phase"]
-                        currentIndex: model.indexOf(first.type === "Spectrum" ? "Spectrum" : first.type === "Phase" ? "Phase" : "Magnitude")
-                        Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Capture magnitude, spectrum, or phase data")
+                anchors.margins: applicationWindow.ui.spacing * 1.5
+                spacing: applicationWindow.ui.spacing
+                DropDown {
+                    id: captureTypeSelection
+                    topInset: 0
+                    bottomInset: 0
+                    contentItem: Text {
+                        text: captureTypeSelection.currentText
+                        font: captureTypeSelection.font
+                        color: applicationWindow.ui.text
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
                     }
-                    Controls.Button { text: qsTr("Capture"); highlighted: true; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Capture the selected live trace (%1)").arg(applicationWindow.shortcutRegistry.display("charts.capture")); onClicked: chartsLayout.capture() }
-                    Controls.Button { text: qsTr("Average selected"); enabled: chartsLayout.selectedCaptures.length > 1; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Create a new linear-amplitude and complex-phase average"); onClicked: chartsLayout.averageSelection() }
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: applicationWindow.ui.controlHeight
+                    Layout.preferredHeight: applicationWindow.ui.controlHeight
+                    model: ["Magnitude", "Spectrum", "Phase"]
+                    currentIndex: model.indexOf(first.type === "Spectrum" ? "Spectrum" : first.type === "Phase" ? "Phase" : "Magnitude")
+                    Controls.ToolTip.visible: hovered
+                    Controls.ToolTip.text: qsTr("Capture magnitude, spectrum, or phase data")
                 }
-                Controls.Label { Layout.fillWidth: true; text: qsTr("Saved traces"); font.bold: true }
+                Flow {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: implicitHeight
+                    spacing: applicationWindow.ui.spacing
+                    StudioButton { text: qsTr("Capture"); highlighted: true; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Capture the selected live trace (%1)").arg(applicationWindow.shortcutRegistry.display("charts.capture")); onClicked: chartsLayout.capture() }
+                    StudioButton { text: qsTr("Average selected"); enabled: chartsLayout.selectedCaptures.length > 1; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Create a new linear-amplitude and complex-phase average"); onClicked: chartsLayout.averageSelection() }
+                }
+                Controls.Label { Layout.fillWidth: true; Layout.topMargin: applicationWindow.ui.spacing; text: qsTr("Saved traces"); font.bold: true }
                 Controls.Label { Layout.fillWidth: true; visible: captureError.length > 0; text: captureError; color: "#D94F4F"; wrapMode: Text.Wrap }
-                Controls.Label { Layout.fillWidth: true; visible: !hasStored; text: qsTr("No captures yet. Select a live measurement and press Capture."); color: applicationWindow.ui.secondaryText; wrapMode: Text.Wrap }
+                Controls.Label { Layout.fillWidth: true; visible: !captureList.hasStored; text: qsTr("No captures yet. Select a live measurement and press Capture."); color: applicationWindow.ui.secondaryText; wrapMode: Text.Wrap }
                 ListView {
                     id: captureList
                     Layout.fillWidth: true; Layout.fillHeight: true
@@ -205,7 +235,7 @@ Item {
                         Rectangle { x: 8; y: 12; width: 12; height: 12; radius: 6; color: itemSource.color }
                         Controls.CheckBox { x: 24; y: 1; checked: itemSource.active; text: itemSource.name; width: parent.width - 30; onClicked: itemSource.active = checked; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Show or hide this trace") }
                         Controls.Label { x: 34; y: 35; text: (itemSource.captureType || "Magnitude") + (itemSource.contributors ? qsTr(" · average of %1").arg(itemSource.contributors.split("\n").length) : ""); color: applicationWindow.ui.secondaryText; font.pixelSize: 11 }
-                        Controls.Button { x: parent.width - 42; y: 32; width: 36; height: 30; text: "⋯"; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Rename, recolor, or delete"); onClicked: { chartsLayout.selectedCapture = itemSource.uuid.toString(); chartsLayout.selectedCaptures = [itemSource.uuid]; actionMenu.open(); } }
+                        StudioButton { x: parent.width - 42; y: 32; width: 36; height: 30; text: "⋯"; Controls.ToolTip.visible: hovered; Controls.ToolTip.text: qsTr("Rename, recolor, or delete"); onClicked: { chartsLayout.selectedCapture = itemSource.uuid.toString(); chartsLayout.selectedCaptures = [itemSource.uuid]; actionMenu.open(); } }
                     }
                     property bool hasStored: {
                         for (var i = 0; i < sourceList.count; ++i) if (chartsLayout.isStored(sourceList.get(i))) return true;
@@ -213,14 +243,15 @@ Item {
                     }
                 }
                 Controls.TextField { id: renameField; Layout.fillWidth: true; placeholderText: qsTr("Selected trace name"); enabled: !!sourceList.getByUUid(chartsLayout.selectedCapture); text: enabled ? sourceList.getByUUid(chartsLayout.selectedCapture).name : ""; onEditingFinished: { var s = sourceList.getByUUid(chartsLayout.selectedCapture); if (s && text.trim().length) s.name = text.trim(); } }
-                RowLayout {
+                Flow {
                     Layout.fillWidth: true
+                    Layout.preferredHeight: childrenRect.height
+                    spacing: 8
                     Repeater {
                         model: ["#F44336", "#FFEB3B", "#9C27B0", "#2196F3", "#00BCD4", "#4CAF50", "#FF9800"]
                         delegate: Rectangle { required property string modelData; width: 20; height: 20; radius: 10; color: modelData; border.color: "#777"; MouseArea { anchors.fill: parent; onClicked: { var s = sourceList.getByUUid(chartsLayout.selectedCapture); if (s) s.color = parent.color; } } }
                     }
-                    Item { Layout.fillWidth: true }
-                    Controls.Button { text: qsTr("Delete"); enabled: !!sourceList.getByUUid(chartsLayout.selectedCapture); onClicked: deleteDialog.open() }
+                    StudioButton { text: qsTr("Delete"); enabled: !!sourceList.getByUUid(chartsLayout.selectedCapture); onClicked: deleteDialog.open() }
                 }
             }
             Controls.Menu { id: actionMenu
@@ -232,9 +263,8 @@ Item {
         SplitView {
             id: sv
             orientation: Qt.Vertical
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumWidth: 300
+            Controls.SplitView.fillWidth: true
+            Controls.SplitView.minimumWidth: 300
             readonly property int minimunHeight: 100
             Chart {
                 id: first

@@ -11,6 +11,10 @@ Current version: v1.4.1
 
 Qt5.15 C++17
 
+## Project layout
+
+See [docs/PROJECT-STRUCTURE.md](docs/PROJECT-STRUCTURE.md) for a map of the source, assets, documentation, and build entry points.
+
 
 ## SAST Tools
 

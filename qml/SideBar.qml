@@ -254,6 +254,8 @@ Item {
             Layout.bottomMargin: 8
 
             MouseArea {
+                // Retain About branding and its interaction for optional restoration.
+                visible: false
                 Layout.alignment: Qt.AlignCenter
                 Layout.preferredHeight: aboutButton.height + aboutButton.topPadding + aboutButton.bottomPadding
                 Layout.fillWidth: true
